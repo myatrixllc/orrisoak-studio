@@ -1,0 +1,12 @@
+# Private credentials — NEVER commit
+.env
+*.env
+config-private.js
+tokens.txt
+credentials.txt
+api-keys.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+node_modules/
