@@ -1,0 +1,45 @@
+# ============================================
+# ORRISOAK STUDIO — .gitignore
+# ============================================
+# Files listed here are NEVER uploaded to GitHub
+
+# ── PRIVATE CREDENTIALS ──
+.env
+*.env
+config-private.js
+tokens.txt
+credentials.txt
+api-keys.txt
+secrets.txt
+private.js
+config-local.js
+
+# ── CONTENT FILES (too large for GitHub) ──
+content/*/videos/*.mp4
+content/*/videos/*.mov
+content/*/videos/*.avi
+
+# ── OS GENERATED FILES ──
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ── EDITOR FILES ──
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ── NODE (if added later) ──
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ── TEMP FILES ──
+*.tmp
+*.temp
+*.log
