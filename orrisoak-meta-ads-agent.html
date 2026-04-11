@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak · Meta Ads Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C; --gold-light: #E8D5A3; --gold-dim: rgba(201,168,76,0.1);
+    --gold-border: rgba(201,168,76,0.2); --black: #070707; --s1: #0F0F0F;
+    --s2: #161616; --s3: #1E1E1E; --s4: #252525;
+    --cream: #F0E9DC; --muted: #786D61; --green: #4CAF7D;
+    --green-dim: rgba(76,175,125,0.1); --blue: #7B9FE8;
+    --blue-dim: rgba(123,159,232,0.1); --orange: #E0943A;
+    --orange-dim: rgba(224,148,58,0.1); --red: #D45A5A;
+    --meta: #1877F2;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--black); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-weight:300; min-height:100vh; display:flex; flex-direction:column; }
+
+  /* TOPBAR */
+  .topbar {
+    background:var(--s1); border-bottom:1px solid var(--gold-border);
+    padding:0 40px; display:flex; align-items:center; justify-content:space-between;
+    height:56px; position:sticky; top:0; z-index:100; flex-shrink:0;
+  }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar-logo { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold); letter-spacing:4px; }
+  .topbar-logo span { font-style:italic; }
+  .topbar-badge { font-size:7px; letter-spacing:4px; text-transform:uppercase; background:rgba(24,119,242,0.15); border:1px solid rgba(24,119,242,0.3); color:var(--blue); padding:4px 12px; }
+  .api-row { display:flex; align-items:center; gap:10px; }
+  .api-input { background:var(--s3); border:1px solid var(--gold-border); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-size:10px; letter-spacing:1px; padding:7px 14px; width:220px; }
+  .api-input::placeholder { color:var(--muted); }
+  .api-input:focus { outline:none; border-color:var(--gold); }
+  .api-status { font-size:8px; letter-spacing:3px; text-transform:uppercase; padding:5px 12px; border:1px solid; }
+  .api-status.ok { color:var(--green); border-color:rgba(76,175,125,0.3); background:var(--green-dim); }
+  .api-status.empty { color:var(--muted); border-color:var(--gold-border); }
+
+  /* LAYOUT */
+  .layout { display:flex; flex:1; overflow:hidden; }
+
+  /* SIDEBAR */
+  .sidebar { width:210px; flex-shrink:0; background:var(--s1); border-right:1px solid var(--gold-border); display:flex; flex-direction:column; padding:24px 0; overflow-y:auto; }
+  .nav-section { font-size:7px; letter-spacing:5px; text-transform:uppercase; color:var(--muted); padding:0 20px; margin-bottom:8px; margin-top:20px; }
+  .nav-section:first-child { margin-top:0; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:11px 20px; cursor:pointer; color:var(--muted); font-size:9px; letter-spacing:3px; text-transform:uppercase; transition:all 0.2s; border-left:2px solid transparent; background:none; border-right:none; border-top:none; border-bottom:none; width:100%; text-align:left; font-family:'Josefin Sans',sans-serif; }
+  .nav-item:hover { color:var(--gold-light); background:var(--gold-dim); }
+  .nav-item.active { color:var(--gold); border-left-color:var(--gold); background:var(--gold-dim); }
+  .nav-icon { font-size:14px; flex-shrink:0; }
+
+  /* MAIN */
+  .main { flex:1; overflow-y:auto; padding:40px 48px; }
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  /* PANEL HEADER */
+  .phead { margin-bottom:32px; }
+  .phead-eye { font-size:8px; letter-spacing:7px; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+  .phead h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(28px,3vw,44px); font-weight:300; line-height:1.05; }
+  .phead h2 em { font-style:italic; color:var(--gold); }
+  .phead p { font-size:11px; letter-spacing:1px; color:var(--muted); margin-top:10px; line-height:2; max-width:600px; }
+
+  /* FORM */
+  .form-row { margin-bottom:18px; }
+  .form-label { font-size:8px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; display:block; }
+  .form-input, .form-select, .form-textarea { width:100%; background:var(--s2); border:1px solid var(--gold-border); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-size:11px; letter-spacing:0.5px; padding:12px 16px; transition:border-color 0.2s; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline:none; border-color:var(--gold); }
+  .form-input::placeholder, .form-textarea::placeholder { color:var(--muted); }
+  .form-textarea { resize:vertical; min-height:80px; line-height:1.8; }
+  .form-select { appearance:none; cursor:pointer; }
+  .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+  /* BUTTONS */
+  .btn { font-family:'Josefin Sans',sans-serif; font-size:9px; letter-spacing:4px; text-transform:uppercase; padding:12px 28px; cursor:pointer; border:none; transition:all 0.2s; display:inline-flex; align-items:center; gap:8px; }
+  .btn-gold { background:var(--gold); color:var(--black); }
+  .btn-gold:hover { background:var(--gold-light); }
+  .btn-gold:disabled { background:var(--s4); color:var(--muted); cursor:not-allowed; }
+  .btn-outline { background:transparent; color:var(--gold); border:1px solid var(--gold); }
+  .btn-outline:hover { background:var(--gold-dim); }
+  .btn-blue { background:var(--meta); color:white; }
+  .btn-blue:hover { opacity:0.9; }
+  .btn-sm { padding:8px 18px; font-size:8px; }
+  .btn-green { background:var(--green); color:white; }
+
+  /* OUTPUT */
+  .output-box { background:var(--s2); border:1px solid var(--gold-border); margin-top:24px; }
+  .output-header { background:var(--s3); border-bottom:1px solid var(--gold-border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .output-label { font-size:8px; letter-spacing:5px; text-transform:uppercase; color:var(--gold); }
+  .output-actions { display:flex; gap:8px; flex-wrap:wrap; }
+  .output-content { padding:24px; font-size:12px; letter-spacing:0.5px; line-height:2.2; color:var(--cream); white-space:pre-wrap; min-height:100px; }
+
+  /* CAMPAIGN CARDS */
+  .campaign-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-bottom:32px; }
+  .campaign-card { background:var(--s1); border:1px solid var(--gold-border); padding:24px 20px; transition:all 0.3s; cursor:pointer; }
+  .campaign-card:hover { border-color:var(--gold); transform:translateY(-2px); }
+  .campaign-card.selected { border-color:var(--gold); background:var(--gold-dim); }
+  .camp-type { font-size:7px; letter-spacing:5px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+  .camp-name { font-family:'Cormorant Garamond',serif; font-size:20px; margin-bottom:8px; }
+  .camp-budget { font-size:10px; letter-spacing:2px; color:var(--muted); margin-bottom:12px; }
+  .camp-desc { font-size:10px; letter-spacing:0.5px; color:var(--muted); line-height:1.9; }
+  .camp-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+  .camp-tag { font-size:7px; letter-spacing:2px; text-transform:uppercase; padding:3px 10px; border:1px solid var(--gold-border); color:var(--gold-light); }
+
+  /* AUDIENCE CARDS */
+  .audience-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:3px; }
+  .audience-card { background:var(--s1); border:1px solid var(--gold-border); padding:20px; }
+  .aud-title { font-family:'Cormorant Garamond',serif; font-size:18px; color:var(--gold); margin-bottom:10px; }
+  .aud-row { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid rgba(201,168,76,0.08); font-size:10px; }
+  .aud-row:last-child { border-bottom:none; }
+  .aud-key { color:var(--muted); letter-spacing:1px; }
+  .aud-val { color:var(--cream); text-align:right; max-width:60%; }
+
+  /* CHECKLIST */
+  .check-list { display:flex; flex-direction:column; gap:6px; }
+  .check-item { display:flex; gap:14px; align-items:flex-start; background:var(--s1); border:1px solid var(--gold-border); padding:14px 18px; cursor:pointer; transition:border-color 0.2s; }
+  .check-item:hover { border-color:var(--gold); }
+  .check-box { width:18px; height:18px; border:1px solid var(--gold-border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--gold); transition:all 0.2s; background:var(--s2); }
+  .check-box.checked { background:var(--gold); color:var(--black); }
+  .check-label { font-size:11px; letter-spacing:0.5px; line-height:1.9; }
+  .check-label.checked { color:var(--muted); text-decoration:line-through; }
+  .check-step { font-size:7px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:4px; }
+
+  /* STATS */
+  .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-bottom:32px; background:var(--gold-dim); }
+  .stat-cell { background:var(--s1); padding:20px 18px; }
+  .stat-num { font-family:'Cormorant Garamond',serif; font-size:36px; color:var(--gold); line-height:1; }
+  .stat-label { font-size:7px; letter-spacing:4px; text-transform:uppercase; color:var(--muted); margin-top:6px; line-height:1.8; }
+
+  /* AD TRACKER */
+  .ad-table { width:100%; border-collapse:collapse; }
+  .ad-th { background:var(--s2); padding:10px 16px; font-size:7px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); text-align:left; border-bottom:1px solid var(--gold-border); }
+  .ad-td { padding:13px 16px; border-bottom:1px solid rgba(201,168,76,0.07); font-size:11px; vertical-align:middle; }
+  .ad-tr { background:var(--s1); transition:background 0.2s; }
+  .ad-tr:hover { background:var(--s2); }
+  .status-pill { font-size:7px; letter-spacing:2px; text-transform:uppercase; padding:4px 10px; border:1px solid; display:inline-block; }
+  .pill-draft { color:var(--muted); border-color:var(--gold-border); }
+  .pill-live { color:var(--green); border-color:rgba(76,175,125,0.4); background:var(--green-dim); }
+  .pill-paused { color:var(--orange); border-color:rgba(224,148,58,0.4); background:var(--orange-dim); }
+  .pill-stopped { color:var(--red); border-color:rgba(212,90,90,0.3); }
+
+  /* INFO BOX */
+  .info-box { background:var(--gold-dim); border:1px solid var(--gold-border); border-left:3px solid var(--gold); padding:16px 20px; margin-bottom:24px; display:flex; gap:12px; }
+  .info-icon { font-size:18px; flex-shrink:0; }
+  .info-text { font-size:11px; color:var(--cream); line-height:2; letter-spacing:0.5px; }
+  .info-text strong { color:var(--gold); }
+
+  /* CREATIVE GRID */
+  .creative-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:3px; }
+  .creative-card { background:var(--s1); border:1px solid var(--gold-border); padding:20px; }
+  .creative-label { font-size:7px; letter-spacing:5px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+  .creative-prompt { font-size:11px; color:var(--cream); line-height:2; background:var(--s2); padding:14px; border-left:2px solid var(--gold); margin-top:8px; }
+
+  /* SPINNER */
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid var(--gold-border); border-top-color:var(--gold); border-radius:50%; animation:spin 0.7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:30px; right:30px; z-index:999; background:var(--s3); border:1px solid var(--gold); border-left:3px solid var(--gold); padding:14px 20px; font-size:10px; letter-spacing:1px; color:var(--cream); transform:translateY(80px); opacity:0; transition:all 0.3s; max-width:320px; }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast.green { border-color:var(--green); border-left-color:var(--green); }
+
+  .divider { border:none; border-top:1px solid var(--gold-border); margin:28px 0; }
+
+  @media(max-width:800px) {
+    .sidebar { display:none; }
+    .main { padding:20px; }
+    .form-grid-2, .form-grid-3, .campaign-grid, .audience-grid, .creative-grid { grid-template-columns:1fr; }
+    .stats-row { grid-template-columns:repeat(2,1fr); }
+    .topbar { padding:0 16px; }
+    .api-input { width:140px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">Orris<span>oak</span></div>
+    <div class="topbar-badge">📘 Meta Ads Agent</div>
+  </div>
+  <div class="api-row">
+    <input class="api-input" type="password" id="apiKey" placeholder="Paste Anthropic API key..." oninput="updateApiStatus()">
+    <div class="api-status empty" id="apiStatus">No Key</div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="nav-section">Campaigns</div>
+    <button class="nav-item active" onclick="nav('campaigns',this)"><span class="nav-icon">🎯</span> Campaign Builder</button>
+    <button class="nav-item" onclick="nav('audiences',this)"><span class="nav-icon">👥</span> Audiences</button>
+
+    <div class="nav-section">Ad Creation</div>
+    <button class="nav-item" onclick="nav('adcopy',this)"><span class="nav-icon">✍️</span> Ad Copy AI</button>
+    <button class="nav-item" onclick="nav('creative',this)"><span class="nav-icon">🖼️</span> Creative Briefs</button>
+    <button class="nav-item" onclick="nav('variations',this)"><span class="nav-icon">🔀</span> A/B Variations</button>
+
+    <div class="nav-section">Tracking</div>
+    <button class="nav-item" onclick="nav('tracker',this)"><span class="nav-icon">📊</span> Ad Tracker</button>
+    <button class="nav-item" onclick="nav('checklist',this)"><span class="nav-icon">✅</span> Launch Checklist</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ══ CAMPAIGN BUILDER ══ -->
+    <div class="panel active" id="panel-campaigns">
+      <div class="phead">
+        <div class="phead-eye">Campaign Builder · Meta Ads</div>
+        <h2>Your 3 Campaigns<br><em>Ready to Launch</em></h2>
+        <p>Start with Campaign 1 (Awareness) at $5/day. Once you see engagement after 7 days, add Campaign 2. Add Campaign 3 only after your first sales come in.</p>
+      </div>
+
+      <div class="info-box">
+        <div class="info-icon">💡</div>
+        <div class="info-text"><strong>Your budget plan:</strong> Start with $5–10/day on awareness only. Do NOT run all 3 campaigns at once with a small budget — it splits your spend too thin and nothing works. Run Campaign 1 for 14 days first, then evaluate.</div>
+      </div>
+
+      <div class="campaign-grid">
+        <div class="campaign-card" onclick="selectCampaign(this,'awareness')">
+          <div class="camp-type">Campaign 1 · Start Here</div>
+          <div class="camp-name">Brand Awareness</div>
+          <div class="camp-budget">$5–7/day · Month 1</div>
+          <div class="camp-desc">Get Orrisoak in front of women 28–55 who love luxury skincare. Video or image ads showing the Gold Serum. Goal: reach and impressions, not sales yet.</div>
+          <div class="camp-tags">
+            <span class="camp-tag">Video Ads</span>
+            <span class="camp-tag">Broad Audience</span>
+            <span class="camp-tag">Reach Objective</span>
+          </div>
+        </div>
+        <div class="campaign-card" onclick="selectCampaign(this,'retargeting')">
+          <div class="camp-type">Campaign 2 · Month 2</div>
+          <div class="camp-name">Retargeting</div>
+          <div class="camp-budget">$5/day · After 500 visitors</div>
+          <div class="camp-desc">Re-show ads to people who visited orrisoak.com or watched your videos. Use before/after results and GLOW15 discount. Much higher conversion rate.</div>
+          <div class="camp-tags">
+            <span class="camp-tag">Carousel Ads</span>
+            <span class="camp-tag">Custom Audience</span>
+            <span class="camp-tag">Traffic Objective</span>
+          </div>
+        </div>
+        <div class="campaign-card" onclick="selectCampaign(this,'conversion')">
+          <div class="camp-type">Campaign 3 · Month 3</div>
+          <div class="camp-name">Conversion</div>
+          <div class="camp-budget">$10/day · After first sales</div>
+          <div class="camp-desc">Target lookalike audiences based on your first buyers. Dynamic product ads with urgency. Focus on the complete ritual bundle for higher order value.</div>
+          <div class="camp-tags">
+            <span class="camp-tag">Dynamic Ads</span>
+            <span class="camp-tag">Lookalike 1–3%</span>
+            <span class="camp-tag">Purchase Objective</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="campaignDetail" style="display:none;">
+        <div class="output-box">
+          <div class="output-header">
+            <span class="output-label" id="campDetailLabel">Campaign Setup Guide</span>
+            <div class="output-actions">
+              <button class="btn btn-sm btn-outline" onclick="copyOutput('campDetailText')">Copy</button>
+              <button class="btn btn-sm btn-blue" onclick="openAdsManager()">📘 Open Ads Manager</button>
+            </div>
+          </div>
+          <div class="output-content" id="campDetailText"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:28px;">
+        <button class="btn btn-gold" onclick="generateCampaignPlan()">
+          <span id="camp-btn-inner">✦ Generate Full Campaign Plan</span>
+        </button>
+      </div>
+
+      <div class="output-box" id="camp-output" style="display:none;margin-top:0;">
+        <div class="output-header">
+          <span class="output-label">Your 90-Day Meta Campaign Plan</span>
+          <div class="output-actions">
+            <button class="btn btn-sm btn-outline" onclick="copyOutput('camp-text')">Copy</button>
+          </div>
+        </div>
+        <div class="output-content" id="camp-text"></div>
+      </div>
+    </div>
+
+    <!-- ══ AUDIENCES ══ -->
+    <div class="panel" id="panel-audiences">
+      <div class="phead">
+        <div class="phead-eye">Target Audiences · Meta Ads</div>
+        <h2>Who Sees<br><em>Your Ads</em></h2>
+        <p>These are the exact audience settings to enter in Meta Ads Manager for each product. Copy these settings directly into your campaign.</p>
+      </div>
+
+      <div class="audience-grid">
+        <div class="audience-card">
+          <div class="aud-title">Gold Serum — Primary</div>
+          <div class="aud-row"><span class="aud-key">Age</span><span class="aud-val">35–60</span></div>
+          <div class="aud-row"><span class="aud-key">Gender</span><span class="aud-val">Women</span></div>
+          <div class="aud-row"><span class="aud-key">Location</span><span class="aud-val">United States</span></div>
+          <div class="aud-row"><span class="aud-key">Interests</span><span class="aud-val">Anti-aging skincare, Luxury beauty, Skincare routines, Botox, Dermatology</span></div>
+          <div class="aud-row"><span class="aud-key">Behaviors</span><span class="aud-val">Engaged shoppers, Luxury goods buyers</span></div>
+          <div class="aud-row"><span class="aud-key">Est. Audience</span><span class="aud-val" style="color:var(--green);">2M–5M people</span></div>
+        </div>
+        <div class="audience-card">
+          <div class="aud-title">Glow Cleanser — Primary</div>
+          <div class="aud-row"><span class="aud-key">Age</span><span class="aud-val">28–50</span></div>
+          <div class="aud-row"><span class="aud-key">Gender</span><span class="aud-val">Women</span></div>
+          <div class="aud-row"><span class="aud-key">Location</span><span class="aud-val">United States</span></div>
+          <div class="aud-row"><span class="aud-key">Interests</span><span class="aud-val">Skincare routines, Glow skin, Natural beauty, K-beauty, Face masks</span></div>
+          <div class="aud-row"><span class="aud-key">Behaviors</span><span class="aud-val">Beauty product buyers, Online shoppers</span></div>
+          <div class="aud-row"><span class="aud-key">Est. Audience</span><span class="aud-val" style="color:var(--green);">3M–8M people</span></div>
+        </div>
+        <div class="audience-card">
+          <div class="aud-title">Magnetic Brush — Primary</div>
+          <div class="aud-row"><span class="aud-key">Age</span><span class="aud-val">22–45</span></div>
+          <div class="aud-row"><span class="aud-key">Gender</span><span class="aud-val">Women</span></div>
+          <div class="aud-row"><span class="aud-key">Location</span><span class="aud-val">United States</span></div>
+          <div class="aud-row"><span class="aud-key">Interests</span><span class="aud-val">Makeup tutorials, Beauty tools, Contouring, Foundation, Makeup brushes</span></div>
+          <div class="aud-row"><span class="aud-key">Behaviors</span><span class="aud-val">Makeup buyers, Beauty enthusiasts</span></div>
+          <div class="aud-row"><span class="aud-key">Est. Audience</span><span class="aud-val" style="color:var(--green);">4M–10M people</span></div>
+        </div>
+        <div class="audience-card">
+          <div class="aud-title">Bundle — Retargeting</div>
+          <div class="aud-row"><span class="aud-key">Audience Type</span><span class="aud-val">Custom Audience</span></div>
+          <div class="aud-row"><span class="aud-key">Source</span><span class="aud-val">Website visitors (last 30 days)</span></div>
+          <div class="aud-row"><span class="aud-key">Also Include</span><span class="aud-val">Video viewers (watched 50%+)</span></div>
+          <div class="aud-row"><span class="aud-key">Also Include</span><span class="aud-val">Instagram profile engagers</span></div>
+          <div class="aud-row"><span class="aud-key">Exclude</span><span class="aud-val">Past purchasers</span></div>
+          <div class="aud-row"><span class="aud-key">Requires</span><span class="aud-val" style="color:var(--orange);">Meta Pixel installed on site</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:28px;">
+        <button class="btn btn-gold" onclick="generateAudienceGuide()">
+          <span id="aud-btn-inner">✦ Generate Detailed Audience Guide</span>
+        </button>
+      </div>
+      <div class="output-box" id="aud-output" style="display:none;margin-top:0;">
+        <div class="output-header">
+          <span class="output-label">Audience Setup Guide</span>
+          <div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyOutput('aud-text')">Copy</button></div>
+        </div>
+        <div class="output-content" id="aud-text"></div>
+      </div>
+    </div>
+
+    <!-- ══ AD COPY AI ══ -->
+    <div class="panel" id="panel-adcopy">
+      <div class="phead">
+        <div class="phead-eye">Ad Copy AI · Facebook & Instagram</div>
+        <h2>Generate Any Ad<br><em>in Seconds</em></h2>
+        <p>Fill in the details and get a complete Facebook/Instagram ad — headline, body copy, and CTA — ready to paste directly into Meta Ads Manager.</p>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label class="form-label">Product</label>
+          <select class="form-select" id="ad-product">
+            <option>24K Gold & Black Truffle Anti-Aging Serum</option>
+            <option>24K Gold Hydrating Glow Cleanser</option>
+            <option>4-in-1 Magnetic Makeup Brush</option>
+            <option>Complete Ritual Bundle (all 3)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Campaign Goal</label>
+          <select class="form-select" id="ad-goal">
+            <option>Brand Awareness — introduce Orrisoak</option>
+            <option>Drive Traffic — get clicks to orrisoak.com</option>
+            <option>Get Purchases — direct conversion</option>
+            <option>Retargeting — remind past visitors</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Ad Format</label>
+          <select class="form-select" id="ad-format">
+            <option>Single Image Ad</option>
+            <option>Video Ad</option>
+            <option>Carousel Ad (3 slides)</option>
+            <option>Story Ad</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Tone</label>
+          <select class="form-select" id="ad-tone">
+            <option>Luxury & aspirational</option>
+            <option>Educational & informative</option>
+            <option>Urgent & promotional</option>
+            <option>Emotional & personal</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Special Offer (optional)</label>
+        <input class="form-input" id="ad-offer" placeholder='e.g. "Use code GLOW15 for 15% off" or "Free US shipping"' />
+      </div>
+
+      <button class="btn btn-gold" onclick="generateAdCopy()" id="ad-btn">
+        <span id="ad-btn-inner">✦ Generate Ad Copy</span>
+      </button>
+
+      <div class="output-box" id="ad-output" style="display:none;">
+        <div class="output-header">
+          <span class="output-label">Your Meta Ad</span>
+          <div class="output-actions">
+            <button class="btn btn-sm btn-outline" onclick="copyOutput('ad-text')">Copy All</button>
+            <button class="btn btn-sm btn-blue" onclick="openAdsManager()">📘 Open Ads Manager</button>
+          </div>
+        </div>
+        <div class="output-content" id="ad-text"></div>
+      </div>
+    </div>
+
+    <!-- ══ CREATIVE BRIEFS ══ -->
+    <div class="panel" id="panel-creative">
+      <div class="phead">
+        <div class="phead-eye">Creative Briefs · Images & Video</div>
+        <h2>AI Image Prompts<br><em>for Every Ad</em></h2>
+        <p>Copy these prompts into Bing Image Creator (free) or Midjourney to generate luxury product images for your ads. No photographer needed.</p>
+      </div>
+
+      <div class="creative-grid">
+        <div class="creative-card">
+          <div class="creative-label">Gold Serum · Hero Image</div>
+          <div class="creative-prompt">Luxury gold skincare serum bottle on dark black marble surface, single dramatic spotlight from above, gold particles floating around bottle, ultra cinematic, beauty editorial photography, 8K, luxury brand aesthetic, deep shadows</div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-sm btn-outline" onclick="copyPrompt(this)">Copy Prompt</button>
+            <button class="btn btn-sm btn-gold" onclick="openBing()">Open Bing →</button>
+          </div>
+        </div>
+        <div class="creative-card">
+          <div class="creative-label">Gold Serum · Texture Close-up</div>
+          <div class="creative-prompt">Extreme macro close-up of golden serum drop on fingertip, shimmering 24K gold particles visible, black velvet background, dramatic soft lighting, luxury beauty macro photography, ultra sharp detail, 8K</div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-sm btn-outline" onclick="copyPrompt(this)">Copy Prompt</button>
+            <button class="btn btn-sm btn-gold" onclick="openBing()">Open Bing →</button>
+          </div>
+        </div>
+        <div class="creative-card">
+          <div class="creative-label">Glow Cleanser · Lifestyle</div>
+          <div class="creative-prompt">Elegant woman with glowing luminous skin applying gold skincare cleanser, marble bathroom, soft morning window light, luxury beauty lifestyle photography, warm golden tones, editorial aesthetic, 8K</div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-sm btn-outline" onclick="copyPrompt(this)">Copy Prompt</button>
+            <button class="btn btn-sm btn-gold" onclick="openBing()">Open Bing →</button>
+          </div>
+        </div>
+        <div class="creative-card">
+          <div class="creative-label">Magnetic Brush · Product Demo</div>
+          <div class="creative-prompt">Luxury makeup brush with gold and black magnetic design, elegant hand holding brush over white marble, soft dramatic studio lighting, premium beauty tool editorial photography, clean minimal luxury aesthetic, 8K</div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-sm btn-outline" onclick="copyPrompt(this)">Copy Prompt</button>
+            <button class="btn btn-sm btn-gold" onclick="openBing()">Open Bing →</button>
+          </div>
+        </div>
+        <div class="creative-card">
+          <div class="creative-label">Bundle · All 3 Products</div>
+          <div class="creative-prompt">Three luxury skincare products arranged on dark marble — serum bottle, cleanser bottle, and makeup brush — golden light, black truffle and gold leaf as props, cinematic luxury beauty brand photography, editorial, 8K</div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-sm btn-outline" onclick="copyPrompt(this)">Copy Prompt</button>
+            <button class="btn btn-sm btn-gold" onclick="openBing()">Open Bing →</button>
+          </div>
+        </div>
+        <div class="creative-card">
+          <div class="creative-label">Ingredients · Black Truffle</div>
+          <div class="creative-prompt">Black truffle mushroom and 24K gold leaf on dark slate surface, cinematic dramatic lighting, luxury ingredient photography, beauty brand editorial style, deep contrast, ultra sharp, 8K</div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-sm btn-outline" onclick="copyPrompt(this)">Copy Prompt</button>
+            <button class="btn btn-sm btn-gold" onclick="openBing()">Open Bing →</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:28px;">
+        <button class="btn btn-gold" onclick="generateCustomCreative()">
+          <span id="creative-btn-inner">✦ Generate Custom Creative Brief</span>
+        </button>
+      </div>
+      <div class="form-row" style="margin-top:16px;">
+        <label class="form-label">Describe your custom creative need</label>
+        <input class="form-input" id="creative-input" placeholder='e.g. "Before and after using Gold Serum for 14 days"' />
+      </div>
+      <div class="output-box" id="creative-output" style="display:none;">
+        <div class="output-header">
+          <span class="output-label">Custom Creative Brief</span>
+          <div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyOutput('creative-text')">Copy</button></div>
+        </div>
+        <div class="output-content" id="creative-text"></div>
+      </div>
+    </div>
+
+    <!-- ══ A/B VARIATIONS ══ -->
+    <div class="panel" id="panel-variations">
+      <div class="phead">
+        <div class="phead-eye">A/B Testing · Ad Variations</div>
+        <h2>Test Multiple Ads<br><em>Find What Works</em></h2>
+        <p>Generate 3 different versions of the same ad. Run all 3 with equal budget for 7 days. Keep the winner, pause the others.</p>
+      </div>
+
+      <div class="info-box">
+        <div class="info-icon">🔬</div>
+        <div class="info-text"><strong>How to A/B test on a small budget:</strong> Split your $5/day into $1.67 per variation. After 7 days, whichever ad has the lowest cost-per-click wins. Pause the other two and put full $5/day behind the winner.</div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label class="form-label">Product to Test</label>
+          <select class="form-select" id="ab-product">
+            <option>24K Gold & Black Truffle Anti-Aging Serum</option>
+            <option>24K Gold Hydrating Glow Cleanser</option>
+            <option>4-in-1 Magnetic Makeup Brush</option>
+            <option>Complete Ritual Bundle</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">What to Test</label>
+          <select class="form-select" id="ab-element">
+            <option>Headlines (3 different opening hooks)</option>
+            <option>Tones (luxury vs educational vs urgent)</option>
+            <option>CTAs (Shop Now vs Learn More vs Get Yours)</option>
+            <option>Angles (ingredients vs results vs ritual)</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="generateVariations()" id="ab-btn">
+        <span id="ab-btn-inner">✦ Generate 3 Ad Variations</span>
+      </button>
+
+      <div class="output-box" id="ab-output" style="display:none;">
+        <div class="output-header">
+          <span class="output-label">3 Ad Variations — Ready to Test</span>
+          <div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyOutput('ab-text')">Copy All</button></div>
+        </div>
+        <div class="output-content" id="ab-text"></div>
+      </div>
+    </div>
+
+    <!-- ══ AD TRACKER ══ -->
+    <div class="panel" id="panel-tracker">
+      <div class="phead">
+        <div class="phead-eye">Ad Tracker · Performance</div>
+        <h2>Track Every<br><em>Active Ad</em></h2>
+        <p>Log your live ads here. Update performance weekly. The agent will tell you which to scale and which to pause.</p>
+      </div>
+
+      <div class="stats-row" id="trackerStats">
+        <div class="stat-cell"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total<br>Ads</div></div>
+        <div class="stat-cell"><div class="stat-num" style="color:var(--green)" id="stat-live">0</div><div class="stat-label">Live<br>Ads</div></div>
+        <div class="stat-cell"><div class="stat-num" id="stat-spend">$0</div><div class="stat-label">Daily<br>Spend</div></div>
+        <div class="stat-cell"><div class="stat-num" id="stat-roas">—</div><div class="stat-label">Avg<br>ROAS</div></div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+        <button class="btn btn-gold btn-sm" onclick="toggleAdForm()">+ Add Ad</button>
+        <button class="btn btn-outline btn-sm" onclick="analyzeAds()">✦ AI Analysis</button>
+      </div>
+
+      <div id="adAddForm" style="display:none;background:var(--s2);border:1px solid var(--gold-border);padding:20px 24px;margin-bottom:20px;">
+        <div class="form-grid-3">
+          <div class="form-row"><label class="form-label">Ad Name</label><input class="form-input" id="add-adname" placeholder="Gold Serum Awareness V1" /></div>
+          <div class="form-row"><label class="form-label">Product</label><select class="form-select" id="add-adproduct"><option>Gold Serum</option><option>Cleanser</option><option>Brush</option><option>Bundle</option></select></div>
+          <div class="form-row"><label class="form-label">Daily Budget</label><input class="form-input" id="add-adbudget" placeholder="$5" /></div>
+          <div class="form-row"><label class="form-label">CTR %</label><input class="form-input" id="add-adctr" placeholder="2.4" /></div>
+          <div class="form-row"><label class="form-label">CPC $</label><input class="form-input" id="add-adcpc" placeholder="0.85" /></div>
+          <div class="form-row"><label class="form-label">ROAS</label><input class="form-input" id="add-adroas" placeholder="2.4" /></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button class="btn btn-gold btn-sm" onclick="addAd()">Add Ad</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleAdForm()">Cancel</button>
+        </div>
+      </div>
+
+      <table class="ad-table">
+        <thead>
+          <tr>
+            <th class="ad-th">Ad Name</th>
+            <th class="ad-th">Product</th>
+            <th class="ad-th">Budget/day</th>
+            <th class="ad-th">CTR</th>
+            <th class="ad-th">CPC</th>
+            <th class="ad-th">ROAS</th>
+            <th class="ad-th">Status</th>
+          </tr>
+        </thead>
+        <tbody id="adTableBody"></tbody>
+      </table>
+
+      <div class="output-box" id="analysis-output" style="display:none;margin-top:28px;">
+        <div class="output-header">
+          <span class="output-label">AI Performance Analysis</span>
+          <div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyOutput('analysis-text')">Copy</button></div>
+        </div>
+        <div class="output-content" id="analysis-text"></div>
+      </div>
+    </div>
+
+    <!-- ══ LAUNCH CHECKLIST ══ -->
+    <div class="panel" id="panel-checklist">
+      <div class="phead">
+        <div class="phead-eye">Launch Checklist · Before Your First Ad</div>
+        <h2>From Zero to<br><em>First Ad Live</em></h2>
+        <p>Complete every step before spending a single dollar on ads. This prevents wasted budget and account issues.</p>
+      </div>
+
+      <div style="margin-bottom:28px;">
+        <p style="font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Step 1 · Meta Business Setup</p>
+        <div class="check-list">
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">business.facebook.com</div>
+              <div class="check-label">Create a Meta Business Account (free) — go to business.facebook.com and sign up with your Facebook account</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">Business Manager</div>
+              <div class="check-label">Connect your Orrisoak Facebook Page and Instagram account to your Business Manager</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">Ads Manager</div>
+              <div class="check-label">Add your credit card as payment method in Ads Manager → Billing → Payment Methods</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:28px;">
+        <p style="font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Step 2 · Meta Pixel (Critical)</p>
+        <div class="check-list">
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">Events Manager → Connect Data Source</div>
+              <div class="check-label">Create a Meta Pixel in Events Manager — this tracks who visits orrisoak.com so you can retarget them later</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">WooCommerce → Facebook for WooCommerce plugin</div>
+              <div class="check-label">Install the free "Facebook for WooCommerce" plugin on your site and connect it to your Pixel — this installs the tracking code automatically</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">Verify with Meta Pixel Helper Chrome extension</div>
+              <div class="check-label">Install Meta Pixel Helper (free Chrome extension) and visit orrisoak.com — it should show your Pixel firing green</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:28px;">
+        <p style="font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Step 3 · Launch First Ad</p>
+        <div class="check-list">
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">Ad Copy AI tab</div>
+              <div class="check-label">Generate your first ad copy using the Ad Copy AI tab — Gold Serum, Awareness campaign, Luxury tone</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">Creative Briefs tab → Bing Image Creator</div>
+              <div class="check-label">Generate your ad image using the Creative Brief prompt in Bing Image Creator — download the best result</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">Ads Manager → Create Campaign</div>
+              <div class="check-label">Create your first campaign: Objective = Awareness, Budget = $5/day, Audience = Women 35-60, Interests = Anti-aging skincare</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">Review & Publish</div>
+              <div class="check-label">Review your ad in the preview — check it looks right on mobile (80% of views are mobile). Hit Publish. Meta reviews within 24 hours.</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div>
+              <div class="check-step">Wait 7 days before making changes</div>
+              <div class="check-label">Do NOT touch the ad for 7 days. Meta's algorithm needs time to optimize. Changing it early resets the learning phase and wastes budget.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:32px;">
+        <button class="btn btn-blue" onclick="openAdsManager()" style="margin-right:12px;">📘 Open Meta Ads Manager</button>
+        <button class="btn btn-outline" onclick="openBing()">🎨 Open Bing Image Creator</button>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+const BRAND = `You are an expert Meta (Facebook & Instagram) advertising strategist for Orris & Oak, a luxury skincare brand based in Westmont, IL (Chicago area).
+
+PRODUCTS:
+1. 24K Gold & Black Truffle Anti-Aging Serum — flagship, real 24K gold + rare black truffle, peptides, retinol-alternative. Lifts, firms, illuminates in 14 days.
+2. 24K Gold Black Truffle Hydrating Glow Cleanser — daily cleanser, gold + truffle + hyaluronic acid.
+3. 4-in-1 Magnetic Makeup Brush — $52, four brushes in one magnetic PU leather case, vegan synthetic hair.
+
+BRAND: Luxury, crafted for daily life. Premium without pretension. "Your glow, elevated."
+WEBSITE: orrisoak.com | DISCOUNT CODE: GLOW15 (15% off)
+BUDGET: $5-10/day starting budget
+TARGET: Women 28-60, interested in luxury skincare, anti-aging, beauty routines`;
+
+// API
+function getKey() { return document.getElementById('apiKey').value.trim(); }
+function updateApiStatus() {
+  const k = getKey(), el = document.getElementById('apiStatus');
+  if (k.startsWith('sk-ant-')) { el.textContent='Key Set ✓'; el.className='api-status ok'; }
+  else if (k.length > 5) { el.textContent='Check Key'; el.className='api-status empty'; }
+  else { el.textContent='No Key'; el.className='api-status empty'; }
+}
+
+async function callClaude(prompt, max=900) {
+  const key = getKey();
+  if (!key) { showToast('Please paste your API key in the top bar'); throw new Error('No key'); }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:max, system:BRAND, messages:[{role:'user',content:prompt}] })
+  });
+  if (!res.ok) { const e=await res.json(); throw new Error(e.error?.message||res.statusText); }
+  return (await res.json()).content[0].text;
+}
+
+function setLoading(id, origText, loading) {
+  const el = document.getElementById(id);
+  el.innerHTML = loading ? '<span class="spinner"></span> Generating...' : origText;
+  el.parentElement.disabled = loading;
+}
+
+// NAV
+function nav(name, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// TOAST
+function showToast(msg, type='gold') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type==='green'?' green':'');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// COPY
+function copyOutput(id) {
+  navigator.clipboard.writeText(document.getElementById(id).innerText)
+    .then(()=>showToast('Copied ✓','green')).catch(()=>alert('Select and copy manually.'));
+}
+
+function copyPrompt(btn) {
+  const text = btn.closest('.creative-card').querySelector('.creative-prompt').innerText;
+  navigator.clipboard.writeText(text).then(()=>{ showToast('Prompt copied ✓','green'); }).catch(()=>alert('Copy manually.'));
+}
+
+// LINKS
+function openAdsManager() { window.open('https://adsmanager.facebook.com','_blank'); }
+function openBing() { window.open('https://bing.com/images/create','_blank'); }
+
+// CAMPAIGN BUILDER
+const campDetails = {
+  awareness: `CAMPAIGN 1: BRAND AWARENESS
+─────────────────────────────
+Objective: Awareness → Reach
+Budget: $5–7/day
+Duration: Run for 14 days minimum before judging
+
+AD SET SETTINGS:
+• Audience: Women, 35–60, United States
+• Interests: Anti-aging skincare, Luxury beauty, Skincare routines
+• Placements: Automatic (let Meta optimize)
+• Optimization: Reach
+
+AD FORMAT: Single image or short video (6–15 seconds)
+CREATIVE: Gold Serum hero shot on dark marble
+
+WHAT SUCCESS LOOKS LIKE after 7 days:
+✦ Cost per 1,000 impressions (CPM): under $15
+✦ Reach: 500–2,000 people per day
+✦ Video views (if video): 30%+ watch rate`,
+
+  retargeting: `CAMPAIGN 2: RETARGETING
+─────────────────────────────
+Objective: Traffic → Link Clicks
+Budget: $5/day
+Start: Only after 500+ website visitors (need Pixel data)
+
+CUSTOM AUDIENCE (create in Audiences tab):
+• Website visitors — last 30 days
+• Video viewers — watched 50%+ of any video
+• Instagram profile engagers — last 60 days
+• EXCLUDE: Past purchasers
+
+AD FORMAT: Carousel (3 slides showing all 3 products)
+OFFER: Include GLOW15 discount code for 15% off
+
+WHAT SUCCESS LOOKS LIKE:
+✦ CTR: above 2%
+✦ CPC: under $1.50
+✦ Return visitors converting at 3–5%`,
+
+  conversion: `CAMPAIGN 3: CONVERSION
+─────────────────────────────
+Objective: Sales → Purchase
+Budget: $10/day
+Start: Only after first 10+ organic sales (need purchase data)
+
+LOOKALIKE AUDIENCE:
+• Source: Your customer list (upload email CSV to Meta)
+• Similarity: 1–3% lookalike
+• Location: United States
+
+AD FORMAT: Dynamic product ads OR single video with strong CTA
+PRODUCT: Complete Ritual Bundle — highest average order value
+URGENCY: Limited time offer, free shipping
+
+WHAT SUCCESS LOOKS LIKE:
+✦ ROAS: above 2.5x
+✦ CPA (cost per purchase): under $25
+✦ CTR: above 3%`
+};
+
+function selectCampaign(card, type) {
+  document.querySelectorAll('.campaign-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('campDetailLabel').textContent = `Campaign ${type==='awareness'?'1':type==='retargeting'?'2':'3'} Setup Guide`;
+  document.getElementById('campDetailText').textContent = campDetails[type];
+  document.getElementById('campaignDetail').style.display = 'block';
+  document.getElementById('campaignDetail').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+async function generateCampaignPlan() {
+  const btn = document.getElementById('camp-btn-inner');
+  setLoading('camp-btn-inner','✦ Generate Full Campaign Plan',true);
+  try {
+    const result = await callClaude(`Create a detailed 90-day Meta (Facebook & Instagram) advertising plan for Orris & Oak. 
+Budget: $5-10/day starting, growing to $20-30/day by month 3.
+Include: Month 1 awareness focus, Month 2 retargeting addition, Month 3 conversion scaling.
+Format with clear sections, specific numbers, and actionable steps.
+Include KPIs to watch each month and when to scale vs pause.`, 1000);
+    document.getElementById('camp-text').textContent = result;
+    document.getElementById('camp-output').style.display = 'block';
+    document.getElementById('camp-output').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e) { showToast('Error: '+e.message); }
+  setLoading('camp-btn-inner','✦ Generate Full Campaign Plan',false);
+}
+
+// AUDIENCE GUIDE
+async function generateAudienceGuide() {
+  setLoading('aud-btn-inner','✦ Generate Detailed Audience Guide',true);
+  try {
+    const result = await callClaude(`Write a step-by-step guide for setting up Meta (Facebook) ad audiences for Orris & Oak. Include:
+1. How to create a Custom Audience from website visitors (step by step in Ads Manager)
+2. How to create a Lookalike Audience from that
+3. Interest-based audiences for each product with exact interest keywords to search in Meta
+4. How to install and verify the Meta Pixel on WooCommerce
+Keep it practical and beginner-friendly.`, 900);
+    document.getElementById('aud-text').textContent = result;
+    document.getElementById('aud-output').style.display = 'block';
+    document.getElementById('aud-output').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e) { showToast('Error: '+e.message); }
+  setLoading('aud-btn-inner','✦ Generate Detailed Audience Guide',false);
+}
+
+// AD COPY
+async function generateAdCopy() {
+  const product = document.getElementById('ad-product').value;
+  const goal = document.getElementById('ad-goal').value;
+  const format = document.getElementById('ad-format').value;
+  const tone = document.getElementById('ad-tone').value;
+  const offer = document.getElementById('ad-offer').value;
+
+  setLoading('ad-btn-inner','✦ Generate Ad Copy',true);
+  try {
+    const result = await callClaude(`Write a complete Meta (Facebook & Instagram) ad for Orris & Oak.
+
+PRODUCT: ${product}
+GOAL: ${goal}
+FORMAT: ${format}
+TONE: ${tone}
+SPECIAL OFFER: ${offer || 'Free US shipping, 100% money-back guarantee'}
+
+OUTPUT FORMAT — label each section clearly:
+PRIMARY TEXT: (the main body copy, 100-125 words)
+HEADLINE: (under 40 characters, punchy)
+DESCRIPTION: (under 30 characters, supporting line)
+CTA BUTTON: (choose: Shop Now / Learn More / Get Offer / Sign Up)
+
+${format.includes('Carousel') ? 'Also write 3 slide headlines and descriptions for each slide.' : ''}
+
+Rules:
+- Primary text must hook immediately — no "Introducing" or generic openers
+- Headline must create curiosity or urgency
+- Always end with orrisoak.com
+- Sound like a luxury brand, not a discount store`, 700);
+
+    document.getElementById('ad-text').textContent = result;
+    document.getElementById('ad-output').style.display = 'block';
+    document.getElementById('ad-output').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e) { showToast('Error: '+e.message); }
+  setLoading('ad-btn-inner','✦ Generate Ad Copy',false);
+}
+
+// CUSTOM CREATIVE
+async function generateCustomCreative() {
+  const input = document.getElementById('creative-input').value.trim();
+  if (!input) { showToast('Please describe your creative need'); return; }
+  setLoading('creative-btn-inner','✦ Generate Custom Creative Brief',true);
+  try {
+    const result = await callClaude(`Generate an AI image prompt and creative brief for a Meta ad for Orris & Oak.
+Creative concept: "${input}"
+Output:
+1. AI IMAGE PROMPT (for Bing Image Creator / Midjourney — detailed, cinematic, luxury aesthetic)
+2. VIDEO CONCEPT (if applicable — describe 3 shots, each 3-5 seconds)
+3. TEXT OVERLAYS (what text to add on the image/video)
+4. MOOD NOTES (lighting, colors, feel)`, 600);
+    document.getElementById('creative-text').textContent = result;
+    document.getElementById('creative-output').style.display = 'block';
+  } catch(e) { showToast('Error: '+e.message); }
+  setLoading('creative-btn-inner','✦ Generate Custom Creative Brief',false);
+}
+
+// A/B VARIATIONS
+async function generateVariations() {
+  const product = document.getElementById('ab-product').value;
+  const element = document.getElementById('ab-element').value;
+  setLoading('ab-btn-inner','✦ Generate 3 Ad Variations',true);
+  try {
+    const result = await callClaude(`Generate 3 distinct Meta ad variations for Orris & Oak to A/B test.
+
+PRODUCT: ${product}
+TESTING: ${element}
+
+For each variation write:
+VARIATION A — [label what makes it different]
+Primary Text: ...
+Headline: ...
+CTA: ...
+
+VARIATION B — [label]
+Primary Text: ...
+Headline: ...
+CTA: ...
+
+VARIATION C — [label]
+Primary Text: ...
+Headline: ...
+CTA: ...
+
+After all 3, add: "HOW TO TEST: Run each at $1.67/day for 7 days. Winner = lowest CPC."
+Make each variation genuinely different — different angles, not just different words.`, 900);
+    document.getElementById('ab-text').textContent = result;
+    document.getElementById('ab-output').style.display = 'block';
+    document.getElementById('ab-output').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e) { showToast('Error: '+e.message); }
+  setLoading('ab-btn-inner','✦ Generate 3 Ad Variations',false);
+}
+
+// AD TRACKER
+let ads = JSON.parse(localStorage.getItem('oo_ads') || '[]');
+function saveAds() { localStorage.setItem('oo_ads', JSON.stringify(ads)); }
+function toggleAdForm() { const f=document.getElementById('adAddForm'); f.style.display=f.style.display==='none'?'block':'none'; }
+function addAd() {
+  const name=document.getElementById('add-adname').value.trim();
+  if (!name) { showToast('Ad name required'); return; }
+  ads.push({ name, product:document.getElementById('add-adproduct').value, budget:document.getElementById('add-adbudget').value, ctr:document.getElementById('add-adctr').value, cpc:document.getElementById('add-adcpc').value, roas:document.getElementById('add-adroas').value, status:'live' });
+  saveAds(); toggleAdForm(); renderAdTable(); showToast('Ad added ✓','green');
+}
+function updateAdStatus(i, val) { ads[i].status=val; saveAds(); renderAdTable(); }
+function renderAdTable() {
+  const body=document.getElementById('adTableBody');
+  body.innerHTML='';
+  let live=0, spend=0, roasTotal=0, roasCount=0;
+  ads.forEach((ad,i) => {
+    if (ad.status==='live') { live++; spend+=parseFloat(ad.budget)||0; }
+    if (ad.roas) { roasTotal+=parseFloat(ad.roas)||0; roasCount++; }
+    const pillClass = {live:'pill-live',paused:'pill-paused',draft:'pill-draft',stopped:'pill-stopped'}[ad.status]||'pill-draft';
+    const tr=document.createElement('tr');
+    tr.className='ad-tr';
+    tr.innerHTML=`
+      <td class="ad-td" style="font-family:'Cormorant Garamond',serif;font-size:16px;">${ad.name}</td>
+      <td class="ad-td" style="color:var(--muted);font-size:10px;">${ad.product}</td>
+      <td class="ad-td" style="color:var(--gold);">${ad.budget||'—'}</td>
+      <td class="ad-td">${ad.ctr?ad.ctr+'%':'—'}</td>
+      <td class="ad-td">${ad.cpc?'$'+ad.cpc:'—'}</td>
+      <td class="ad-td" style="color:${parseFloat(ad.roas)>=2.5?'var(--green)':parseFloat(ad.roas)>0?'var(--orange)':'var(--cream)'}">${ad.roas?ad.roas+'x':'—'}</td>
+      <td class="ad-td">
+        <select onchange="updateAdStatus(${i},this.value)" style="background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:9px;padding:4px 8px;cursor:pointer;">
+          <option value="draft" ${ad.status==='draft'?'selected':''}>Draft</option>
+          <option value="live" ${ad.status==='live'?'selected':''}>Live ●</option>
+          <option value="paused" ${ad.status==='paused'?'selected':''}>Paused</option>
+          <option value="stopped" ${ad.status==='stopped'?'selected':''}>Stopped</option>
+        </select>
+      </td>`;
+    body.appendChild(tr);
+  });
+  document.getElementById('stat-total').textContent = ads.length;
+  document.getElementById('stat-live').textContent = live;
+  document.getElementById('stat-spend').textContent = '$'+spend.toFixed(0);
+  document.getElementById('stat-roas').textContent = roasCount ? (roasTotal/roasCount).toFixed(1)+'x' : '—';
+}
+
+async function analyzeAds() {
+  if (!ads.length) { showToast('Add some ads first'); return; }
+  const adSummary = ads.map(a=>`${a.name}: ${a.product}, $${a.budget}/day, CTR ${a.ctr||'?'}%, CPC $${a.cpc||'?'}, ROAS ${a.roas||'?'}x, Status: ${a.status}`).join('\n');
+  try {
+    const result = await callClaude(`Analyze these Meta ads for Orris & Oak and give specific recommendations:\n\n${adSummary}\n\nFor each ad tell me: Scale / Pause / Keep watching / Stop — and exactly why. Then give 3 specific actions to improve overall performance. Be direct and specific.`);
+    document.getElementById('analysis-text').textContent = result;
+    document.getElementById('analysis-output').style.display = 'block';
+    document.getElementById('analysis-output').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e) { showToast('Error: '+e.message); }
+}
+
+// CHECKLIST
+function toggleCheck(item) {
+  const box=item.querySelector('.check-box'), label=item.querySelector('.check-label');
+  box.classList.toggle('checked'); label.classList.toggle('checked');
+}
+
+renderAdTable();
+</script>
+</body>
+</html>

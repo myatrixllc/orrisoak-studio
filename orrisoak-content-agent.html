@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak · Content Creation Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dim:rgba(201,168,76,0.1);
+  --gold-border:rgba(201,168,76,0.2);--black:#070707;--s1:#0F0F0F;
+  --s2:#161616;--s3:#1E1E1E;--s4:#252525;--cream:#F0E9DC;--muted:#786D61;
+  --green:#4CAF7D;--green-dim:rgba(76,175,125,0.1);--green-border:rgba(76,175,125,0.3);
+  --blue:#7B9FE8;--blue-dim:rgba(123,159,232,0.1);--orange:#D4894A;--red:#D45A5A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{background:var(--s1);border-bottom:1px solid var(--gold-border);padding:0 36px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200;flex-shrink:0;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);letter-spacing:4px;}
+.logo span{font-style:italic;}
+.topbar-badge{font-size:7px;letter-spacing:4px;text-transform:uppercase;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:4px 12px;}
+.api-row{display:flex;align-items:center;gap:8px;}
+.api-input{background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:1px;padding:6px 12px;width:200px;}
+.api-input::placeholder{color:var(--muted);}
+.api-input:focus{outline:none;border-color:var(--gold);}
+.api-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:background 0.3s;}
+.api-dot.ok{background:var(--green);}
+
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:200px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--gold-border);display:flex;flex-direction:column;padding:20px 0;overflow-y:auto;}
+.nav-group{font-size:7px;letter-spacing:5px;text-transform:uppercase;color:var(--muted);padding:0 16px;margin:16px 0 7px;}
+.nav-group:first-child{margin-top:0;}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:10px 16px;cursor:pointer;color:var(--muted);font-size:8px;letter-spacing:3px;text-transform:uppercase;transition:all 0.2s;border-left:2px solid transparent;background:none;border-right:none;border-top:none;border-bottom:none;width:100%;text-align:left;font-family:'Josefin Sans',sans-serif;}
+.nav-btn:hover{color:var(--gold-light);background:var(--gold-dim);}
+.nav-btn.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-dim);}
+.nav-icon{font-size:13px;flex-shrink:0;}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:32px 40px;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* PANEL HEAD */
+.phead{margin-bottom:24px;}
+.phead-eye{font-size:8px;letter-spacing:7px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.phead h2{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3vw,40px);font-weight:300;line-height:1.05;}
+.phead h2 em{font-style:italic;color:var(--gold);}
+.phead p{font-size:11px;letter-spacing:0.5px;color:var(--muted);margin-top:8px;line-height:2;max-width:560px;}
+
+/* PRODUCT SELECTOR */
+.product-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:24px;}
+.product-card{background:var(--s1);border:1px solid var(--gold-border);padding:16px 18px;cursor:pointer;transition:all 0.2s;position:relative;}
+.product-card:hover{border-color:var(--gold-light);}
+.product-card.selected{border-color:var(--gold);background:var(--gold-dim);}
+.product-card.selected::after{content:'✓';position:absolute;top:10px;right:12px;color:var(--gold);font-size:12px;}
+.product-eye{font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.product-name-sm{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--cream);line-height:1.3;}
+.product-price{font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:4px;}
+
+/* FORMS */
+.form-row{margin-bottom:14px;}
+.form-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--s2);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;letter-spacing:0.5px;padding:10px 13px;transition:border-color 0.2s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--gold);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--muted);}
+.form-textarea{resize:vertical;min-height:70px;line-height:1.8;}
+.form-select{appearance:none;cursor:pointer;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;}
+
+/* BUTTONS */
+.btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:11px 24px;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-gold{background:var(--gold);color:var(--black);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-gold:disabled{background:var(--s4);color:var(--muted);cursor:not-allowed;}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+.btn-outline:hover{background:var(--gold-dim);}
+.btn-green{background:var(--green);color:white;}
+.btn-sm{padding:7px 15px;font-size:7px;}
+
+/* CONTENT CARDS */
+.content-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;margin-top:8px;}
+.content-card{background:var(--s1);border:1px solid var(--gold-border);overflow:hidden;transition:border-color 0.2s;}
+.content-card:hover{border-color:var(--gold);}
+.content-card-head{background:var(--s2);border-bottom:1px solid var(--gold-border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.content-card-label{font-size:7px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
+.content-card-body{padding:16px;font-size:11px;letter-spacing:0.5px;line-height:2;color:var(--cream);white-space:pre-wrap;min-height:80px;}
+.content-card-foot{padding:10px 16px;border-top:1px solid var(--gold-border);display:flex;gap:8px;}
+
+/* LIBRARY GRID */
+.library-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;}
+.lib-card{background:var(--s1);border:1px solid var(--gold-border);padding:16px;cursor:pointer;transition:all 0.2s;}
+.lib-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.lib-type{font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.lib-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--cream);margin-bottom:6px;line-height:1.3;}
+.lib-preview{font-size:10px;color:var(--muted);line-height:1.8;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+.lib-product{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+
+/* REEL SCRIPT */
+.reel-shots{display:flex;flex-direction:column;gap:3px;margin-top:8px;}
+.reel-shot{background:var(--s1);border:1px solid var(--gold-border);display:grid;grid-template-columns:60px 1fr;overflow:hidden;}
+.reel-shot-num{background:var(--gold);color:var(--black);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:24px;}
+.reel-shot-body{padding:14px 16px;}
+.reel-shot-label{font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.reel-shot-text{font-size:11px;color:var(--cream);line-height:1.9;}
+.reel-shot-sub{font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px;}
+
+/* WEEK PLANNER */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.week-day{background:var(--s1);border:1px solid var(--gold-border);}
+.week-head{background:var(--s2);padding:9px 8px;text-align:center;font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--gold-border);}
+.week-head.today{background:var(--gold);color:var(--black);}
+.week-tasks{padding:8px;}
+.week-task{background:var(--s3);border-left:2px solid var(--gold);padding:6px 8px;margin-bottom:4px;font-size:8px;line-height:1.7;cursor:pointer;transition:all 0.2s;}
+.week-task:hover{background:var(--s4);}
+.week-task.ig{border-left-color:var(--green);}
+.week-task.fb{border-left-color:var(--blue);}
+.week-task.email{border-left-color:var(--orange);}
+.week-task-platform{font-size:6px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:3px;}
+.week-task-platform.ig{color:var(--green);}
+.week-task-platform.fb{color:var(--blue);}
+.week-task-platform.email{color:var(--orange);}
+.week-rest{color:var(--muted);font-size:10px;font-family:'Cormorant Garamond',serif;font-style:italic;padding:6px 0;}
+
+/* OUTPUT BOX */
+.output-box{background:var(--s2);border:1px solid var(--gold-border);margin-top:16px;}
+.output-head{background:var(--s3);border-bottom:1px solid var(--gold-border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.output-label{font-size:7px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
+.output-actions{display:flex;gap:7px;flex-wrap:wrap;}
+.output-content{padding:18px;font-size:12px;letter-spacing:0.5px;line-height:2.2;color:var(--cream);white-space:pre-wrap;min-height:60px;}
+
+/* INFO BOX */
+.info-box{background:var(--gold-dim);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:12px 16px;margin-bottom:18px;display:flex;gap:10px;}
+.info-icon{font-size:16px;flex-shrink:0;}
+.info-text{font-size:10px;color:var(--cream);line-height:2;letter-spacing:0.5px;}
+.info-text strong{color:var(--gold);}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:24px;background:var(--gold-dim);}
+.stat-box{background:var(--s1);padding:16px 14px;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);line-height:1;}
+.stat-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:4px;line-height:1.7;}
+
+/* SPINNER */
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--gold-border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--s3);border:1px solid var(--gold);border-left:3px solid var(--gold);padding:12px 16px;font-size:10px;letter-spacing:1px;color:var(--cream);transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:280px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{border-color:var(--green);border-left-color:var(--green);}
+
+.divider{border:none;border-top:1px solid var(--gold-border);margin:20px 0;}
+
+@media(max-width:800px){
+  .sidebar{display:none;}
+  .main{padding:20px;}
+  .g2,.g3,.product-selector,.content-grid,.library-grid{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .week-grid{grid-template-columns:repeat(3,1fr);}
+  .topbar{padding:0 14px;}
+  .api-input{width:140px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div class="logo">Orris<span>oak</span></div>
+    <div class="topbar-badge">✨ Content Creation Agent</div>
+  </div>
+  <div class="api-row">
+    <input class="api-input" type="password" id="apiKey" placeholder="Paste Claude API key..." oninput="updateKey()">
+    <div class="api-dot" id="apiDot"></div>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="nav-group">Create</div>
+  <button class="nav-btn active" onclick="nav('ideas',this)"><span class="nav-icon">💡</span> Ideas First</button>
+  <button class="nav-btn" onclick="nav('library',this)"><span class="nav-icon">📚</span> Content Library</button>
+  <button class="nav-btn" onclick="nav('caption',this)"><span class="nav-icon">📱</span> Caption AI</button>
+  <button class="nav-btn" onclick="nav('reel',this)"><span class="nav-icon">🎬</span> Reel Script</button>
+  <button class="nav-btn" onclick="nav('ad',this)"><span class="nav-icon">📢</span> Ad Copy</button>
+  <button class="nav-btn" onclick="nav('image',this)"><span class="nav-icon">🖼️</span> Image Prompts</button>
+  <button class="nav-btn" onclick="nav('email',this)"><span class="nav-icon">📧</span> Email Campaigns</button>
+
+  <div class="nav-group">Plan</div>
+  <button class="nav-btn" onclick="nav('planner',this)"><span class="nav-icon">📅</span> Week Planner</button>
+  <button class="nav-btn" onclick="nav('prelaunch',this)"><span class="nav-icon">🚀</span> Pre-Launch Plan</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ══ IDEAS FIRST ══ -->
+<div class="panel active" id="panel-ideas">
+  <div class="phead">
+    <div class="phead-eye">Ideas First · Smart Content Creation</div>
+    <h2>What Should We<br><em>Create Today?</em></h2>
+    <p>Select a product and goal — AI suggests 6 fresh content ideas. Pick the one you love and we build it fully in seconds.</p>
+  </div>
+  <div class="product-selector">
+    <div class="product-card selected" onclick="selectIdeasProduct(this,'serum')">
+      <div class="product-eye">Skincare · Serum</div>
+      <div class="product-name-sm">24K Gold & Black Truffle Anti-Aging Serum</div>
+      <div class="product-price">Premium · Anti-aging</div>
+    </div>
+    <div class="product-card" onclick="selectIdeasProduct(this,'cleanser')">
+      <div class="product-eye">Skincare · Cleanser</div>
+      <div class="product-name-sm">24K Gold Black Truffle Hydrating Glow Cleanser</div>
+      <div class="product-price">Daily ritual · Glow</div>
+    </div>
+    <div class="product-card" onclick="selectIdeasProduct(this,'brush')">
+      <div class="product-eye">Makeup · Tools</div>
+      <div class="product-name-sm">4-in-1 Magnetic Makeup Brush</div>
+      <div class="product-price">$30–50 · Travel-friendly</div>
+    </div>
+  </div>
+  <div class="g2" style="margin-bottom:16px;">
+    <div class="form-row">
+      <label class="form-label">Content Type</label>
+      <select class="form-select" id="idea-type">
+        <option>Any — surprise me</option>
+        <option>Instagram Caption</option>
+        <option>Instagram Reel Script</option>
+        <option>Facebook Ad</option>
+        <option>Email Campaign</option>
+        <option>Image Prompt for Bing</option>
+        <option>Story Sequence</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Current Goal</label>
+      <select class="form-select" id="idea-goal">
+        <option>Build brand awareness</option>
+        <option>Drive traffic to orrisoak.com</option>
+        <option>Get purchases</option>
+        <option>Grow email list</option>
+        <option>Pre-launch buzz</option>
+        <option>Engage existing followers</option>
+      </select>
+    </div>
+  </div>
+  <button class="btn btn-gold" onclick="generateIdeas()" id="idea-btn" style="width:100%;justify-content:center;margin-bottom:24px;">
+    <span id="idea-inner">✦ Suggest 6 Content Ideas</span>
+  </button>
+  <div id="ideasGrid" style="display:none;">
+    <div style="font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Pick the idea you love — we'll build it fully</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;" id="ideaCards"></div>
+  </div>
+  <div class="output-box" id="idea-out" style="display:none;margin-top:20px;">
+    <div class="output-head">
+      <span class="output-label" id="idea-out-label">Your Content — Ready to Use</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('idea-text')">Copy</button>
+        <button class="btn btn-sm btn-gold" onclick="generateIdeas()">New Ideas →</button>
+      </div>
+    </div>
+    <div class="output-content" id="idea-text"></div>
+  </div>
+</div>
+
+<!-- ══ CONTENT LIBRARY ══ -->
+<div class="panel" id="panel-library">
+  <div class="phead">
+    <div class="phead-eye">Content Library · Auto-Generate</div>
+    <h2>Build Your Complete<br><em>Content Library</em></h2>
+    <p>Select a product and click Generate — AI builds a complete content library for that product instantly. All content types in one click.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-text"><strong>How it works:</strong> Select a product → click Generate Library → AI creates 10+ pieces of ready-to-use content including captions, ad copy, reel scripts, image prompts and email campaigns. Save anything you love to use later.</div>
+  </div>
+
+  <!-- PRODUCT SELECTOR -->
+  <div class="product-selector" id="libProductSelector">
+    <div class="product-card selected" onclick="selectLibProduct(this,'serum')">
+      <div class="product-eye">Skincare · Serum</div>
+      <div class="product-name-sm">24K Gold & Black Truffle Anti-Aging Serum</div>
+      <div class="product-price">Premium · Anti-aging</div>
+    </div>
+    <div class="product-card" onclick="selectLibProduct(this,'cleanser')">
+      <div class="product-eye">Skincare · Cleanser</div>
+      <div class="product-name-sm">24K Gold Black Truffle Hydrating Glow Cleanser</div>
+      <div class="product-price">Daily ritual · Glow</div>
+    </div>
+    <div class="product-card" onclick="selectLibProduct(this,'brush')">
+      <div class="product-eye">Makeup · Tools</div>
+      <div class="product-name-sm">4-in-1 Magnetic Makeup Brush</div>
+      <div class="product-price">$30–50 · Travel-friendly</div>
+    </div>
+  </div>
+
+  <button class="btn btn-gold" onclick="generateLibrary()" id="lib-btn" style="width:100%;justify-content:center;margin-bottom:20px;">
+    <span id="lib-inner">✦ Generate Complete Content Library</span>
+  </button>
+
+  <div id="libraryResults" style="display:none;">
+    <div class="stats-row" id="libStats">
+      <div class="stat-box"><div class="stat-num" id="ls-captions">0</div><div class="stat-label">Captions<br>Generated</div></div>
+      <div class="stat-box"><div class="stat-num" id="ls-ads">0</div><div class="stat-label">Ad Copy<br>Variations</div></div>
+      <div class="stat-box"><div class="stat-num" id="ls-reels">0</div><div class="stat-label">Reel<br>Scripts</div></div>
+      <div class="stat-box"><div class="stat-num" id="ls-prompts">0</div><div class="stat-label">Image<br>Prompts</div></div>
+    </div>
+    <div class="library-grid" id="libraryGrid"></div>
+  </div>
+</div>
+
+<!-- ══ CAPTION AI ══ -->
+<div class="panel" id="panel-caption">
+  <div class="phead">
+    <div class="phead-eye">Caption AI · Instagram & Facebook</div>
+    <h2>Generate Any<br><em>Caption Instantly</em></h2>
+    <p>Select your product, platform and tone — get a complete caption with hashtags ready to copy and post.</p>
+  </div>
+
+  <!-- PRODUCT SELECTOR -->
+  <div class="product-selector">
+    <div class="product-card selected" onclick="selectProduct(this,'cap','serum')">
+      <div class="product-eye">Serum</div>
+      <div class="product-name-sm">24K Gold Anti-Aging Serum</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'cap','cleanser')">
+      <div class="product-eye">Cleanser</div>
+      <div class="product-name-sm">Hydrating Glow Cleanser</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'cap','brush')">
+      <div class="product-eye">Brush</div>
+      <div class="product-name-sm">4-in-1 Magnetic Brush</div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="form-row">
+      <label class="form-label">Platform</label>
+      <select class="form-select" id="cap-platform">
+        <option>Instagram Feed</option>
+        <option>Instagram Reel</option>
+        <option>Instagram Story</option>
+        <option>Facebook</option>
+        <option>TikTok</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Tone</label>
+      <select class="form-select" id="cap-tone">
+        <option>Luxury & aspirational</option>
+        <option>Educational & informative</option>
+        <option>Fun & casual</option>
+        <option>Emotional & personal</option>
+        <option>Urgent & promotional</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Content Theme</label>
+      <select class="form-select" id="cap-theme">
+        <option>Product introduction</option>
+        <option>Ingredient spotlight</option>
+        <option>Before & after results</option>
+        <option>Morning ritual</option>
+        <option>Product demo</option>
+        <option>Customer testimonial</option>
+        <option>Limited time offer</option>
+        <option>Brand story</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <label class="form-label">Special Offer or CTA (optional)</label>
+    <input class="form-input" id="cap-offer" placeholder='e.g. "Use GLOW15 for 15% off" or leave blank'>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-gold" onclick="generateCaption()" id="cap-btn"><span id="cap-inner">✦ Generate Caption</span></button>
+    <button class="btn btn-outline" onclick="generateCaptionVariations()" id="capv-btn"><span id="capv-inner">Generate 3 Variations</span></button>
+  </div>
+
+  <div class="output-box" id="cap-out" style="display:none;">
+    <div class="output-head">
+      <span class="output-label">Your Caption — Ready to Post</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('cap-text')">Copy</button>
+        <button class="btn btn-sm btn-green" onclick="saveToLibrary('cap-text','Caption')">Save to Library</button>
+      </div>
+    </div>
+    <div class="output-content" id="cap-text"></div>
+  </div>
+</div>
+
+<!-- ══ REEL SCRIPT ══ -->
+<div class="panel" id="panel-reel">
+  <div class="phead">
+    <div class="phead-eye">Reel Script · Shot by Shot</div>
+    <h2>Complete Reel<br><em>Scripts & Storyboards</em></h2>
+    <p>Get a complete shot-by-shot Reel script for any product — what to film, how long each shot, what text to show, and what music to use.</p>
+  </div>
+
+  <div class="product-selector">
+    <div class="product-card selected" onclick="selectProduct(this,'reel','serum')">
+      <div class="product-eye">Serum</div>
+      <div class="product-name-sm">24K Gold Anti-Aging Serum</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'reel','cleanser')">
+      <div class="product-eye">Cleanser</div>
+      <div class="product-name-sm">Hydrating Glow Cleanser</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'reel','brush')">
+      <div class="product-eye">Brush</div>
+      <div class="product-name-sm">4-in-1 Magnetic Brush</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="form-row">
+      <label class="form-label">Reel Style</label>
+      <select class="form-select" id="reel-style">
+        <option>Product demo — show how it works</option>
+        <option>Get Ready With Me — morning ritual</option>
+        <option>Before & After transformation</option>
+        <option>Educational — explain the ingredients</option>
+        <option>Unboxing & first impression</option>
+        <option>Luxury lifestyle — aspirational</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Reel Length</label>
+      <select class="form-select" id="reel-length">
+        <option>15 seconds — quick hook</option>
+        <option>30 seconds — standard</option>
+        <option>60 seconds — detailed</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn btn-gold" onclick="generateReel()" id="reel-btn"><span id="reel-inner">✦ Generate Reel Script</span></button>
+
+  <div class="output-box" id="reel-out" style="display:none;">
+    <div class="output-head">
+      <span class="output-label">Your Reel Script — Shot by Shot</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('reel-text')">Copy Script</button>
+        <button class="btn btn-sm btn-green" onclick="saveToLibrary('reel-text','Reel Script')">Save</button>
+      </div>
+    </div>
+    <div class="output-content" id="reel-text"></div>
+  </div>
+</div>
+
+<!-- ══ AD COPY ══ -->
+<div class="panel" id="panel-ad">
+  <div class="phead">
+    <div class="phead-eye">Ad Copy · Meta Facebook & Instagram</div>
+    <h2>Generate Complete<br><em>Ad Copy</em></h2>
+    <p>Full Meta ad copy — Primary Text, Headline, Description and CTA — ready to paste directly into Meta Ads Manager.</p>
+  </div>
+
+  <div class="product-selector">
+    <div class="product-card selected" onclick="selectProduct(this,'ad','serum')">
+      <div class="product-eye">Serum</div>
+      <div class="product-name-sm">24K Gold Anti-Aging Serum</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'ad','cleanser')">
+      <div class="product-eye">Cleanser</div>
+      <div class="product-name-sm">Hydrating Glow Cleanser</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'ad','brush')">
+      <div class="product-eye">Brush</div>
+      <div class="product-name-sm">4-in-1 Magnetic Brush</div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="form-row">
+      <label class="form-label">Campaign Goal</label>
+      <select class="form-select" id="ad-goal">
+        <option>Brand Awareness</option>
+        <option>Drive Traffic</option>
+        <option>Get Purchases</option>
+        <option>Retargeting</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Ad Format</label>
+      <select class="form-select" id="ad-format">
+        <option>Single Image</option>
+        <option>Video</option>
+        <option>Carousel — 3 slides</option>
+        <option>Story</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Tone</label>
+      <select class="form-select" id="ad-tone">
+        <option>Luxury & aspirational</option>
+        <option>Educational</option>
+        <option>Urgent & promotional</option>
+        <option>Emotional</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <label class="form-label">Special Offer</label>
+    <input class="form-input" id="ad-offer" placeholder='e.g. "GLOW15 for 15% off" or "Free US shipping"'>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-gold" onclick="generateAd()" id="ad-btn"><span id="ad-inner">✦ Generate Ad</span></button>
+    <button class="btn btn-outline" onclick="generateAdVariations()" id="adv-btn"><span id="adv-inner">A/B/C Variations</span></button>
+  </div>
+
+  <div class="output-box" id="ad-out" style="display:none;">
+    <div class="output-head">
+      <span class="output-label">Your Meta Ad — Ready to Paste</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('ad-text')">Copy All</button>
+        <button class="btn btn-sm btn-green" onclick="saveToLibrary('ad-text','Ad Copy')">Save</button>
+      </div>
+    </div>
+    <div class="output-content" id="ad-text"></div>
+  </div>
+</div>
+
+<!-- ══ IMAGE PROMPTS ══ -->
+<div class="panel" id="panel-image">
+  <div class="phead">
+    <div class="phead-eye">Image Prompts · AI Generated</div>
+    <h2>Luxury Product Images<br><em>in One Click</em></h2>
+    <p>Generate AI image prompts for any product and style. Copy into Bing Image Creator (free) to get professional luxury product photos instantly.</p>
+  </div>
+
+  <div class="product-selector">
+    <div class="product-card selected" onclick="selectProduct(this,'img','serum')">
+      <div class="product-eye">Serum</div>
+      <div class="product-name-sm">24K Gold Anti-Aging Serum</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'img','cleanser')">
+      <div class="product-eye">Cleanser</div>
+      <div class="product-name-sm">Hydrating Glow Cleanser</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'img','brush')">
+      <div class="product-eye">Brush</div>
+      <div class="product-name-sm">4-in-1 Magnetic Brush</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="form-row">
+      <label class="form-label">Image Style</label>
+      <select class="form-select" id="img-style">
+        <option>Dark luxury — black marble, dramatic lighting</option>
+        <option>Clean minimal — white marble, soft light</option>
+        <option>Lifestyle — hands, skin, natural setting</option>
+        <option>Editorial — fashion magazine aesthetic</option>
+        <option>Ingredient focus — gold, truffle, botanicals</option>
+        <option>Before & after — skin transformation</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Usage</label>
+      <select class="form-select" id="img-usage">
+        <option>Instagram Feed Post</option>
+        <option>Instagram Story</option>
+        <option>Meta Ad — single image</option>
+        <option>Website hero image</option>
+        <option>Email header</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn btn-gold" onclick="generateImagePrompts()" id="img-btn"><span id="img-inner">✦ Generate 5 Image Prompts</span></button>
+
+  <div class="output-box" id="img-out" style="display:none;">
+    <div class="output-head">
+      <span class="output-label">Image Prompts — Paste into Bing</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('img-text')">Copy All</button>
+        <button class="btn btn-sm btn-gold" onclick="window.open('https://bing.com/images/create','_blank')">Open Bing →</button>
+      </div>
+    </div>
+    <div class="output-content" id="img-text"></div>
+  </div>
+</div>
+
+<!-- ══ EMAIL CAMPAIGNS ══ -->
+<div class="panel" id="panel-email">
+  <div class="phead">
+    <div class="phead-eye">Email Campaigns · Klaviyo Ready</div>
+    <h2>Complete Email<br><em>Campaigns</em></h2>
+    <p>Generate full email campaigns for Klaviyo — subject line, preview text, and full email body ready to paste.</p>
+  </div>
+
+  <div class="product-selector">
+    <div class="product-card selected" onclick="selectProduct(this,'em','serum')">
+      <div class="product-eye">Serum</div>
+      <div class="product-name-sm">24K Gold Anti-Aging Serum</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'em','cleanser')">
+      <div class="product-eye">Cleanser</div>
+      <div class="product-name-sm">Hydrating Glow Cleanser</div>
+    </div>
+    <div class="product-card" onclick="selectProduct(this,'em','brush')">
+      <div class="product-eye">Brush</div>
+      <div class="product-name-sm">4-in-1 Magnetic Brush</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="form-row">
+      <label class="form-label">Email Type</label>
+      <select class="form-select" id="em-type">
+        <option>Product Launch Announcement</option>
+        <option>Welcome Series — Email 1</option>
+        <option>Welcome Series — Email 2</option>
+        <option>Abandoned Cart Recovery</option>
+        <option>Post-Purchase Thank You</option>
+        <option>Re-engagement — Win Back</option>
+        <option>Flash Sale / Promo</option>
+        <option>Educational — Ingredient Story</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Tone</label>
+      <select class="form-select" id="em-tone">
+        <option>Luxury & warm</option>
+        <option>Urgent & promotional</option>
+        <option>Educational & informative</option>
+        <option>Personal & intimate</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <label class="form-label">Discount Code (optional)</label>
+    <input class="form-input" id="em-discount" placeholder='e.g. "GLOW15" for 15% off'>
+  </div>
+
+  <button class="btn btn-gold" onclick="generateEmail()" id="em-btn"><span id="em-inner">✦ Generate Email Campaign</span></button>
+
+  <div class="output-box" id="em-out" style="display:none;">
+    <div class="output-head">
+      <span class="output-label">Email Campaign — Klaviyo Ready</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('em-text')">Copy</button>
+        <button class="btn btn-sm btn-green" onclick="saveToLibrary('em-text','Email')">Save</button>
+      </div>
+    </div>
+    <div class="output-content" id="em-text"></div>
+  </div>
+</div>
+
+<!-- ══ WEEK PLANNER ══ -->
+<div class="panel" id="panel-planner">
+  <div class="phead">
+    <div class="phead-eye">Week Planner · Content Calendar</div>
+    <h2>Your Posting Plan<br><em>This Week</em></h2>
+    <p>Click any task to generate content for it instantly. Green = Instagram, Blue = Facebook, Orange = Email.</p>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="btn btn-gold" onclick="generateWeekPlan()" id="wp-btn"><span id="wp-inner">✦ Auto-Generate This Week's Plan</span></button>
+  </div>
+  <div class="week-grid" id="weekGrid"></div>
+</div>
+
+<!-- ══ PRE-LAUNCH PLAN ══ -->
+<div class="panel" id="panel-prelaunch">
+  <div class="phead">
+    <div class="phead-eye">Pre-Launch Plan · April–May 2026</div>
+    <h2>Build Buzz<br><em>Before Launch</em></h2>
+    <p>Your products arrive early May. Here's your complete pre-launch content strategy to build anticipation and an email list before you spend a dollar on ads.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-icon">🚀</div>
+    <div class="info-text"><strong>Target launch date: May 1, 2026.</strong> You have ~4 weeks to build buzz. Goal: 500+ email subscribers and 15+ influencer contacts before launch day. Then activate all 3 Meta campaigns simultaneously.</div>
+  </div>
+
+  <button class="btn btn-gold" onclick="generatePreLaunch()" id="pl-btn" style="width:100%;justify-content:center;margin-bottom:20px;">
+    <span id="pl-inner">✦ Generate Complete Pre-Launch Content Pack</span>
+  </button>
+
+  <div class="output-box" id="pl-out" style="display:none;">
+    <div class="output-head">
+      <span class="output-label">Pre-Launch Content Pack — All 4 Weeks</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('pl-text')">Copy All</button>
+      </div>
+    </div>
+    <div class="output-content" id="pl-text"></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── BRAND CONTEXT ──
+const BRAND = `You are a luxury brand content strategist for Orris & Oak (Orrisoak), a premium skincare and beauty brand based in Westmont, IL (Chicago area).
+
+PRODUCTS:
+1. 24K Gold & Black Truffle Anti-Aging Serum
+   - Real 24K gold particles + rare black truffle extract
+   - Peptides, retinol-alternative
+   - Visibly lifts, firms and illuminates in 14 days
+   - Premium positioning, $89+
+
+2. 24K Gold Black Truffle Hydrating Glow Cleanser  
+   - Daily cleanser with gold + truffle + hyaluronic acid
+   - "Barrier-supporting formula" / "Low-pH Hydrating Cleanser"
+   - Melts away impurities, gold-infused radiance
+   - Entry-level product, daily use
+
+3. 4-in-1 Magnetic Makeup Brush
+   - Magnetically unites 4 professional brushes into one compact set
+   - One face brush + 3 precision brushes (eyes, brows, detail)
+   - Stored as one, deployed as four
+   - Magnetic attachment mechanism — looks like 1 brush but IS 4
+   - $30-50, travel-friendly, impulse buy price point
+   - Perfect for travelers, everyday users, beauty minimalists
+
+BRAND VOICE: Luxury crafted for daily life. "Your glow, elevated." Warm, aspirational, confident. Premium without pretension.
+BRAND AESTHETIC: Dark luxury — black, gold, cream. Cormorant Garamond editorial feel.
+WEBSITE: orrisoak.com | EMAIL: support@orrisoak.com | PHONE: 312-985-6684
+DISCOUNT CODE: GLOW15 = 15% off | Free US shipping | 100% money-back guarantee
+SOCIAL: @orrisoak Instagram | Orris & Oak Facebook
+HASHTAGS: #OrriosakGlow #OrrisAndOak #LuxurySkincare #24KGoldSkincare #AntiAgingSkincare #GlowingSkin
+LAUNCH: Products arriving early May 2026 — currently in pre-launch phase`;
+
+const PRODUCTS = {
+  serum: '24K Gold & Black Truffle Anti-Aging Serum',
+  cleanser: '24K Gold Black Truffle Hydrating Glow Cleanser',
+  brush: '4-in-1 Magnetic Makeup Brush (4 brushes that magnetically unite into 1 compact tool)'
+};
+
+// ── SELECTED PRODUCTS STATE ──
+let selected = { cap:'serum', reel:'serum', ad:'serum', img:'serum', em:'serum', lib:'serum' };
+
+// ── API ──
+function getKey(){ return document.getElementById('apiKey').value.trim(); }
+function updateKey(){
+  const k = getKey();
+  document.getElementById('apiDot').className = 'api-dot' + (k.startsWith('sk-ant-') ? ' ok' : '');
+  if(k) localStorage.setItem('oo_claude_key', k);
+}
+async function claude(prompt, max=900){
+  const k = getKey();
+  if(!k){ toast('Paste your Claude API key in the top bar'); throw new Error('No key'); }
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:max, system:BRAND, messages:[{role:'user',content:prompt}] })
+  });
+  if(!r.ok){ const e=await r.json(); throw new Error(e.error?.message||r.statusText); }
+  return (await r.json()).content[0].text;
+}
+
+// ── HELPERS ──
+function nav(name, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='planner') renderWeek();
+}
+function toast(msg, type='gold'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type==='green'?' green':'');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function copyEl(id){
+  navigator.clipboard.writeText(document.getElementById(id).innerText)
+    .then(()=>toast('Copied ✓','green')).catch(()=>alert('Select and copy manually.'));
+}
+function loading(innerId, origText, on){
+  const el = document.getElementById(innerId);
+  if(on){ el.dataset.orig=el.innerHTML; el.innerHTML='<span class="spinner"></span> Generating...'; }
+  else el.innerHTML = el.dataset.orig || origText;
+  el.parentElement.disabled = on;
+}
+function selectProduct(card, prefix, type){
+  card.closest('.product-selector').querySelectorAll('.product-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selected[prefix] = type;
+}
+function selectLibProduct(card, type){
+  card.closest('.product-selector').querySelectorAll('.product-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selected.lib = type;
+}
+
+// ── SAVED LIBRARY ──
+let savedContent = JSON.parse(localStorage.getItem('oo_content_lib')||'[]');
+function saveToLibrary(textId, type){
+  const content = document.getElementById(textId).innerText;
+  const item = { type, product: selected[textId.split('-')[0]]||'', content, date: new Date().toLocaleDateString() };
+  savedContent.push(item);
+  localStorage.setItem('oo_content_lib', JSON.stringify(savedContent));
+  toast('Saved to library ✓','green');
+}
+
+// ── IDEAS FIRST ──
+let selectedIdeasProduct = 'serum';
+function selectIdeasProduct(card, type){
+  card.closest('.product-selector').querySelectorAll('.product-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedIdeasProduct = type;
+}
+
+async function generateIdeas(){
+  const product = PRODUCTS[selectedIdeasProduct];
+  const type = document.getElementById('idea-type').value;
+  const goal = document.getElementById('idea-goal').value;
+  loading('idea-inner','✦ Suggest 6 Content Ideas', true);
+  document.getElementById('ideasGrid').style.display='none';
+  document.getElementById('idea-out').style.display='none';
+  try {
+    const r = await claude(`Generate 6 distinct content ideas for Orris & Oak.
+PRODUCT: ${product}
+CONTENT TYPE: ${type}
+GOAL: ${goal}
+
+Return ONLY valid JSON array, no markdown:
+[
+  {
+    "type": "Instagram Reel",
+    "title": "Short catchy title",
+    "hook": "The opening line or hook",
+    "why": "Why this will perform well (1 sentence)",
+    "angle": "educational"
+  }
+]
+
+Make each idea genuinely different. Types can include: Instagram Caption, Instagram Reel, Facebook Ad, Email, Image Prompt, Story Sequence.
+Keep titles under 8 words. Hooks under 15 words.`, 600);
+
+    const clean = r.replace(/```json|```/g,'').trim();
+    const ideas = JSON.parse(clean);
+    const grid = document.getElementById('ideaCards');
+    grid.innerHTML = '';
+    ideas.forEach((idea,i) => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--s1);border:1px solid var(--gold-border);padding:18px;cursor:pointer;transition:all 0.2s;';
+      card.innerHTML = `
+        <div style="font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">${idea.type}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--cream);margin-bottom:8px;line-height:1.3;">${idea.title}</div>
+        <div style="font-size:10px;color:var(--gold-light);line-height:1.8;margin-bottom:8px;font-style:italic;">"${idea.hook}"</div>
+        <div style="font-size:9px;color:var(--muted);line-height:1.8;margin-bottom:14px;">${idea.why}</div>
+        <button class="btn btn-gold btn-sm" style="width:100%;justify-content:center;" onclick="buildIdea(${i})">✦ Build This →</button>`;
+      card.onmouseenter = () => card.style.borderColor = 'var(--gold)';
+      card.onmouseleave = () => card.style.borderColor = 'var(--gold-border)';
+      grid.appendChild(card);
+    });
+    window._currentIdeas = ideas;
+    document.getElementById('ideasGrid').style.display='block';
+    toast('6 ideas ready — pick your favourite!','green');
+  } catch(e){ toast('Error: '+e.message); }
+  loading('idea-inner','✦ Suggest 6 Content Ideas', false);
+}
+
+async function buildIdea(index){
+  const idea = window._currentIdeas[index];
+  const product = PRODUCTS[selectedIdeasProduct];
+  document.getElementById('idea-out-label').textContent = idea.type + ' — ' + idea.title;
+  document.getElementById('idea-out').style.display='block';
+  document.getElementById('idea-text').innerHTML = '<span class="spinner"></span> Building your content...';
+  try {
+    let prompt = '';
+    if(idea.type.includes('Caption')){
+      prompt = `Write a complete Instagram caption for Orris & Oak.
+PRODUCT: ${product}
+CONCEPT: ${idea.title}
+HOOK: Start with "${idea.hook}"
+Include 12-15 hashtags including #OrriosakGlow #OrrisAndOak. End with orrisoak.com. Output ONLY the caption.`;
+    } else if(idea.type.includes('Reel')){
+      prompt = `Write a complete Instagram Reel script for Orris & Oak.
+PRODUCT: ${product}
+CONCEPT: ${idea.title}
+OPENING HOOK: "${idea.hook}"
+Format as shot-by-shot: Shot number, duration, visual description, text overlay, music mood. Include full caption at end.`;
+    } else if(idea.type.includes('Ad')){
+      prompt = `Write a complete Facebook/Instagram ad for Orris & Oak.
+PRODUCT: ${product}
+CONCEPT: ${idea.title}
+HOOK: "${idea.hook}"
+Format: PRIMARY TEXT, HEADLINE, DESCRIPTION, CTA BUTTON, URL: orrisoak.com`;
+    } else if(idea.type.includes('Email')){
+      prompt = `Write a complete email for Orris & Oak for Klaviyo.
+PRODUCT: ${product}
+CONCEPT: ${idea.title}
+OPENING: "${idea.hook}"
+Include: SUBJECT LINE, PREVIEW TEXT, full EMAIL BODY, sign-off as The Orris & Oak Team.`;
+    } else if(idea.type.includes('Image')){
+      prompt = `Generate 3 detailed AI image prompts for Bing Image Creator for Orris & Oak.
+PRODUCT: ${product}
+CONCEPT: ${idea.title}
+Each prompt should be 40-60 words, cinematic luxury beauty aesthetic, 8K quality. Number each 1-3.`;
+    } else if(idea.type.includes('Story')){
+      prompt = `Write a complete Instagram Story sequence for Orris & Oak.
+PRODUCT: ${product}
+CONCEPT: ${idea.title}
+HOOK: "${idea.hook}"
+Write 4-5 slides. For each: Slide number, visual description, text to show, interactive element (poll/question/link sticker).`;
+    } else {
+      prompt = `Create complete content for Orris & Oak: ${idea.type}
+PRODUCT: ${product}
+CONCEPT: ${idea.title}
+HOOK: "${idea.hook}"
+Make it ready to use immediately.`;
+    }
+    const r = await claude(prompt, 700);
+    document.getElementById('idea-text').textContent = r;
+    document.getElementById('idea-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+    toast(idea.type + ' ready ✓','green');
+  } catch(e){
+    document.getElementById('idea-text').textContent = 'Error: ' + e.message;
+    toast('Error: '+e.message);
+  }
+}
+
+// ── CONTENT LIBRARY ──
+async function generateLibrary(){
+  const product = PRODUCTS[selected.lib];
+  loading('lib-inner','✦ Generate Complete Content Library', true);
+  document.getElementById('libraryResults').style.display='none';
+  try {
+    const result = await claude(`Generate a complete content library for Orris & Oak for this product: ${product}
+
+Create ALL of the following, clearly labeled:
+
+=== INSTAGRAM CAPTION 1 — Product Introduction ===
+(luxury aspirational tone, 150 words, 15 hashtags)
+
+=== INSTAGRAM CAPTION 2 — Educational/Ingredient ===
+(educational tone, 150 words, 15 hashtags)
+
+=== INSTAGRAM CAPTION 3 — Emotional/Lifestyle ===
+(emotional warm tone, 150 words, 15 hashtags)
+
+=== FACEBOOK AD COPY — Awareness ===
+Primary Text: (100 words)
+Headline: (under 40 chars)
+Description: (under 30 chars)
+CTA: Shop Now
+
+=== FACEBOOK AD COPY — Conversion ===
+Primary Text: (100 words)
+Headline: (under 40 chars)
+Description: (under 30 chars)
+CTA: Shop Now
+
+=== REEL SCRIPT — 30 seconds ===
+Shot by shot breakdown with timing, visuals, text overlays and music
+
+=== IMAGE PROMPT 1 — Dark Luxury ===
+(detailed Bing-ready prompt)
+
+=== IMAGE PROMPT 2 — Lifestyle ===
+(detailed Bing-ready prompt)
+
+=== EMAIL SUBJECT LINES — 5 options ===
+(numbered list)
+
+Make everything specific to ${product}. Sound luxury, not generic.`, 2000);
+
+    document.getElementById('libraryResults').style.display = 'block';
+    document.getElementById('ls-captions').textContent = '3';
+    document.getElementById('ls-ads').textContent = '2';
+    document.getElementById('ls-reels').textContent = '1';
+    document.getElementById('ls-prompts').textContent = '2';
+
+    // Parse sections and display as cards
+    const sections = result.split('===').filter(s=>s.trim());
+    const grid = document.getElementById('libraryGrid');
+    grid.innerHTML = '';
+    for(let i=0; i<sections.length-1; i+=2){
+      const title = sections[i].trim();
+      const content = sections[i+1]?.trim() || '';
+      if(!content) continue;
+      const card = document.createElement('div');
+      card.className = 'lib-card';
+      card.innerHTML = `
+        <div class="lib-type">${title.includes('INSTAGRAM')?'Instagram':title.includes('FACEBOOK')?'Facebook Ad':title.includes('REEL')?'Reel Script':title.includes('IMAGE')?'Image Prompt':'Email'}</div>
+        <div class="lib-title">${title.replace(/—/g,'·').trim()}</div>
+        <div class="lib-preview">${content}</div>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button class="btn btn-sm btn-outline" onclick="showFull(this)">View Full</button>
+          <button class="btn btn-sm btn-gold" onclick="copyFull(this)">Copy</button>
+        </div>
+        <div class="full-content" style="display:none;">${content}</div>`;
+      grid.appendChild(card);
+    }
+    toast('Content library generated ✓','green');
+  } catch(e){ toast('Error: '+e.message); }
+  loading('lib-inner','✦ Generate Complete Content Library', false);
+}
+function showFull(btn){
+  const card = btn.closest('.lib-card');
+  const preview = card.querySelector('.lib-preview');
+  const full = card.querySelector('.full-content');
+  const showing = full.style.display !== 'none';
+  preview.style.display = showing ? '' : 'none';
+  full.style.display = showing ? 'none' : 'block';
+  btn.textContent = showing ? 'View Full' : 'Collapse';
+}
+function copyFull(btn){
+  const content = btn.closest('.lib-card').querySelector('.full-content').textContent;
+  navigator.clipboard.writeText(content).then(()=>toast('Copied ✓','green'));
+}
+
+// ── CAPTION ──
+async function generateCaption(){
+  const product = PRODUCTS[selected.cap];
+  const platform = document.getElementById('cap-platform').value;
+  const tone = document.getElementById('cap-tone').value;
+  const theme = document.getElementById('cap-theme').value;
+  const offer = document.getElementById('cap-offer').value;
+  loading('cap-inner','✦ Generate Caption', true);
+  try {
+    const r = await claude(`Write a ${platform} caption for Orris & Oak.
+PRODUCT: ${product}
+TONE: ${tone}
+THEME: ${theme}
+OFFER: ${offer||'Free US shipping · orrisoak.com'}
+
+Rules:
+- Hook first line — stops the scroll instantly
+- 2-3 short paragraphs
+- Natural emojis
+- End with CTA linking to orrisoak.com
+- 12-15 hashtags including #OrriosakGlow #OrrisAndOak
+- Match platform: Instagram = visual/emotional, Facebook = slightly longer, TikTok = punchy/casual
+- Output ONLY the caption, ready to copy`, 500);
+    document.getElementById('cap-text').textContent = r;
+    document.getElementById('cap-out').style.display = 'block';
+    document.getElementById('cap-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e){ toast('Error: '+e.message); }
+  loading('cap-inner','✦ Generate Caption', false);
+}
+async function generateCaptionVariations(){
+  const product = PRODUCTS[selected.cap];
+  loading('capv-inner','Generate 3 Variations', true);
+  try {
+    const r = await claude(`Write 3 distinct Instagram caption variations for Orris & Oak for: ${product}
+
+Label each clearly:
+━━ VARIATION A — [angle name] ━━
+(caption)
+
+━━ VARIATION B — [angle name] ━━
+(caption)
+
+━━ VARIATION C — [angle name] ━━
+(caption)
+
+Each should have a genuinely different angle — luxury aspirational, educational, and emotional/personal. Each 120-150 words with 12 hashtags.`, 800);
+    document.getElementById('cap-text').textContent = r;
+    document.getElementById('cap-out').style.display = 'block';
+  } catch(e){ toast('Error: '+e.message); }
+  loading('capv-inner','Generate 3 Variations', false);
+}
+
+// ── REEL SCRIPT ──
+async function generateReel(){
+  const product = PRODUCTS[selected.reel];
+  const style = document.getElementById('reel-style').value;
+  const length = document.getElementById('reel-length').value;
+  loading('reel-inner','✦ Generate Reel Script', true);
+  try {
+    const r = await claude(`Write a complete Instagram/TikTok Reel script for Orris & Oak.
+PRODUCT: ${product}
+STYLE: ${style}
+LENGTH: ${length}
+
+Format as shot-by-shot breakdown:
+
+REEL TITLE: [catchy title]
+HOOK: [what appears in first 2 seconds]
+MUSIC: [describe the sound/mood]
+
+SHOT 1 — [duration]
+Visual: [exactly what to film]
+Text overlay: [what text appears on screen]
+Voiceover/Sound: [if any]
+
+SHOT 2 — [duration]
+...continue for all shots...
+
+CAPTION: [complete Instagram caption with hashtags]
+THUMBNAIL IDEA: [what the cover frame should show]
+
+Make it specific, filmable with a phone, and genuinely engaging.`, 700);
+    document.getElementById('reel-text').textContent = r;
+    document.getElementById('reel-out').style.display = 'block';
+    document.getElementById('reel-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e){ toast('Error: '+e.message); }
+  loading('reel-inner','✦ Generate Reel Script', false);
+}
+
+// ── AD COPY ──
+async function generateAd(){
+  const product = PRODUCTS[selected.ad];
+  const goal = document.getElementById('ad-goal').value;
+  const format = document.getElementById('ad-format').value;
+  const tone = document.getElementById('ad-tone').value;
+  const offer = document.getElementById('ad-offer').value;
+  loading('ad-inner','✦ Generate Ad', true);
+  try {
+    const r = await claude(`Write a complete Meta ad for Orris & Oak.
+PRODUCT: ${product}
+GOAL: ${goal} | FORMAT: ${format} | TONE: ${tone}
+OFFER: ${offer||'Free US shipping · 100% money-back guarantee'}
+
+═══ PRIMARY TEXT ═══
+(100-120 words, hook opener, end with orrisoak.com)
+
+═══ HEADLINE ═══
+(under 40 chars, punchy)
+
+═══ DESCRIPTION ═══
+(under 30 chars)
+
+═══ CTA BUTTON ═══
+(Shop Now / Learn More / Get Offer)
+
+═══ WEBSITE URL ═══
+https://orrisoak.com
+
+${format.includes('Carousel')?'═══ SLIDE 1 HEADLINE ═══\n═══ SLIDE 2 HEADLINE ═══\n═══ SLIDE 3 HEADLINE ═══':''}
+
+Sound luxury, not pushy. No generic openers like "Introducing".`);
+    document.getElementById('ad-text').textContent = r;
+    document.getElementById('ad-out').style.display = 'block';
+    document.getElementById('ad-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e){ toast('Error: '+e.message); }
+  loading('ad-inner','✦ Generate Ad', false);
+}
+async function generateAdVariations(){
+  const product = PRODUCTS[selected.ad];
+  loading('adv-inner','A/B/C Variations', true);
+  try {
+    const r = await claude(`Generate 3 Meta ad A/B/C variations for Orris & Oak: ${product}
+
+━━━ VARIATION A — [angle] ━━━
+Primary Text: (80 words)
+Headline: (under 40 chars)
+CTA: ...
+
+━━━ VARIATION B — [angle] ━━━
+...
+
+━━━ VARIATION C — [angle] ━━━
+...
+
+━━━ TESTING PLAN ━━━
+How to split test these at $10/day.
+
+Make each genuinely different angle.`, 800);
+    document.getElementById('ad-text').textContent = r;
+    document.getElementById('ad-out').style.display = 'block';
+  } catch(e){ toast('Error: '+e.message); }
+  loading('adv-inner','A/B/C Variations', false);
+}
+
+// ── IMAGE PROMPTS ──
+async function generateImagePrompts(){
+  const product = PRODUCTS[selected.img];
+  const style = document.getElementById('img-style').value;
+  const usage = document.getElementById('img-usage').value;
+  loading('img-inner','✦ Generate 5 Image Prompts', true);
+  try {
+    const r = await claude(`Generate 5 detailed AI image prompts for Bing Image Creator for Orris & Oak.
+PRODUCT: ${product}
+STYLE: ${style}
+USAGE: ${usage}
+
+Number each prompt 1-5. Each should be:
+- Detailed and specific (40-60 words)
+- Include lighting, background, mood, camera style
+- Cinematic luxury beauty aesthetic
+- Reference the actual product accurately
+- End each with: "luxury beauty editorial photography, 8K"
+
+Make each genuinely different composition and angle.`, 600);
+    document.getElementById('img-text').textContent = r;
+    document.getElementById('img-out').style.display = 'block';
+    document.getElementById('img-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e){ toast('Error: '+e.message); }
+  loading('img-inner','✦ Generate 5 Image Prompts', false);
+}
+
+// ── EMAIL ──
+async function generateEmail(){
+  const product = PRODUCTS[selected.em];
+  const type = document.getElementById('em-type').value;
+  const tone = document.getElementById('em-tone').value;
+  const discount = document.getElementById('em-discount').value;
+  loading('em-inner','✦ Generate Email Campaign', true);
+  try {
+    const r = await claude(`Write a complete email campaign for Orris & Oak for Klaviyo.
+PRODUCT: ${product}
+EMAIL TYPE: ${type}
+TONE: ${tone}
+DISCOUNT: ${discount||'none'}
+
+Format:
+SUBJECT LINE: (under 50 chars, compelling)
+PREVIEW TEXT: (under 100 chars)
+
+EMAIL BODY:
+[Full email — greeting, body paragraphs, CTA button text, sign-off]
+
+Sign off as: The Orris & Oak Team | orrisoak.com | support@orrisoak.com
+
+Rules: Warm luxury tone. Clear CTA. Mobile-friendly short paragraphs. If discount provided, make it prominent.`, 700);
+    document.getElementById('em-text').textContent = r;
+    document.getElementById('em-out').style.display = 'block';
+    document.getElementById('em-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e){ toast('Error: '+e.message); }
+  loading('em-inner','✦ Generate Email Campaign', false);
+}
+
+// ── WEEK PLANNER ──
+const weekPlan = [
+  { tasks:[{text:'What is 24K Gold in skincare?',type:'ig',p:'Instagram + Facebook'},{text:'Gold Serum awareness ad',type:'fb',p:'Meta Ads'}]},
+  { tasks:[{text:'Morning ritual video — all 3 products',type:'ig',p:'Instagram Reel + TikTok'}]},
+  { tasks:[{text:'Black Truffle beauty secret',type:'ig',p:'Facebook + Story'},{text:'Story poll: Which product first?',type:'ig',p:'Instagram Story'}]},
+  { tasks:[{text:'Magnetic Brush snap demo video',type:'ig',p:'Instagram Reel + TikTok'}]},
+  { tasks:[{text:'"Why luxury skincare is worth it"',type:'fb',p:'Facebook Post'}]},
+  { tasks:[{text:'Product flat lay — all 3 together',type:'ig',p:'Instagram Feed'}]},
+  { tasks:[]},
+];
+const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const taskDone = new Set();
+
+function renderWeek(){
+  const today = (new Date().getDay()+6)%7;
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  weekPlan.forEach((d,i)=>{
+    const col = document.createElement('div');
+    col.className = 'week-day';
+    col.innerHTML = `<div class="week-head ${i===today?'today':''}">${days[i]}${i===today?' ★':''}</div><div class="week-tasks" id="wt-${i}"></div>`;
+    grid.appendChild(col);
+    const tasks = col.querySelector('.week-tasks');
+    if(!d.tasks.length){ tasks.innerHTML='<div class="week-rest">Rest & engage</div>'; return; }
+    d.tasks.forEach((t,j)=>{
+      const key=`${i}-${j}`;
+      const el = document.createElement('div');
+      el.className = `week-task ${t.type}${taskDone.has(key)?' done':''}`;
+      el.innerHTML = `${t.text}<div class="week-task-platform ${t.type}">${t.p}</div>`;
+      el.onclick = ()=>{
+        if(taskDone.has(key)) taskDone.delete(key);
+        else taskDone.add(key);
+        renderWeek();
+      };
+      tasks.appendChild(el);
+    });
+  });
+}
+
+async function generateWeekPlan(){
+  loading('wp-inner','✦ Auto-Generate This Week\'s Plan', true);
+  try {
+    const r = await claude(`Generate a complete 7-day social media content plan for Orris & Oak this week.
+
+For each day (Monday through Sunday) list:
+- What to post
+- Platform (Instagram/Facebook/TikTok)
+- Content type (Reel/Photo/Story/Email)
+- Key message
+
+Cover all 3 products across the week. Include at least:
+- 2 Instagram Reels
+- 3 Feed posts
+- 2 Stories
+- 1 Facebook post
+- Sunday = rest/engage with comments
+
+Format clearly with DAY headers. Make it practical and specific.`, 600);
+    const outBox = document.createElement('div');
+    outBox.className = 'output-box';
+    outBox.style.marginTop = '20px';
+    outBox.innerHTML = `<div class="output-head"><span class="output-label">This Week's Content Plan</span><div class="output-actions"><button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(this.closest('.output-box').querySelector('.output-content').innerText).then(()=>toast('Copied ✓','green'))">Copy</button></div></div><div class="output-content">${r}</div>`;
+    document.getElementById('weekGrid').after(outBox);
+    toast('Week plan generated ✓','green');
+  } catch(e){ toast('Error: '+e.message); }
+  loading('wp-inner','✦ Auto-Generate This Week\'s Plan', false);
+}
+
+// ── PRE-LAUNCH ──
+async function generatePreLaunch(){
+  loading('pl-inner','✦ Generate Complete Pre-Launch Content Pack', true);
+  try {
+    const r = await claude(`Generate a complete 4-week pre-launch content plan for Orris & Oak.
+Products arriving early May 2026. Target launch: May 1, 2026.
+
+WEEK 1 (Apr 7-12): "Something is coming" — mystery/teaser
+WEEK 2 (Apr 13-19): First product hints — partial reveals  
+WEEK 3 (Apr 20-26): Full product reveal — all 3 products
+WEEK 4 (Apr 27-May 1): Launch countdown + launch day
+
+For each week provide:
+- 3 social media posts (with full captions and hashtags)
+- 1 Instagram Story sequence (3 slides)
+- Key goal for the week
+- Email to send (subject line + body)
+
+Make captions specific and ready to post. Include emojis and hashtags.
+Always end posts with orrisoak.com and relevant hashtags including #OrriosakGlow #OrrisAndOak.`, 2000);
+    document.getElementById('pl-text').textContent = r;
+    document.getElementById('pl-out').style.display = 'block';
+    document.getElementById('pl-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+    toast('Pre-launch pack generated ✓','green');
+  } catch(e){ toast('Error: '+e.message); }
+  loading('pl-inner','✦ Generate Complete Pre-Launch Content Pack', false);
+}
+
+// ── INIT ──
+const savedKey = localStorage.getItem('oo_claude_key');
+if(savedKey){ document.getElementById('apiKey').value=savedKey; updateKey(); }
+renderWeek();
+</script>
+</body>
+</html>

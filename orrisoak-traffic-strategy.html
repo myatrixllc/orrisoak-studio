@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak · Traffic & Brand Awareness Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --gold-dim: rgba(201,168,76,0.12);
+    --black: #080808;
+    --surface: #111111;
+    --surface2: #181818;
+    --surface3: #222222;
+    --border: rgba(201,168,76,0.18);
+    --cream: #F5EFE3;
+    --muted: #7A6E62;
+    --green: #4CAF7D;
+    --green-dim: rgba(76,175,125,0.1);
+    --blue: #6B8CFF;
+    --blue-dim: rgba(107,140,255,0.1);
+    --orange: #E0943A;
+    --orange-dim: rgba(224,148,58,0.1);
+    --red: #E05252;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 50px 60px 40px;
+    position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .header::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(201,168,76,0.05), transparent);
+  }
+  .header-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+  .eyebrow { font-size: 8px; letter-spacing: 7px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  .header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 5vw, 62px);
+    font-weight: 300; line-height: 1.05; color: var(--cream);
+  }
+  .header h1 em { font-style: italic; color: var(--gold); }
+  .header-desc {
+    font-size: 12px; letter-spacing: 1.5px; color: var(--muted);
+    margin-top: 14px; max-width: 620px; line-height: 2.2;
+  }
+  .header-pills {
+    display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap;
+  }
+  .pill {
+    font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 7px 16px; border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .pill.green { border-color: rgba(76,175,125,0.4); color: var(--green); background: var(--green-dim); }
+  .pill.gold { border-color: rgba(201,168,76,0.4); color: var(--gold); background: var(--gold-dim); }
+  .pill.blue { border-color: rgba(107,140,255,0.4); color: var(--blue); background: var(--blue-dim); }
+
+  /* BODY */
+  .body { max-width: 1200px; margin: 0 auto; padding: 60px; }
+
+  /* PRIORITY BANNER */
+  .priority-banner {
+    background: var(--gold-dim);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-left: 4px solid var(--gold);
+    padding: 22px 28px;
+    margin-bottom: 50px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .priority-banner-icon { font-size: 24px; flex-shrink: 0; }
+  .priority-banner-title {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 6px;
+  }
+  .priority-banner-text {
+    font-size: 12px; letter-spacing: 0.5px; color: var(--cream); line-height: 2;
+  }
+
+  /* SECTION */
+  .section { margin-bottom: 64px; }
+  .section-head { margin-bottom: 28px; }
+  .section-eyebrow {
+    font-size: 8px; letter-spacing: 6px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(26px, 3vw, 38px);
+    font-weight: 300; line-height: 1.15;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+  .section-desc {
+    font-size: 11px; letter-spacing: 1px; color: var(--muted);
+    margin-top: 10px; line-height: 2.2; max-width: 700px;
+  }
+
+  /* CHANNEL CARDS */
+  .channels { display: flex; flex-direction: column; gap: 3px; }
+  .channel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid transparent;
+    display: grid; grid-template-columns: 60px 1fr auto;
+    gap: 0; overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .channel-card:hover { border-color: var(--gold); }
+  .channel-card.priority-1 { border-left-color: var(--green); }
+  .channel-card.priority-2 { border-left-color: var(--gold); }
+  .channel-card.priority-3 { border-left-color: var(--blue); }
+  .channel-card.priority-4 { border-left-color: var(--orange); }
+
+  .channel-rank {
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-weight: 300; color: rgba(201,168,76,0.2);
+    background: var(--surface2); border-right: 1px solid var(--border);
+    padding: 0 10px;
+  }
+  .channel-body { padding: 22px 24px; }
+  .channel-top {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+  }
+  .channel-icon { font-size: 22px; }
+  .channel-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; color: var(--cream);
+  }
+  .channel-badge {
+    font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 0;
+  }
+  .badge-free { background: var(--green-dim); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+  .badge-low { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+  .badge-medium { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(107,140,255,0.3); }
+  .badge-later { background: var(--surface3); color: var(--muted); border: 1px solid var(--border); }
+
+  .channel-desc {
+    font-size: 11px; letter-spacing: 0.5px; color: var(--muted);
+    line-height: 2; margin-bottom: 14px;
+  }
+  .channel-actions {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .action-tag {
+    font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--gold-light); padding: 4px 12px;
+  }
+  .channel-meta {
+    padding: 22px 24px; border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: flex-end; gap: 8px; min-width: 160px;
+    background: var(--surface2);
+  }
+  .meta-label { font-size: 7px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+  .meta-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; color: var(--gold); text-align: right;
+  }
+  .meta-sub { font-size: 8px; letter-spacing: 2px; color: var(--muted); text-align: right; }
+
+  /* BUDGET TABLE */
+  .budget-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 2px; background: var(--gold-dim); margin-top: 4px;
+  }
+  .budget-cell {
+    background: var(--surface); padding: 24px 20px;
+    transition: background 0.2s;
+  }
+  .budget-cell:hover { background: var(--surface2); }
+  .budget-cell-label {
+    font-size: 8px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px;
+  }
+  .budget-cell-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px; font-weight: 300; color: var(--cream);
+    line-height: 1;
+  }
+  .budget-cell-desc {
+    font-size: 10px; letter-spacing: 0.5px; color: var(--muted);
+    margin-top: 8px; line-height: 1.9;
+  }
+
+  /* WEEKLY PLAN */
+  .week-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .day-col { background: var(--surface); }
+  .day-header {
+    padding: 12px 10px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); text-align: center;
+  }
+  .day-tasks { padding: 14px 10px; }
+  .day-task {
+    font-size: 9px; letter-spacing: 0.5px; color: var(--cream);
+    padding: 8px 0; border-bottom: 1px solid var(--gold-dim);
+    line-height: 1.7;
+  }
+  .day-task:last-child { border-bottom: none; }
+  .day-task-platform {
+    font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); opacity: 0.7; margin-top: 3px;
+  }
+  .day-task.rest {
+    color: var(--muted); font-style: italic; font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+  }
+
+  /* CONTENT IDEAS */
+  .ideas-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .idea-card {
+    background: var(--surface); padding: 24px 20px;
+    border-top: 2px solid transparent;
+    transition: border-top-color 0.3s;
+  }
+  .idea-card:hover { border-top-color: var(--gold); }
+  .idea-platform {
+    font-size: 7px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px;
+  }
+  .idea-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; color: var(--cream); margin-bottom: 8px; line-height: 1.4;
+  }
+  .idea-why {
+    font-size: 10px; letter-spacing: 0.5px; color: var(--muted); line-height: 1.9;
+  }
+
+  /* INFLUENCER QUICK GUIDE */
+  .inf-strip {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .inf-card {
+    background: var(--surface); padding: 28px 24px;
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .inf-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+  .inf-card.best { border-color: var(--gold); background: var(--gold-dim); }
+  .inf-best-badge {
+    font-size: 7px; letter-spacing: 3px; text-transform: uppercase;
+    background: var(--gold); color: var(--black);
+    padding: 3px 10px; display: inline-block; margin-bottom: 14px;
+  }
+  .inf-tier {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; color: var(--gold); margin-bottom: 4px;
+  }
+  .inf-range {
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px;
+  }
+  .inf-list { list-style: none; }
+  .inf-list li {
+    font-size: 10px; letter-spacing: 0.5px; color: var(--muted);
+    padding: 7px 0; border-bottom: 1px solid var(--gold-dim); line-height: 1.8;
+  }
+  .inf-list li::before { content: '✦ '; color: var(--gold); font-size: 7px; }
+
+  /* HASHTAG BOX */
+  .hashtag-grid {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+  }
+  .hashtag {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--gold-light); font-size: 10px; letter-spacing: 1px;
+    padding: 8px 16px; transition: all 0.2s; cursor: pointer;
+  }
+  .hashtag:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+  .hashtag.branded { border-color: rgba(201,168,76,0.4); color: var(--gold); background: var(--gold-dim); }
+
+  /* CTA */
+  .final-cta {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 50px; text-align: center; margin-top: 60px;
+    position: relative; overflow: hidden;
+  }
+  .final-cta::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08), transparent 70%);
+  }
+  .final-cta-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 300; position: relative;
+  }
+  .final-cta-title em { font-style: italic; color: var(--gold); }
+  .final-cta-text {
+    font-size: 11px; letter-spacing: 1.5px; color: var(--muted);
+    margin: 14px auto 28px; max-width: 500px; line-height: 2.2; position: relative;
+  }
+  .btn-gold {
+    display: inline-block; background: var(--gold); color: var(--black);
+    padding: 14px 44px; font-family: 'Josefin Sans', sans-serif;
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: all 0.2s; position: relative;
+    margin: 0 8px;
+  }
+  .btn-gold:hover { background: var(--gold-light); }
+  .btn-outline {
+    display: inline-block; background: transparent; color: var(--gold);
+    padding: 14px 44px; font-family: 'Josefin Sans', sans-serif;
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    text-decoration: none; border: 1px solid var(--gold); cursor: pointer;
+    transition: all 0.2s; position: relative; margin: 0 8px;
+  }
+  .btn-outline:hover { background: var(--gold-dim); }
+
+  @media (max-width: 900px) {
+    .body { padding: 40px 20px; }
+    .header { padding: 40px 20px 32px; }
+    .channel-card { grid-template-columns: 1fr; }
+    .channel-rank { display: none; }
+    .channel-meta { border-left: none; border-top: 1px solid var(--border); flex-direction: row; justify-content: space-between; align-items: center; }
+    .budget-grid, .ideas-grid, .inf-strip { grid-template-columns: 1fr; }
+    .week-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="eyebrow">Orris & Oak · Brand Awareness Plan · 2025</div>
+    <h1>Bringing Customers<br><em>To Orrisoak.com</em></h1>
+    <p class="header-desc">A prioritized, budget-smart traffic strategy for Orrisoak — built around your $500/month budget, organic-first approach, and brand awareness goal. No wasted spend. Just what works right now.</p>
+    <div class="header-pills">
+      <div class="pill green">✓ Budget: Under $500/month</div>
+      <div class="pill gold">✓ Goal: Brand Awareness</div>
+      <div class="pill blue">✓ Currently: Organic Social</div>
+    </div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- PRIORITY BANNER -->
+  <div class="priority-banner">
+    <div class="priority-banner-icon">💡</div>
+    <div>
+      <div class="priority-banner-title">The Honest Strategy for Your Budget</div>
+      <div class="priority-banner-text">
+        With under $500/month and zero brand awareness yet, <strong style="color:var(--gold)">paid ads will burn your budget fast</strong> with little return — people don't buy from brands they've never heard of. The smartest move right now is <strong style="color:var(--gold)">Organic Social + Micro-Influencers first</strong>. Build trust and recognition for 60 days, then layer in small paid ads to amplify what's already working. This is exactly how luxury beauty brands like yours break through.
+      </div>
+    </div>
+  </div>
+
+  <!-- CHANNEL PRIORITY -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-eyebrow">Traffic Channels · Ranked for Orrisoak</div>
+      <h2 class="section-title">Your 6 Channels,<br><em>In Priority Order</em></h2>
+      <p class="section-desc">Start at #1 and work your way down as your budget and confidence grows. Do not skip ahead — each channel builds on the last.</p>
+    </div>
+
+    <div class="channels">
+
+      <!-- #1 -->
+      <div class="channel-card priority-1">
+        <div class="channel-rank">1</div>
+        <div class="channel-body">
+          <div class="channel-top">
+            <div class="channel-icon">📱</div>
+            <div class="channel-name">Organic Social Media</div>
+            <span class="channel-badge badge-free">100% Free</span>
+            <span class="channel-badge badge-free">Start Today</span>
+          </div>
+          <p class="channel-desc">Instagram and Facebook posting — your most powerful free tool. Post 5x per week minimum. Show the products, the ritual, the ingredients, before/afters, and behind the scenes. This builds trust and brand recognition that makes every other channel work better. Your AI Agent generates captions in seconds.</p>
+          <div class="channel-actions">
+            <span class="action-tag">Instagram Reels</span>
+            <span class="action-tag">Facebook Posts</span>
+            <span class="action-tag">Instagram Stories</span>
+            <span class="action-tag">TikTok Videos</span>
+            <span class="action-tag">Pinterest Pins</span>
+          </div>
+        </div>
+        <div class="channel-meta">
+          <div class="meta-label">Monthly Cost</div>
+          <div class="meta-value">$0</div>
+          <div class="meta-sub">Time: 1–2 hrs/day</div>
+          <div class="meta-sub" style="color:var(--green);">● Start Immediately</div>
+        </div>
+      </div>
+
+      <!-- #2 -->
+      <div class="channel-card priority-2">
+        <div class="channel-rank">2</div>
+        <div class="channel-body">
+          <div class="channel-top">
+            <div class="channel-icon">🤝</div>
+            <div class="channel-name">Micro-Influencer Gifting</div>
+            <span class="channel-badge badge-low">Product Cost Only</span>
+            <span class="channel-badge badge-free">High ROI</span>
+          </div>
+          <p class="channel-desc">Send your 3 products (the complete ritual) to 10–15 beauty influencers with 5K–50K followers in exchange for an honest review post or reel. This is the fastest way to get brand awareness with a small budget. One good influencer post can bring hundreds of new visitors to orrisoak.com in 24 hours.</p>
+          <div class="channel-actions">
+            <span class="action-tag">Instagram Reviews</span>
+            <span class="action-tag">TikTok Unboxing</span>
+            <span class="action-tag">YouTube Shorts</span>
+            <span class="action-tag">Blog Reviews</span>
+          </div>
+        </div>
+        <div class="channel-meta">
+          <div class="meta-label">Monthly Cost</div>
+          <div class="meta-value">$50–150</div>
+          <div class="meta-sub">Product + shipping cost</div>
+          <div class="meta-sub" style="color:var(--gold);">● Start Week 2</div>
+        </div>
+      </div>
+
+      <!-- #3 -->
+      <div class="channel-card priority-3">
+        <div class="channel-rank">3</div>
+        <div class="channel-body">
+          <div class="channel-top">
+            <div class="channel-icon">📝</div>
+            <div class="channel-name">SEO Blog Content</div>
+            <span class="channel-badge badge-free">Free</span>
+            <span class="channel-badge badge-medium">Long-term</span>
+          </div>
+          <p class="channel-desc">Write 2 blog posts per month on your Ritual Journal (already on orrisoak.com) targeting searches like "24K gold skincare benefits," "best anti-aging serum 2025," "how to use a magnetic makeup brush." Google traffic is free and compounds over time — articles you write today bring visitors for years. Your AI agent can write full blog posts.</p>
+          <div class="channel-actions">
+            <span class="action-tag">Google SEO</span>
+            <span class="action-tag">Blog Articles</span>
+            <span class="action-tag">Pinterest SEO</span>
+            <span class="action-tag">Long-tail Keywords</span>
+          </div>
+        </div>
+        <div class="channel-meta">
+          <div class="meta-label">Monthly Cost</div>
+          <div class="meta-value">$0</div>
+          <div class="meta-sub">Time: 2–3 hrs/post</div>
+          <div class="meta-sub" style="color:var(--blue);">● Start Month 2</div>
+        </div>
+      </div>
+
+      <!-- #4 -->
+      <div class="channel-card priority-4">
+        <div class="channel-rank">4</div>
+        <div class="channel-body">
+          <div class="channel-top">
+            <div class="channel-icon">💰</div>
+            <div class="channel-name">Facebook & Instagram Ads</div>
+            <span class="channel-badge badge-low">$200–300/mo</span>
+            <span class="channel-badge badge-medium">Month 2+</span>
+          </div>
+          <p class="channel-desc">Once you have 10+ organic posts and at least 2–3 influencer posts live, start small paid ads. Boost your best-performing organic posts for $5–10/day. Target women 28–55 interested in luxury skincare. Start with the Gold Serum awareness campaign. Only add paid ads once you have social proof — it multiplies results dramatically.</p>
+          <div class="channel-actions">
+            <span class="action-tag">Boosted Posts</span>
+            <span class="action-tag">Awareness Campaign</span>
+            <span class="action-tag">Retargeting</span>
+            <span class="action-tag">Lookalike Audiences</span>
+          </div>
+        </div>
+        <div class="channel-meta">
+          <div class="meta-label">Monthly Budget</div>
+          <div class="meta-value">$200</div>
+          <div class="meta-sub">$5–10/day to start</div>
+          <div class="meta-sub" style="color:var(--orange);">● Start Month 2</div>
+        </div>
+      </div>
+
+      <!-- #5 -->
+      <div class="channel-card" style="border-left-color: var(--muted);">
+        <div class="channel-rank">5</div>
+        <div class="channel-body">
+          <div class="channel-top">
+            <div class="channel-icon">🔍</div>
+            <div class="channel-name">Google Shopping Ads</div>
+            <span class="channel-badge badge-later">Month 3+</span>
+          </div>
+          <p class="channel-desc">When someone searches "24K gold anti-aging serum" on Google, your product appears at the top with a photo and price. Very high purchase intent — these are people actively looking to buy. Requires a Google Merchant Center account connected to WooCommerce. Start with $5/day once you have reviews to show.</p>
+          <div class="channel-actions">
+            <span class="action-tag">Google Shopping</span>
+            <span class="action-tag">Search Ads</span>
+            <span class="action-tag">High Intent Traffic</span>
+          </div>
+        </div>
+        <div class="channel-meta">
+          <div class="meta-label">Monthly Budget</div>
+          <div class="meta-value">$150</div>
+          <div class="meta-sub">$5/day minimum</div>
+          <div class="meta-sub" style="color:var(--muted);">● Start Month 3</div>
+        </div>
+      </div>
+
+      <!-- #6 -->
+      <div class="channel-card" style="border-left-color: var(--muted);">
+        <div class="channel-rank">6</div>
+        <div class="channel-body">
+          <div class="channel-top">
+            <div class="channel-icon">🤳</div>
+            <div class="channel-name">TikTok Ads</div>
+            <span class="channel-badge badge-later">Month 4+</span>
+          </div>
+          <p class="channel-desc">TikTok has the best organic reach of any platform right now — your videos can go viral with zero ad spend. Post organically first. Once you have a video that gets strong organic views, put $20–50 behind it as a Spark Ad to amplify it. Beauty products perform exceptionally well on TikTok.</p>
+          <div class="channel-actions">
+            <span class="action-tag">Organic TikTok</span>
+            <span class="action-tag">Spark Ads</span>
+            <span class="action-tag">Viral Potential</span>
+          </div>
+        </div>
+        <div class="channel-meta">
+          <div class="meta-label">Monthly Budget</div>
+          <div class="meta-value">$50–100</div>
+          <div class="meta-sub">Spark Ads only</div>
+          <div class="meta-sub" style="color:var(--muted);">● Start Month 4</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BUDGET BREAKDOWN -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-eyebrow">Budget Allocation</div>
+      <h2 class="section-title">How to Spend<br><em>Your $500/Month</em></h2>
+    </div>
+    <div class="budget-grid">
+      <div class="budget-cell">
+        <div class="budget-cell-label">Month 1</div>
+        <div class="budget-cell-amount" style="color:var(--green);">$0</div>
+        <div class="budget-cell-desc">100% organic. Post daily. Build your content library. Identify 15 influencers to contact. Zero ad spend.</div>
+      </div>
+      <div class="budget-cell">
+        <div class="budget-cell-label">Month 2</div>
+        <div class="budget-cell-amount">$350</div>
+        <div class="budget-cell-desc"><strong style="color:var(--gold);">$150</strong> influencer gifting (ship products to 5 creators) + <strong style="color:var(--gold);">$200</strong> Facebook boosted posts ($7/day)</div>
+      </div>
+      <div class="budget-cell">
+        <div class="budget-cell-label">Month 3</div>
+        <div class="budget-cell-amount">$450</div>
+        <div class="budget-cell-desc"><strong style="color:var(--gold);">$150</strong> influencers + <strong style="color:var(--gold);">$150</strong> Facebook ads + <strong style="color:var(--gold);">$150</strong> Google Shopping (new)</div>
+      </div>
+      <div class="budget-cell">
+        <div class="budget-cell-label">Month 4+</div>
+        <div class="budget-cell-amount">$500</div>
+        <div class="budget-cell-desc"><strong style="color:var(--gold);">$150</strong> influencers + <strong style="color:var(--gold);">$200</strong> Facebook + <strong style="color:var(--gold);">$100</strong> Google + <strong style="color:var(--gold);">$50</strong> TikTok Spark Ads</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY POSTING PLAN -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-eyebrow">Organic Social · Week 1 Plan</div>
+      <h2 class="section-title">Post Every Day<br><em>Starting Now</em></h2>
+      <p class="section-desc">Consistency beats perfection. Post this exact schedule for the first 4 weeks to build your audience. Use your AI agent to generate every caption instantly.</p>
+    </div>
+    <div class="week-grid">
+      <div class="day-col">
+        <div class="day-header">Mon</div>
+        <div class="day-tasks">
+          <div class="day-task">
+            "What is 24K Gold in skincare?" — educational carousel
+            <div class="day-task-platform">Instagram + Facebook</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">Tue</div>
+        <div class="day-tasks">
+          <div class="day-task">
+            Morning ritual video showing all 3 products
+            <div class="day-task-platform">Instagram Reel + TikTok</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">Wed</div>
+        <div class="day-tasks">
+          <div class="day-task">
+            Black Truffle — nature's rarest beauty secret
+            <div class="day-task-platform">Facebook Post + Story</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">Thu</div>
+        <div class="day-tasks">
+          <div class="day-task">
+            Close-up product texture video — Gold Serum
+            <div class="day-task-platform">Instagram Reel + TikTok</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">Fri</div>
+        <div class="day-tasks">
+          <div class="day-task">
+            "Why luxury skincare is worth it" — story/opinion post
+            <div class="day-task-platform">Instagram + Facebook</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">Sat</div>
+        <div class="day-tasks">
+          <div class="day-task">
+            4-in-1 Magnetic Brush demo video
+            <div class="day-task-platform">Instagram Reel + TikTok</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">Sun</div>
+        <div class="day-tasks">
+          <div class="day-task rest">
+            Engage with comments & DMs. Rest & plan next week.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT IDEAS -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-eyebrow">Content That Drives Traffic</div>
+      <h2 class="section-title">9 Content Ideas<br><em>That Actually Work</em></h2>
+    </div>
+    <div class="ideas-grid">
+      <div class="idea-card">
+        <div class="idea-platform">Instagram Reel · TikTok</div>
+        <div class="idea-title">"I tried 24K Gold skincare for 30 days — here's what happened"</div>
+        <div class="idea-why">Before/after format. Extremely high engagement. People tag friends. Gets saved constantly.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">Instagram Reel · TikTok</div>
+        <div class="idea-title">Magnetic Brush ASMR unboxing + demo in 30 seconds</div>
+        <div class="idea-why">Visual and satisfying. The magnetic click is extremely watchable. Very shareable.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">Instagram Carousel</div>
+        <div class="idea-title">"5 signs your skin needs the Gold Serum" — swipe post</div>
+        <div class="idea-why">Educational carousels get the most saves on Instagram. Saves = algorithm boost.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">Facebook + Instagram</div>
+        <div class="idea-title">Side-by-side: drugstore cleanser vs Orrisoak Gold Cleanser</div>
+        <div class="idea-why">Comparison content drives massive comments and debate. Very shareable.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">TikTok · Instagram Reel</div>
+        <div class="idea-title">"Get ready with me" morning routine using all 3 products</div>
+        <div class="idea-why">GRWM is the #1 beauty format on TikTok. Huge organic reach potential.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">Instagram Story Poll</div>
+        <div class="idea-title">"Which Orrisoak product would you try first?" — poll sticker</div>
+        <div class="idea-why">Interactive stories get 3x more reach. Polls create micro-commitment to your brand.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">Blog · Pinterest</div>
+        <div class="idea-title">"24K Gold in skincare: science or hype? The full truth"</div>
+        <div class="idea-why">Answers a top Google search. Positions Orrisoak as an expert. Drives long-term SEO traffic.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">Instagram + Facebook</div>
+        <div class="idea-title">Behind the scenes — how Orrisoak products are made</div>
+        <div class="idea-why">Brand authenticity content builds deep trust. People buy from brands they feel connected to.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">All Platforms</div>
+        <div class="idea-title">"The complete luxury ritual" — cleanse, treat, apply in 60 seconds</div>
+        <div class="idea-why">Shows all 3 products working together. Great for awareness and for the bundle upsell.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFLUENCER SECTION -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-eyebrow">Influencer Gifting · Quick Start</div>
+      <h2 class="section-title">Your Fastest Path<br><em>to Brand Awareness</em></h2>
+      <p class="section-desc">Send your complete 3-product ritual to 10–15 micro influencers this week. One good post can bring 500–2,000 new visitors to orrisoak.com overnight — for the cost of a few products and shipping.</p>
+    </div>
+    <div class="inf-strip">
+      <div class="inf-card">
+        <div class="inf-tier">Nano</div>
+        <div class="inf-range">1K – 10K · Free Gifting</div>
+        <ul class="inf-list">
+          <li>Send products only — no payment</li>
+          <li>Highest trust with their audience</li>
+          <li>Target: skincare & beauty accounts</li>
+          <li>Find on Instagram search: #skincareobsessed</li>
+          <li>Send 5–10 this month</li>
+        </ul>
+      </div>
+      <div class="inf-card best">
+        <div class="inf-best-badge">Best for You Right Now</div>
+        <div class="inf-tier">Micro</div>
+        <div class="inf-range">10K – 50K · Gifting + Small Fee</div>
+        <ul class="inf-list">
+          <li>Products + $50–150 optional fee</li>
+          <li>Strong niche beauty audiences</li>
+          <li>Content reusable in your ads later</li>
+          <li>Search: #luxuryskincare #antiagingskincare</li>
+          <li>Target 3–5 this month</li>
+        </ul>
+      </div>
+      <div class="inf-card">
+        <div class="inf-tier">Mid-tier</div>
+        <div class="inf-range">50K – 200K · Month 3+</div>
+        <ul class="inf-list">
+          <li>$300–$800 per post</li>
+          <li>Massive reach for launch campaigns</li>
+          <li>Wait until you have reviews + social proof</li>
+          <li>Their audience will check your profile first</li>
+          <li>Target 1–2 per quarter</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- HASHTAGS -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-eyebrow">Hashtag Strategy</div>
+      <h2 class="section-title">Use These on<br><em>Every Post</em></h2>
+      <p class="section-desc">Mix branded, niche, and broad hashtags on every post. Always include your branded hashtags to build a searchable content library for Orrisoak.</p>
+    </div>
+    <div style="margin-bottom:16px;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);">Branded (always use these)</div>
+    <div class="hashtag-grid" style="margin-bottom:24px;">
+      <span class="hashtag branded">#OrriosakGlow</span>
+      <span class="hashtag branded">#OrrisAndOak</span>
+      <span class="hashtag branded">#OrriosakBeauty</span>
+      <span class="hashtag branded">#OrriosakRitual</span>
+    </div>
+    <div style="margin-bottom:16px;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);">Niche (high relevance, medium size)</div>
+    <div class="hashtag-grid" style="margin-bottom:24px;">
+      <span class="hashtag">#LuxurySkincare</span>
+      <span class="hashtag">#24KGoldSkincare</span>
+      <span class="hashtag">#AntiAgingSkincare</span>
+      <span class="hashtag">#GoldSerum</span>
+      <span class="hashtag">#BlackTruffle</span>
+      <span class="hashtag">#SkincareRitual</span>
+      <span class="hashtag">#CleanBeauty</span>
+      <span class="hashtag">#MagneticBrush</span>
+      <span class="hashtag">#MakeupBrush</span>
+    </div>
+    <div style="margin-bottom:16px;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);">Broad (reach new audiences)</div>
+    <div class="hashtag-grid">
+      <span class="hashtag">#Skincare</span>
+      <span class="hashtag">#SkincareRoutine</span>
+      <span class="hashtag">#BeautyTips</span>
+      <span class="hashtag">#GlowingSkin</span>
+      <span class="hashtag">#AntiAging</span>
+      <span class="hashtag">#MakeupTools</span>
+      <span class="hashtag">#SkincareCommunity</span>
+      <span class="hashtag">#BeautyLovers</span>
+    </div>
+  </div>
+
+  <!-- FINAL CTA -->
+  <div class="final-cta">
+    <div class="final-cta-title">Your First Week<br><em>Action Plan</em></div>
+    <div class="final-cta-text">Day 1: Post your first piece of content using the AI Agent. Day 2: Find 15 micro-influencers to contact. Day 3: Send your first influencer outreach DM. Day 4–7: Post daily and engage with every comment.</div>
+    <a href="https://orrisoak.com" target="_blank" class="btn-gold">↗ Go to Orrisoak.com</a>
+    <a href="#" onclick="window.print()" class="btn-outline">Print This Plan</a>
+  </div>
+
+</div>
+</body>
+</html>

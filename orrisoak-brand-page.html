@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak — Luxury Skincare & Beauty</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --gold-pale: #F7EFD8;
+    --black: #0A0A0A;
+    --charcoal: #1A1A1A;
+    --truffle: #2C1F1F;
+    --cream: #FAF6EE;
+    --text-light: #8A7A6A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* CUSTOM CURSOR */
+  body::after {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 60px;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+  }
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 300; letter-spacing: 6px;
+    color: var(--gold); text-transform: uppercase;
+  }
+  .logo span { font-style: italic; font-weight: 400; }
+  nav { display: flex; gap: 36px; }
+  nav a {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold-light); text-decoration: none; opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  nav a:hover { opacity: 1; }
+  .nav-cta {
+    border: 1px solid var(--gold) !important;
+    padding: 10px 22px; opacity: 1 !important;
+    color: var(--gold) !important;
+    transition: all 0.3s !important;
+  }
+  .nav-cta:hover { background: var(--gold) !important; color: var(--black) !important; }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    position: relative;
+    padding: 120px 40px 80px;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,168,76,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(44,31,31,0.6) 0%, transparent 60%),
+      linear-gradient(160deg, #0A0A0A 0%, #1A1208 50%, #0A0A0A 100%);
+  }
+  .hero-grain {
+    position: absolute; inset: 0; opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+  .hero-line {
+    position: absolute; top: 0; left: 50%;
+    width: 1px; height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--gold));
+    transform: translateX(-50%);
+    animation: lineDown 1.5s ease forwards;
+  }
+  @keyframes lineDown { from { height: 0; opacity: 0; } to { height: 120px; opacity: 1; } }
+
+  .hero-eyebrow {
+    font-size: 9px; letter-spacing: 8px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 28px; opacity: 0;
+    animation: fadeUp 1s 0.5s ease forwards;
+    position: relative;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(52px, 9vw, 110px);
+    font-weight: 300; line-height: 0.95;
+    letter-spacing: -1px;
+    position: relative; opacity: 0;
+    animation: fadeUp 1s 0.7s ease forwards;
+  }
+  .hero h1 em {
+    font-style: italic; color: var(--gold);
+    display: block;
+  }
+  .hero-subtitle {
+    font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--text-light); margin-top: 32px; max-width: 500px;
+    opacity: 0; animation: fadeUp 1s 1s ease forwards;
+    position: relative; line-height: 2;
+  }
+  .hero-divider {
+    width: 60px; height: 1px; background: var(--gold);
+    margin: 36px auto; opacity: 0;
+    animation: fadeUp 1s 1.2s ease forwards;
+    position: relative;
+  }
+  .hero-cta {
+    display: inline-flex; gap: 20px; opacity: 0;
+    animation: fadeUp 1s 1.4s ease forwards;
+    position: relative;
+  }
+  .btn-gold {
+    background: var(--gold); color: var(--black);
+    padding: 16px 44px; font-family: 'Josefin Sans', sans-serif;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    border: none; cursor: pointer;
+    transition: all 0.3s; text-decoration: none; display: inline-block;
+  }
+  .btn-gold:hover { background: var(--gold-light); transform: translateY(-2px); }
+  .btn-outline {
+    background: transparent; color: var(--gold);
+    padding: 16px 44px; font-family: 'Josefin Sans', sans-serif;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    border: 1px solid var(--gold); cursor: pointer;
+    transition: all 0.3s; text-decoration: none; display: inline-block;
+  }
+  .btn-outline:hover { background: rgba(201,168,76,0.1); transform: translateY(-2px); }
+
+  .hero-scroll {
+    position: absolute; bottom: 40px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--text-light); display: flex; flex-direction: column;
+    align-items: center; gap: 12px; opacity: 0;
+    animation: fadeUp 1s 2s ease forwards;
+  }
+  .hero-scroll::after {
+    content: ''; width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  @keyframes scrollPulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── MARQUEE ─── */
+  .marquee-wrap {
+    background: var(--gold);
+    padding: 14px 0; overflow: hidden;
+    position: relative; z-index: 2;
+  }
+  .marquee-track {
+    display: flex; width: max-content;
+    animation: marquee 25s linear infinite;
+  }
+  .marquee-track span {
+    font-size: 9px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--black); font-weight: 400;
+    padding: 0 40px; white-space: nowrap;
+  }
+  .marquee-track span::before {
+    content: '✦'; margin-right: 40px; opacity: 0.5;
+  }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ─── SECTION BASE ─── */
+  section { position: relative; }
+  .section-eyebrow {
+    font-size: 9px; letter-spacing: 7px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 16px; display: block;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 300; line-height: 1.1;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* ─── BRAND STORY ─── */
+  .brand-story {
+    padding: 120px 60px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+    max-width: 1300px; margin: 0 auto;
+  }
+  .brand-story-text p {
+    color: var(--text-light); line-height: 2.2;
+    font-size: 13px; letter-spacing: 1px;
+    margin-top: 28px;
+  }
+  .brand-stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 40px; margin-top: 60px;
+  }
+  .stat-item { border-top: 1px solid rgba(201,168,76,0.3); padding-top: 20px; }
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px; font-weight: 300; color: var(--gold);
+  }
+  .stat-label {
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text-light); margin-top: 6px; display: block;
+  }
+  .brand-visual {
+    position: relative; height: 500px;
+  }
+  .brand-visual-inner {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, var(--truffle) 0%, #3D2B0E 50%, var(--charcoal) 100%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .brand-visual-inner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 60% 40%, rgba(201,168,76,0.25), transparent 60%);
+  }
+  .brand-visual-icon {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 120px; color: rgba(201,168,76,0.15);
+    font-style: italic; position: relative; z-index: 1;
+  }
+  .brand-visual-badge {
+    position: absolute; bottom: -20px; right: -20px;
+    width: 120px; height: 120px; background: var(--gold);
+    border-radius: 50%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .brand-visual-badge span:first-child {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; color: var(--black); font-weight: 500;
+  }
+  .brand-visual-badge span:last-child {
+    font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--black); text-align: center; line-height: 1.4;
+  }
+  .brand-visual-corner {
+    position: absolute; top: 20px; left: 20px;
+    border-top: 2px solid var(--gold); border-left: 2px solid var(--gold);
+    width: 30px; height: 30px;
+  }
+  .brand-visual-corner2 {
+    position: absolute; bottom: 20px; right: 20px;
+    border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold);
+    width: 30px; height: 30px;
+  }
+
+  /* ─── PRODUCTS ─── */
+  .products-section {
+    padding: 100px 60px;
+    background: var(--charcoal);
+  }
+  .products-header {
+    text-align: center; max-width: 700px; margin: 0 auto 80px;
+  }
+  .products-header p {
+    color: var(--text-light); font-size: 12px;
+    letter-spacing: 2px; line-height: 2.2; margin-top: 20px;
+  }
+  .products-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px; max-width: 1300px; margin: 0 auto;
+  }
+  .product-card {
+    background: var(--black);
+    position: relative; overflow: hidden;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+  }
+  .product-card:hover { transform: translateY(-8px); z-index: 2; }
+  .product-card:hover .product-overlay { opacity: 1; }
+  .product-card:hover .product-cta { transform: translateY(0); opacity: 1; }
+
+  .product-visual {
+    height: 380px; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .product-1 .product-visual {
+    background: linear-gradient(145deg, #1A1208 0%, #2C1F0A 40%, #3D2B0E 70%, #1A0A0A 100%);
+  }
+  .product-2 .product-visual {
+    background: linear-gradient(145deg, #0A1A0A 0%, #0E2C1A 40%, #1A3D2B 70%, #0A1A10 100%);
+  }
+  .product-3 .product-visual {
+    background: linear-gradient(145deg, #0A0A1A 0%, #0E0E2C 40%, #1A1A3D 70%, #0A0A1A 100%);
+  }
+
+  .product-glow-1 {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(201,168,76,0.3), transparent 65%);
+  }
+  .product-glow-2 {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(76,201,120,0.2), transparent 65%);
+  }
+  .product-glow-3 {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(100,120,220,0.25), transparent 65%);
+  }
+
+  .product-emblem {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 80px; font-style: italic;
+    opacity: 0.15; position: absolute; color: var(--gold);
+    transition: all 0.5s;
+  }
+  .product-card:hover .product-emblem { opacity: 0.3; transform: scale(1.1); }
+
+  .product-badge {
+    position: absolute; top: 20px; left: 20px;
+    background: var(--gold); color: var(--black);
+    font-size: 7px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 5px 12px;
+  }
+  .product-badge-new { background: #C94C4C; color: white; }
+
+  .product-overlay {
+    position: absolute; inset: 0;
+    background: rgba(201,168,76,0.06);
+    opacity: 0; transition: opacity 0.4s;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+
+  .product-info { padding: 32px 30px 40px; }
+  .product-category {
+    font-size: 8px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--gold); opacity: 0.7; margin-bottom: 10px; display: block;
+  }
+  .product-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 400; line-height: 1.3;
+    color: var(--cream);
+  }
+  .product-tagline {
+    font-size: 10px; letter-spacing: 2px; color: var(--text-light);
+    line-height: 2; margin-top: 12px;
+  }
+  .product-divider {
+    width: 30px; height: 1px; background: var(--gold);
+    margin: 20px 0; opacity: 0.5;
+  }
+  .product-ingredients {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .ingredient-tag {
+    font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+    border: 1px solid rgba(201,168,76,0.3); color: var(--gold-light);
+    padding: 4px 10px; opacity: 0.7;
+  }
+  .product-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); transform: translateY(8px); opacity: 0;
+    transition: all 0.4s 0.1s;
+    background: none; border: none; cursor: pointer;
+    font-family: 'Josefin Sans', sans-serif; padding: 0;
+  }
+  .product-cta::after {
+    content: '→'; font-size: 14px;
+    transition: transform 0.3s;
+  }
+  .product-card:hover .product-cta::after { transform: translateX(4px); }
+
+  /* ─── KEY INGREDIENTS ─── */
+  .ingredients-section {
+    padding: 120px 60px;
+    max-width: 1300px; margin: 0 auto;
+  }
+  .ingredients-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; margin-top: 60px;
+    background: rgba(201,168,76,0.15);
+  }
+  .ingredient-card {
+    background: var(--black); padding: 40px 30px;
+    transition: background 0.3s;
+  }
+  .ingredient-card:hover { background: var(--charcoal); }
+  .ingredient-icon {
+    font-size: 36px; margin-bottom: 20px; display: block;
+  }
+  .ingredient-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 400; color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .ingredient-desc {
+    font-size: 11px; letter-spacing: 1px; color: var(--text-light);
+    line-height: 2;
+  }
+
+  /* ─── MARKETING STRATEGY ─── */
+  .strategy-section {
+    padding: 120px 60px;
+    background: linear-gradient(160deg, var(--truffle) 0%, var(--charcoal) 100%);
+  }
+  .strategy-inner { max-width: 1300px; margin: 0 auto; }
+  .strategy-header { text-align: center; margin-bottom: 80px; }
+  .strategy-header p {
+    color: var(--text-light); font-size: 12px; letter-spacing: 2px;
+    line-height: 2.2; margin-top: 20px; max-width: 600px; margin-left: auto; margin-right: auto;
+  }
+
+  .strategy-tabs {
+    display: flex; gap: 0; margin-bottom: 60px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    justify-content: center;
+  }
+  .strategy-tab {
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    padding: 16px 32px; cursor: pointer; color: var(--text-light);
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: all 0.3s; background: none; border: none;
+    font-family: 'Josefin Sans', sans-serif;
+    border-bottom: 2px solid transparent;
+  }
+  .strategy-tab.active {
+    color: var(--gold); border-bottom-color: var(--gold);
+  }
+  .strategy-tab:hover { color: var(--gold-light); }
+
+  .strategy-panel { display: none; }
+  .strategy-panel.active { display: block; }
+
+  .strategy-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  }
+  .strategy-card {
+    background: rgba(0,0,0,0.4); padding: 40px 32px;
+    border-top: 2px solid transparent;
+    transition: border-color 0.3s;
+  }
+  .strategy-card:hover { border-top-color: var(--gold); }
+  .strategy-card-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px; font-weight: 300; color: rgba(201,168,76,0.15);
+    line-height: 1; margin-bottom: 20px; display: block;
+  }
+  .strategy-card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; color: var(--cream); margin-bottom: 14px;
+  }
+  .strategy-card-text {
+    font-size: 11px; letter-spacing: 1px; color: var(--text-light);
+    line-height: 2.2;
+  }
+  .strategy-card-tags {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;
+  }
+  .strategy-tag {
+    font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+    background: rgba(201,168,76,0.1); color: var(--gold);
+    padding: 5px 12px; border: 1px solid rgba(201,168,76,0.2);
+  }
+
+  /* ─── INFLUENCER TIERS ─── */
+  .influencer-section {
+    padding: 120px 60px;
+    max-width: 1300px; margin: 0 auto;
+  }
+  .influencer-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 30px; margin-top: 60px;
+  }
+  .influencer-tier {
+    border: 1px solid rgba(201,168,76,0.2); padding: 40px 32px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .influencer-tier:hover { border-color: var(--gold); transform: translateY(-4px); }
+  .influencer-tier.featured {
+    border-color: var(--gold);
+    background: linear-gradient(145deg, rgba(201,168,76,0.06), transparent);
+  }
+  .tier-badge {
+    position: absolute; top: -1px; right: 30px;
+    background: var(--gold); color: var(--black);
+    font-size: 7px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 5px 14px;
+  }
+  .tier-icon { font-size: 40px; margin-bottom: 20px; display: block; }
+  .tier-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; color: var(--gold); margin-bottom: 6px;
+  }
+  .tier-range {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-light); margin-bottom: 24px;
+  }
+  .tier-features { list-style: none; }
+  .tier-features li {
+    font-size: 11px; letter-spacing: 1px; color: var(--text-light);
+    padding: 10px 0; border-bottom: 1px solid rgba(201,168,76,0.1);
+    line-height: 1.8;
+  }
+  .tier-features li::before { content: '✦ '; color: var(--gold); font-size: 8px; }
+
+  /* ─── CONTENT CALENDAR ─── */
+  .calendar-section {
+    padding: 120px 60px;
+    background: var(--charcoal);
+  }
+  .calendar-inner { max-width: 1300px; margin: 0 auto; }
+  .calendar-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 2px; margin-top: 60px;
+  }
+  .calendar-week {
+    background: var(--black); padding: 32px 24px;
+  }
+  .week-label {
+    font-size: 8px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 20px; display: block;
+  }
+  .week-day {
+    padding: 14px 0; border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+  .week-day:last-child { border-bottom: none; }
+  .day-name {
+    font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-light); margin-bottom: 5px;
+  }
+  .day-content {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px; color: var(--cream); line-height: 1.4;
+  }
+  .day-platform {
+    font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); opacity: 0.6; margin-top: 3px;
+  }
+
+  /* ─── METRICS ─── */
+  .metrics-section {
+    padding: 120px 60px;
+    max-width: 1300px; margin: 0 auto; text-align: center;
+  }
+  .metrics-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 2px; margin-top: 60px;
+    background: rgba(201,168,76,0.1);
+  }
+  .metric-card {
+    background: var(--black); padding: 40px 20px;
+    transition: background 0.3s;
+  }
+  .metric-card:hover { background: var(--charcoal); }
+  .metric-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px; font-weight: 300; color: var(--gold);
+    display: block; line-height: 1;
+  }
+  .metric-label {
+    font-size: 8px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text-light); margin-top: 10px; display: block; line-height: 1.8;
+  }
+
+  /* ─── AD COPY ─── */
+  .adcopy-section {
+    padding: 120px 60px;
+    background: linear-gradient(160deg, var(--charcoal), var(--black));
+  }
+  .adcopy-inner { max-width: 1300px; margin: 0 auto; }
+  .adcopy-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 30px; margin-top: 60px;
+  }
+  .ad-card {
+    border: 1px solid rgba(201,168,76,0.2); padding: 36px 30px;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .ad-card:hover { border-color: var(--gold); background: rgba(201,168,76,0.03); }
+  .ad-type {
+    font-size: 8px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 20px; display: block;
+  }
+  .ad-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; color: var(--cream); line-height: 1.3;
+    margin-bottom: 16px;
+  }
+  .ad-body {
+    font-size: 11px; letter-spacing: 1px; color: var(--text-light);
+    line-height: 2.2; margin-bottom: 20px;
+  }
+  .ad-cta-text {
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); border-bottom: 1px solid var(--gold);
+    padding-bottom: 3px; display: inline-block;
+  }
+
+  /* ─── CTA SECTION ─── */
+  .final-cta {
+    padding: 160px 60px;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .final-cta-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(201,168,76,0.1), transparent 70%);
+  }
+  .final-cta h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 300; line-height: 1.1;
+    position: relative;
+  }
+  .final-cta h2 em { font-style: italic; color: var(--gold); }
+  .final-cta p {
+    color: var(--text-light); font-size: 12px; letter-spacing: 3px;
+    line-height: 2.2; margin: 30px auto 40px; max-width: 500px;
+    position: relative;
+  }
+  .final-cta-btns {
+    display: flex; justify-content: center; gap: 20px;
+    position: relative;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--charcoal); padding: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(201,168,76,0.15);
+  }
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 300; letter-spacing: 6px;
+    color: var(--gold);
+  }
+  .footer-text {
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-light);
+  }
+  .footer-links {
+    display: flex; gap: 30px;
+  }
+  .footer-links a {
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-light); text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--gold); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1024px) {
+    .brand-story { grid-template-columns: 1fr; }
+    .products-grid { grid-template-columns: 1fr; }
+    .strategy-grid, .influencer-grid, .adcopy-grid { grid-template-columns: 1fr; }
+    .ingredients-grid, .calendar-grid, .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    header { padding: 20px 30px; }
+    nav { display: none; }
+    .brand-story, .products-section, .ingredients-section,
+    .strategy-section, .influencer-section, .calendar-section,
+    .metrics-section, .adcopy-section, .final-cta, footer { padding: 80px 30px; }
+  }
+
+  /* scroll reveal */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Orris<span>oak</span></div>
+  <nav>
+    <a href="#products">Products</a>
+    <a href="#strategy">Strategy</a>
+    <a href="#influencers">Influencers</a>
+    <a href="#adcopy">Ad Copy</a>
+    <a href="#contact" class="nav-cta">Get Started</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-line"></div>
+  <p class="hero-eyebrow">Orrisoak · Luxury Beauty · Brand Strategy 2025</p>
+  <h1>Where Gold<br><em>Meets</em> Nature</h1>
+  <p class="hero-subtitle">Three iconic products. One powerful brand story. A complete strategy to own the luxury beauty market on Facebook & beyond.</p>
+  <div class="hero-divider"></div>
+  <div class="hero-cta">
+    <a href="#products" class="btn-gold">Explore Products</a>
+    <a href="#strategy" class="btn-outline">View Strategy</a>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>24K Gold Serum</span>
+    <span>Black Truffle Complex</span>
+    <span>Anti-Aging Formula</span>
+    <span>Hydrating Glow Cleanser</span>
+    <span>4-in-1 Magnetic Brush</span>
+    <span>Luxury Skincare</span>
+    <span>Orrisoak Beauty</span>
+    <span>24K Gold Serum</span>
+    <span>Black Truffle Complex</span>
+    <span>Anti-Aging Formula</span>
+    <span>Hydrating Glow Cleanser</span>
+    <span>4-in-1 Magnetic Brush</span>
+    <span>Luxury Skincare</span>
+    <span>Orrisoak Beauty</span>
+  </div>
+</div>
+
+<!-- BRAND STORY -->
+<section style="background: var(--black);">
+  <div class="brand-story">
+    <div class="brand-story-text reveal">
+      <span class="section-eyebrow">Our Story</span>
+      <h2 class="section-title">The Alchemy of<br><em>Timeless Beauty</em></h2>
+      <p>Orrisoak was born from a singular belief: that the rarest ingredients in nature — gold refined over millennia, truffles grown in secret soil — hold the key to skin that defies time.</p>
+      <p>Our formulations blend cutting-edge biotechnology with ancient luxury rituals. Every product is crafted for those who understand that beauty is not just appearance — it is a statement of intention.</p>
+      <div class="brand-stats">
+        <div class="stat-item">
+          <div class="stat-number">24K</div>
+          <span class="stat-label">Pure Gold<br>Complex</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">3×</div>
+          <span class="stat-label">Faster Cell<br>Renewal</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">98%</div>
+          <span class="stat-label">Natural<br>Ingredients</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4-in-1</div>
+          <span class="stat-label">Magnetic<br>Innovation</span>
+        </div>
+      </div>
+    </div>
+    <div class="brand-visual reveal">
+      <div class="brand-visual-inner">
+        <div class="brand-visual-corner"></div>
+        <div class="brand-visual-corner2"></div>
+        <div class="brand-visual-icon">O</div>
+        <div class="brand-visual-badge">
+          <span>★★★★★</span>
+          <span>Luxury<br>Certified</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products-section" id="products">
+  <div class="products-header reveal">
+    <span class="section-eyebrow">The Collection</span>
+    <h2 class="section-title">Three Products.<br><em>One Ritual.</em></h2>
+    <p>Each product is engineered to work in harmony — a complete luxury beauty system anchored by gold, black truffle, and magnetic innovation.</p>
+  </div>
+  <div class="products-grid reveal">
+
+    <!-- Product 1 -->
+    <div class="product-card product-1">
+      <div class="product-visual">
+        <div class="product-glow-1"></div>
+        <div class="product-emblem">✦</div>
+        <div class="product-badge">Bestseller</div>
+        <div class="product-overlay"></div>
+      </div>
+      <div class="product-info">
+        <span class="product-category">Anti-Aging · Serum</span>
+        <div class="product-name">24K Gold & Black Truffle<br>Anti-Aging Serum</div>
+        <p class="product-tagline">Turn back time. Visibly lift, firm and illuminate with the most precious ingredients on Earth.</p>
+        <div class="product-divider"></div>
+        <div class="product-ingredients">
+          <span class="ingredient-tag">24K Gold</span>
+          <span class="ingredient-tag">Black Truffle</span>
+          <span class="ingredient-tag">Retinol-Alt</span>
+          <span class="ingredient-tag">Peptides</span>
+        </div>
+        <button class="product-cta">Discover More</button>
+      </div>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="product-card product-2">
+      <div class="product-visual">
+        <div class="product-glow-2"></div>
+        <div class="product-emblem" style="color: #4CC97A;">✦</div>
+        <div class="product-badge" style="background: #2C5F3A; color: #A8E6BC;">New Launch</div>
+        <div class="product-overlay" style="border-color: rgba(76,201,120,0.3); background: rgba(76,201,120,0.04);"></div>
+      </div>
+      <div class="product-info">
+        <span class="product-category" style="color: #4CC97A;">Cleanse · Glow</span>
+        <div class="product-name">24K Gold Black Truffle<br>Hydrating Glow Cleanser</div>
+        <p class="product-tagline">Melt away impurities while bathing skin in gold-infused luminosity. Your ritual starts here.</p>
+        <div class="product-divider" style="background: #4CC97A;"></div>
+        <div class="product-ingredients">
+          <span class="ingredient-tag" style="border-color: rgba(76,201,120,0.3); color: #A8E6BC;">24K Gold</span>
+          <span class="ingredient-tag" style="border-color: rgba(76,201,120,0.3); color: #A8E6BC;">Truffle Extract</span>
+          <span class="ingredient-tag" style="border-color: rgba(76,201,120,0.3); color: #A8E6BC;">Hyaluronic Acid</span>
+        </div>
+        <button class="product-cta" style="color: #4CC97A;">Discover More</button>
+      </div>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="product-card product-3">
+      <div class="product-visual">
+        <div class="product-glow-3"></div>
+        <div class="product-emblem" style="color: #8890E8;">✦</div>
+        <div class="product-badge product-badge-new">Innovation</div>
+        <div class="product-overlay" style="border-color: rgba(100,120,220,0.3); background: rgba(100,120,220,0.04);"></div>
+      </div>
+      <div class="product-info">
+        <span class="product-category" style="color: #8890E8;">Makeup · Tools</span>
+        <div class="product-name">4-in-1 Magnetic<br>Makeup Brush</div>
+        <p class="product-tagline">Four professional brushes. One magnetic system. Effortless application, revolutionary design.</p>
+        <div class="product-divider" style="background: #8890E8;"></div>
+        <div class="product-ingredients">
+          <span class="ingredient-tag" style="border-color: rgba(100,120,220,0.3); color: #C4C8F0;">Foundation</span>
+          <span class="ingredient-tag" style="border-color: rgba(100,120,220,0.3); color: #C4C8F0;">Contour</span>
+          <span class="ingredient-tag" style="border-color: rgba(100,120,220,0.3); color: #C4C8F0;">Highlight</span>
+          <span class="ingredient-tag" style="border-color: rgba(100,120,220,0.3); color: #C4C8F0;">Blend</span>
+        </div>
+        <button class="product-cta" style="color: #8890E8;">Discover More</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KEY INGREDIENTS -->
+<section style="background: var(--black);">
+  <div class="ingredients-section">
+    <div class="reveal" style="text-align: center; margin-bottom: 0;">
+      <span class="section-eyebrow">The Science</span>
+      <h2 class="section-title">Nature's Most<br><em>Potent Actives</em></h2>
+    </div>
+    <div class="ingredients-grid reveal">
+      <div class="ingredient-card">
+        <span class="ingredient-icon">✨</span>
+        <div class="ingredient-name">24K Gold</div>
+        <p class="ingredient-desc">Activates skin's natural repair process. Fights free radicals, boosts collagen production, and delivers unmatched radiance.</p>
+      </div>
+      <div class="ingredient-card">
+        <span class="ingredient-icon">🍄</span>
+        <div class="ingredient-name">Black Truffle</div>
+        <p class="ingredient-desc">Nature's most luxurious anti-aging ingredient. Rich in amino acids and antioxidants that deeply nourish and reverse visible aging.</p>
+      </div>
+      <div class="ingredient-card">
+        <span class="ingredient-icon">💧</span>
+        <div class="ingredient-name">Hyaluronic Acid</div>
+        <p class="ingredient-desc">Holds 1,000× its weight in water. Plumps fine lines and delivers intense, lasting hydration at every skin layer.</p>
+      </div>
+      <div class="ingredient-card">
+        <span class="ingredient-icon">🧲</span>
+        <div class="ingredient-name">Magnetic Tech</div>
+        <p class="ingredient-desc">Proprietary magnetic brush system allows seamless tool switching for a flawless professional application in seconds.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARKETING STRATEGY -->
+<section class="strategy-section" id="strategy">
+  <div class="strategy-inner">
+    <div class="strategy-header reveal">
+      <span class="section-eyebrow">Marketing Strategy</span>
+      <h2 class="section-title">Your Complete<br><em>Growth Blueprint</em></h2>
+      <p>A 90-day AI-powered strategy to build brand awareness, grow your audience, and drive sales — without agency fees.</p>
+    </div>
+
+    <div class="strategy-tabs reveal">
+      <button class="strategy-tab active" onclick="showPanel('facebook')">Facebook Ads</button>
+      <button class="strategy-tab" onclick="showPanel('content')">Content Plan</button>
+      <button class="strategy-tab" onclick="showPanel('launch')">Launch Plan</button>
+    </div>
+
+    <!-- FACEBOOK ADS PANEL -->
+    <div class="strategy-panel active" id="panel-facebook">
+      <div class="strategy-grid">
+        <div class="strategy-card">
+          <span class="strategy-card-number">01</span>
+          <div class="strategy-card-title">Awareness Campaign</div>
+          <p class="strategy-card-text">Target women 28–55, interests in luxury skincare, anti-aging, beauty routines. Use video ads showing the gold serum texture and truffle ingredients. Budget: $15–25/day.</p>
+          <div class="strategy-card-tags">
+            <span class="strategy-tag">Video Ads</span>
+            <span class="strategy-tag">Broad Audience</span>
+            <span class="strategy-tag">$15–25/day</span>
+          </div>
+        </div>
+        <div class="strategy-card">
+          <span class="strategy-card-number">02</span>
+          <div class="strategy-card-title">Retargeting Campaign</div>
+          <p class="strategy-card-text">Re-engage website visitors and video viewers with before/after testimonials and limited-time offers. Show product bundle deals. Budget: $10–15/day.</p>
+          <div class="strategy-card-tags">
+            <span class="strategy-tag">Carousel Ads</span>
+            <span class="strategy-tag">Custom Audience</span>
+            <span class="strategy-tag">$10–15/day</span>
+          </div>
+        </div>
+        <div class="strategy-card">
+          <span class="strategy-card-number">03</span>
+          <div class="strategy-card-title">Conversion Campaign</div>
+          <p class="strategy-card-text">Target lookalike audiences from best customers. Use dynamic product ads with urgency messaging. Focus on full routine bundle for higher AOV. Budget: $20–30/day.</p>
+          <div class="strategy-card-tags">
+            <span class="strategy-tag">Dynamic Ads</span>
+            <span class="strategy-tag">Lookalike 1–3%</span>
+            <span class="strategy-tag">$20–30/day</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT PLAN PANEL -->
+    <div class="strategy-panel" id="panel-content">
+      <div class="strategy-grid">
+        <div class="strategy-card">
+          <span class="strategy-card-number">01</span>
+          <div class="strategy-card-title">Educational Content</div>
+          <p class="strategy-card-text">3x/week posts explaining 24K gold benefits, black truffle science, and skin hydration tips. Positions Orrisoak as a trusted luxury authority, not just a product.</p>
+          <div class="strategy-card-tags">
+            <span class="strategy-tag">Instagram Reels</span>
+            <span class="strategy-tag">Facebook Posts</span>
+            <span class="strategy-tag">3×/Week</span>
+          </div>
+        </div>
+        <div class="strategy-card">
+          <span class="strategy-card-number">02</span>
+          <div class="strategy-card-title">Ritual & Lifestyle Content</div>
+          <p class="strategy-card-text">Show the luxury morning ritual using all 3 products. Aspirational lifestyle imagery — marble bathrooms, gold tones, soft lighting. Creates desire and brand identity.</p>
+          <div class="strategy-card-tags">
+            <span class="strategy-tag">Stories</span>
+            <span class="strategy-tag">Reels</span>
+            <span class="strategy-tag">2×/Week</span>
+          </div>
+        </div>
+        <div class="strategy-card">
+          <span class="strategy-card-number">03</span>
+          <div class="strategy-card-title">UGC & Social Proof</div>
+          <p class="strategy-card-text">Feature customer reviews, before/afters, and unboxing videos. Encourage users to share their glow results with branded hashtag #OrriosakGlow for organic reach.</p>
+          <div class="strategy-card-tags">
+            <span class="strategy-tag">Reviews</span>
+            <span class="strategy-tag">Before/After</span>
+            <span class="strategy-tag">#OrriosakGlow</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAUNCH PLAN PANEL -->
+    <div class="strategy-panel" id="panel-launch">
+      <div class="strategy-grid">
+        <div class="strategy-card">
+          <span class="strategy-card-number">01</span>
+          <div class="strategy-card-title">Month 1 — Build Buzz</div>
+          <p class="strategy-card-text">Launch teaser content, build email list with free skin quiz, seed product with 10–15 micro-influencers. Run awareness Facebook ads to warm audiences.</p>
+          <div class="strategy-card-tags">
+            <span class="strategy-tag">Teasers</span>
+            <span class="strategy-tag">Micro-Influencers</span>
+            <span class="strategy-tag">Email List</span>
+          </div>
+        </div>
+        <div class="strategy-card">
+          <span class="strategy-card-number">02</span>
+          <div class="strategy-card-title">Month 2 — Launch Hard</div>
+          <p class="strategy-card-text">Full product launch with influencer posts live, Facebook ad campaigns at full budget, launch day discount for email list. PR outreach to beauty editors.</p>
+          <div class="strategy-card-tags">
+            <span class="strategy-tag">Launch Sale</span>
+            <span class="strategy-tag">Full Ads</span>
+            <span class="strategy-tag">PR Outreach</span>
+          </div>
+        </div>
+        <div class="strategy-card">
+          <span class="strategy-card-number">03</span>
+          <div class="strategy-card-title">Month 3 — Scale & Retain</div>
+          <p class="strategy-card-text">Scale winning ad sets, introduce subscription/loyalty program, push bundle "Complete Ritual" offer, retarget purchasers for replenishment and upsell.</p>
+          <div class="strategy-card-tags">
+            <span class="strategy-tag">Scale Ads</span>
+            <span class="strategy-tag">Subscription</span>
+            <span class="strategy-tag">Bundles</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INFLUENCER TIERS -->
+<section id="influencers">
+  <div class="influencer-section">
+    <div class="reveal" style="text-align: center;">
+      <span class="section-eyebrow">Influencer Marketing</span>
+      <h2 class="section-title">The Right Voices<br><em>For Your Brand</em></h2>
+    </div>
+    <div class="influencer-grid reveal">
+      <div class="influencer-tier">
+        <span class="tier-icon">🌱</span>
+        <div class="tier-name">Nano</div>
+        <div class="tier-range">1K – 10K Followers</div>
+        <ul class="tier-features">
+          <li>Highest engagement rates (8–15%)</li>
+          <li>Gifting-based partnership (free product)</li>
+          <li>Ultra-authentic, trusted reviews</li>
+          <li>Perfect for local + niche audiences</li>
+          <li>Target: 20–30 nano influencers/month</li>
+        </ul>
+      </div>
+      <div class="influencer-tier featured">
+        <div class="tier-badge">Best ROI</div>
+        <span class="tier-icon">⭐</span>
+        <div class="tier-name">Micro</div>
+        <div class="tier-range">10K – 100K Followers</div>
+        <ul class="tier-features">
+          <li>Strong engagement (3–8%)</li>
+          <li>$150–$800 per post + gifting</li>
+          <li>Niche beauty & skincare audiences</li>
+          <li>Reusable content for your ads</li>
+          <li>Target: 8–12 micro influencers/month</li>
+        </ul>
+      </div>
+      <div class="influencer-tier">
+        <span class="tier-icon">💎</span>
+        <div class="tier-name">Macro</div>
+        <div class="tier-range">100K – 1M Followers</div>
+        <ul class="tier-features">
+          <li>Massive reach and brand credibility</li>
+          <li>$1,500–$8,000 per post</li>
+          <li>Ideal for launch campaigns</li>
+          <li>Celebrity-adjacent brand perception</li>
+          <li>Target: 1–2 macro per quarter</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT CALENDAR -->
+<section class="calendar-section">
+  <div class="calendar-inner">
+    <div class="reveal" style="text-align: center;">
+      <span class="section-eyebrow">Content Calendar</span>
+      <h2 class="section-title">Your First Month,<br><em>Planned.</em></h2>
+    </div>
+    <div class="calendar-grid reveal">
+      <div class="calendar-week">
+        <span class="week-label">Week 1 · Awareness</span>
+        <div class="week-day">
+          <div class="day-name">Mon</div>
+          <div class="day-content">What is 24K Gold in skincare? The science explained</div>
+          <div class="day-platform">Facebook · Blog Post</div>
+        </div>
+        <div class="week-day">
+          <div class="day-name">Wed</div>
+          <div class="day-content">Black Truffle — Nature's rarest anti-aging secret</div>
+          <div class="day-platform">Instagram Reel</div>
+        </div>
+        <div class="week-day">
+          <div class="day-name">Fri</div>
+          <div class="day-content">Morning ritual video: Gold Cleanser → Gold Serum</div>
+          <div class="day-platform">Facebook Video Ad</div>
+        </div>
+      </div>
+      <div class="calendar-week">
+        <span class="week-label">Week 2 · Product Deep-Dive</span>
+        <div class="week-day">
+          <div class="day-name">Mon</div>
+          <div class="day-content">24K Gold Serum: Before & After transformation story</div>
+          <div class="day-platform">Facebook Post · Stories</div>
+        </div>
+        <div class="week-day">
+          <div class="day-name">Wed</div>
+          <div class="day-content">How to use the 4-in-1 Magnetic Brush (tutorial)</div>
+          <div class="day-platform">Instagram Reel · TikTok</div>
+        </div>
+        <div class="week-day">
+          <div class="day-name">Fri</div>
+          <div class="day-content">The Complete Orrisoak Ritual — unboxing & review</div>
+          <div class="day-platform">YouTube · Facebook</div>
+        </div>
+      </div>
+      <div class="calendar-week">
+        <span class="week-label">Week 3 · Social Proof</span>
+        <div class="week-day">
+          <div class="day-name">Mon</div>
+          <div class="day-content">5 customer reviews — real results with gold cleanser</div>
+          <div class="day-platform">Facebook Carousel</div>
+        </div>
+        <div class="week-day">
+          <div class="day-name">Wed</div>
+          <div class="day-content">Influencer feature: "My honest Orrisoak review"</div>
+          <div class="day-platform">Collab Post · Stories</div>
+        </div>
+        <div class="week-day">
+          <div class="day-name">Fri</div>
+          <div class="day-content">#OrriosakGlow challenge — share your glow!</div>
+          <div class="day-platform">Facebook · Instagram</div>
+        </div>
+      </div>
+      <div class="calendar-week">
+        <span class="week-label">Week 4 · Convert</span>
+        <div class="week-day">
+          <div class="day-name">Mon</div>
+          <div class="day-content">The Complete Ritual Bundle — limited offer</div>
+          <div class="day-platform">Facebook Ad · Email</div>
+        </div>
+        <div class="week-day">
+          <div class="day-name">Wed</div>
+          <div class="day-content">Why luxury skincare is worth the investment</div>
+          <div class="day-platform">Blog · Facebook</div>
+        </div>
+        <div class="week-day">
+          <div class="day-name">Fri</div>
+          <div class="day-content">End-of-month sale + next month teaser</div>
+          <div class="day-platform">Email · Stories · Ads</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TARGET METRICS -->
+<section style="background: var(--black);">
+  <div class="metrics-section reveal">
+    <span class="section-eyebrow">Target KPIs</span>
+    <h2 class="section-title">Your 90-Day<br><em>Success Metrics</em></h2>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <span class="metric-number">50K</span>
+        <span class="metric-label">Reach Per<br>Month</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-number">3.5%</span>
+        <span class="metric-label">Target<br>CTR</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-number">2.8×</span>
+        <span class="metric-label">ROAS<br>Target</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-number">1K+</span>
+        <span class="metric-label">Email List<br>Month 1</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-number">30+</span>
+        <span class="metric-label">Influencer<br>Posts</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AD COPY -->
+<section class="adcopy-section" id="adcopy">
+  <div class="adcopy-inner">
+    <div class="reveal" style="text-align: center;">
+      <span class="section-eyebrow">Ready-To-Use Ad Copy</span>
+      <h2 class="section-title">Your Facebook Ads,<br><em>Written.</em></h2>
+    </div>
+    <div class="adcopy-grid reveal">
+      <div class="ad-card">
+        <span class="ad-type">24K Gold Serum · Awareness Ad</span>
+        <div class="ad-headline">"Your skin deserves the world's most precious ingredient."</div>
+        <p class="ad-body">Introducing Orrisoak's 24K Gold & Black Truffle Anti-Aging Serum. Formulated with real gold particles and rare truffle extract to visibly lift, firm, and illuminate your skin in just 14 days. This is luxury skincare — redefined.</p>
+        <span class="ad-cta-text">Shop Now → orrisoak.com</span>
+      </div>
+      <div class="ad-card">
+        <span class="ad-type">Glow Cleanser · Conversion Ad</span>
+        <div class="ad-headline">"Start your glow ritual with 24K gold."</div>
+        <p class="ad-body">Every great skincare routine begins with the perfect cleanse. Our Gold Black Truffle Hydrating Glow Cleanser melts away impurities while flooding your skin with gold-infused radiance. Wake up glowing. Every single day.</p>
+        <span class="ad-cta-text">Try It Now → orrisoak.com</span>
+      </div>
+      <div class="ad-card">
+        <span class="ad-type">Magnetic Brush · Demo Ad</span>
+        <div class="ad-headline">"4 professional brushes. 1 magnetic genius."</div>
+        <p class="ad-body">Say goodbye to cluttered brush sets. The Orrisoak 4-in-1 Magnetic Makeup Brush snaps, twists, and transforms in seconds — giving you a flawless foundation, contour, highlight, and blend in one elegant tool.</p>
+        <span class="ad-cta-text">See How It Works → orrisoak.com</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta" id="contact">
+  <div class="final-cta-bg"></div>
+  <h2>Ready to Launch<br><em>Your Brand?</em></h2>
+  <p>Your complete AI marketing engine is ready. No agency fees. No delays. Start building your beauty empire today.</p>
+  <div class="final-cta-btns">
+    <a href="https://orrisoak.com" target="_blank" class="btn-gold">Visit Orrisoak.com</a>
+    <a href="#strategy" class="btn-outline">Review Strategy</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Orrisoak</div>
+  <div class="footer-text">© 2025 Orrisoak · Brand Strategy Document</div>
+  <div class="footer-links">
+    <a href="#products">Products</a>
+    <a href="#strategy">Strategy</a>
+    <a href="#influencers">Influencers</a>
+  </div>
+</footer>
+
+<script>
+  // Tab switching
+  function showPanel(name) {
+    document.querySelectorAll('.strategy-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.strategy-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

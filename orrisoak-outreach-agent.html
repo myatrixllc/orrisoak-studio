@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak · AI Outreach Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C; --gold-light: #E8D5A3; --gold-dim: rgba(201,168,76,0.1);
+    --gold-border: rgba(201,168,76,0.2); --black: #070707; --s1: #0F0F0F;
+    --s2: #161616; --s3: #1E1E1E; --s4: #252525;
+    --cream: #F0E9DC; --muted: #786D61; --green: #4CAF7D;
+    --green-dim: rgba(76,175,125,0.1); --blue: #7B9FE8; --red: #D45A5A;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--black); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-weight:300; min-height:100vh; display:flex; flex-direction:column; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background:var(--s1); border-bottom:1px solid var(--gold-border);
+    padding:0 40px; display:flex; align-items:center; justify-content:space-between;
+    height:56px; position:sticky; top:0; z-index:100; flex-shrink:0;
+  }
+  .topbar-logo { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold); letter-spacing:4px; }
+  .topbar-logo span { font-style:italic; }
+  .topbar-badge { font-size:7px; letter-spacing:4px; text-transform:uppercase; background:var(--gold-dim); border:1px solid var(--gold-border); color:var(--gold); padding:4px 12px; }
+  .api-row { display:flex; align-items:center; gap:10px; }
+  .api-input {
+    background:var(--s3); border:1px solid var(--gold-border); color:var(--cream);
+    font-family:'Josefin Sans',sans-serif; font-size:10px; letter-spacing:1px;
+    padding:7px 14px; width:220px;
+  }
+  .api-input::placeholder { color:var(--muted); }
+  .api-input:focus { outline:none; border-color:var(--gold); }
+  .api-status { font-size:8px; letter-spacing:3px; text-transform:uppercase; padding:5px 12px; border:1px solid; }
+  .api-status.ok { color:var(--green); border-color:rgba(76,175,125,0.3); background:var(--green-dim); }
+  .api-status.empty { color:var(--muted); border-color:var(--gold-border); }
+
+  /* ── LAYOUT ── */
+  .layout { display:flex; flex:1; overflow:hidden; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width:200px; flex-shrink:0; background:var(--s1);
+    border-right:1px solid var(--gold-border);
+    display:flex; flex-direction:column; padding:24px 0;
+  }
+  .nav-section { font-size:7px; letter-spacing:5px; text-transform:uppercase; color:var(--muted); padding:0 20px; margin-bottom:8px; margin-top:20px; }
+  .nav-section:first-child { margin-top:0; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px;
+    padding:11px 20px; cursor:pointer; color:var(--muted);
+    font-size:9px; letter-spacing:3px; text-transform:uppercase;
+    transition:all 0.2s; border-left:2px solid transparent;
+    background:none; border-right:none; border-top:none; border-bottom:none;
+    width:100%; text-align:left; font-family:'Josefin Sans',sans-serif;
+  }
+  .nav-item:hover { color:var(--gold-light); background:var(--gold-dim); }
+  .nav-item.active { color:var(--gold); border-left-color:var(--gold); background:var(--gold-dim); }
+  .nav-icon { font-size:14px; flex-shrink:0; }
+  .nav-badge {
+    margin-left:auto; background:var(--gold); color:var(--black);
+    font-size:7px; padding:2px 6px; border-radius:0; min-width:18px; text-align:center;
+  }
+  .nav-badge.green { background:var(--green); }
+
+  /* ── MAIN ── */
+  .main { flex:1; overflow-y:auto; padding:40px 48px; }
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  /* ── PANEL HEADER ── */
+  .phead { margin-bottom:32px; }
+  .phead-eye { font-size:8px; letter-spacing:7px; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+  .phead h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(28px,3vw,44px); font-weight:300; line-height:1.05; }
+  .phead h2 em { font-style:italic; color:var(--gold); }
+  .phead p { font-size:11px; letter-spacing:1px; color:var(--muted); margin-top:10px; line-height:2; max-width:600px; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-row { margin-bottom:18px; }
+  .form-label { font-size:8px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; display:block; }
+  .form-input, .form-select, .form-textarea {
+    width:100%; background:var(--s2); border:1px solid var(--gold-border);
+    color:var(--cream); font-family:'Josefin Sans',sans-serif;
+    font-size:11px; letter-spacing:0.5px; padding:12px 16px;
+    transition:border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline:none; border-color:var(--gold); }
+  .form-input::placeholder, .form-textarea::placeholder { color:var(--muted); }
+  .form-textarea { resize:vertical; min-height:80px; line-height:1.8; }
+  .form-select { appearance:none; -webkit-appearance:none; cursor:pointer; }
+  .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    font-family:'Josefin Sans',sans-serif; font-size:9px; letter-spacing:4px;
+    text-transform:uppercase; padding:12px 28px; cursor:pointer;
+    border:none; transition:all 0.2s; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-gold { background:var(--gold); color:var(--black); }
+  .btn-gold:hover { background:var(--gold-light); }
+  .btn-gold:disabled { background:var(--s4); color:var(--muted); cursor:not-allowed; }
+  .btn-outline { background:transparent; color:var(--gold); border:1px solid var(--gold); }
+  .btn-outline:hover { background:var(--gold-dim); }
+  .btn-green { background:var(--green); color:white; }
+  .btn-green:hover { opacity:0.9; }
+  .btn-sm { padding:8px 18px; font-size:8px; }
+
+  /* ── OUTPUT BOX ── */
+  .output-box {
+    background:var(--s2); border:1px solid var(--gold-border);
+    padding:0; margin-top:24px; position:relative;
+  }
+  .output-header {
+    background:var(--s3); border-bottom:1px solid var(--gold-border);
+    padding:12px 20px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .output-label { font-size:8px; letter-spacing:5px; text-transform:uppercase; color:var(--gold); }
+  .output-actions { display:flex; gap:8px; }
+  .output-content {
+    padding:24px; font-size:12px; letter-spacing:0.5px; line-height:2.2;
+    color:var(--cream); white-space:pre-wrap; min-height:120px;
+  }
+  .output-content.loading { color:var(--muted); font-style:italic; }
+  .output-content.empty { color:var(--muted); }
+
+  /* ── PIPELINE TABLE ── */
+  .pipe-controls { display:flex; gap:12px; margin-bottom:20px; align-items:center; flex-wrap:wrap; }
+  .pipe-add-form {
+    background:var(--s2); border:1px solid var(--gold-border);
+    padding:20px 24px; margin-bottom:20px; display:none;
+  }
+  .pipe-add-form.open { display:block; }
+  .pipe-table { width:100%; border-collapse:collapse; }
+  .pipe-th {
+    background:var(--s2); padding:10px 16px;
+    font-size:7px; letter-spacing:4px; text-transform:uppercase;
+    color:var(--gold); text-align:left; border-bottom:1px solid var(--gold-border);
+  }
+  .pipe-td {
+    padding:14px 16px; border-bottom:1px solid rgba(201,168,76,0.08);
+    font-size:11px; vertical-align:middle;
+  }
+  .pipe-tr { background:var(--s1); transition:background 0.2s; }
+  .pipe-tr:hover { background:var(--s2); }
+  .pipe-handle { font-family:'Cormorant Garamond',serif; font-size:17px; }
+  .status-pill {
+    font-size:7px; letter-spacing:2px; text-transform:uppercase;
+    padding:4px 10px; border:1px solid; display:inline-block;
+  }
+  .pill-todo { color:var(--muted); border-color:var(--gold-border); }
+  .pill-sent { color:var(--gold); border-color:rgba(201,168,76,0.4); background:var(--gold-dim); }
+  .pill-yes { color:var(--green); border-color:rgba(76,175,125,0.4); background:var(--green-dim); }
+  .pill-posted { color:var(--blue); border-color:rgba(123,159,232,0.4); background:rgba(123,159,232,0.08); }
+  .pill-no { color:var(--red); border-color:rgba(212,90,90,0.4); background:rgba(212,90,90,0.08); }
+  .follow-up-alert {
+    font-size:8px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--gold); background:var(--gold-dim); border:1px solid var(--gold-border);
+    padding:3px 10px; display:inline-block;
+  }
+
+  /* ── CONTENT SCHEDULER ── */
+  .week-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-top:8px; }
+  .day-col { background:var(--s1); border:1px solid var(--gold-border); }
+  .day-head {
+    background:var(--s2); padding:10px 8px; text-align:center;
+    font-size:7px; letter-spacing:3px; text-transform:uppercase; color:var(--gold);
+    border-bottom:1px solid var(--gold-border);
+  }
+  .day-head.today { background:var(--gold); color:var(--black); }
+  .day-tasks { padding:10px 8px; min-height:100px; }
+  .day-task {
+    background:var(--s3); border-left:2px solid var(--gold);
+    padding:7px 9px; margin-bottom:6px; font-size:9px; line-height:1.7;
+    cursor:pointer; transition:background 0.2s;
+  }
+  .day-task:hover { background:var(--s4); }
+  .day-task.done { border-left-color:var(--green); opacity:0.5; text-decoration:line-through; }
+  .day-task-platform { font-size:7px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-top:3px; opacity:0.7; }
+  .day-rest { color:var(--muted); font-size:10px; font-family:'Cormorant Garamond',serif; font-style:italic; padding:8px 0; }
+
+  /* ── TODAY CARD ── */
+  .today-card {
+    background:linear-gradient(135deg, var(--s2), var(--s1));
+    border:1px solid var(--gold); padding:28px 32px; margin-bottom:28px;
+    position:relative; overflow:hidden;
+  }
+  .today-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+  }
+  .today-label { font-size:8px; letter-spacing:6px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+  .today-title { font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:6px; }
+  .today-platform { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
+  .today-actions { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+
+  /* ── STATS ROW ── */
+  .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-bottom:32px; background:var(--gold-dim); }
+  .stat-cell { background:var(--s1); padding:20px 18px; }
+  .stat-num { font-family:'Cormorant Garamond',serif; font-size:36px; color:var(--gold); line-height:1; }
+  .stat-label { font-size:7px; letter-spacing:4px; text-transform:uppercase; color:var(--muted); margin-top:6px; line-height:1.8; }
+
+  /* ── SPINNER ── */
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid var(--gold-border); border-top-color:var(--gold); border-radius:50%; animation:spin 0.7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* ── TOAST ── */
+  .toast {
+    position:fixed; bottom:30px; right:30px; z-index:999;
+    background:var(--s3); border:1px solid var(--gold); border-left:3px solid var(--gold);
+    padding:14px 20px; font-size:10px; letter-spacing:1px; color:var(--cream);
+    transform:translateY(80px); opacity:0; transition:all 0.3s;
+    max-width:320px;
+  }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast.green { border-color:var(--green); border-left-color:var(--green); }
+
+  /* ── DIVIDER ── */
+  .divider { border:none; border-top:1px solid var(--gold-border); margin:28px 0; }
+
+  @media(max-width:800px){
+    .sidebar { display:none; }
+    .main { padding:20px; }
+    .form-grid-2 { grid-template-columns:1fr; }
+    .week-grid { grid-template-columns:repeat(3,1fr); }
+    .stats-row { grid-template-columns:repeat(2,1fr); }
+    .topbar { padding:0 16px; }
+    .api-input { width:140px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="topbar-logo">Orris<span>oak</span></div>
+    <div class="topbar-badge">AI Outreach Agent</div>
+  </div>
+  <div class="api-row">
+    <input class="api-input" type="password" id="apiKey" placeholder="Paste Anthropic API key..." oninput="updateApiStatus()">
+    <div class="api-status empty" id="apiStatus">No Key</div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="nav-section">Outreach</div>
+    <button class="nav-item active" onclick="nav('dm',this)">
+      <span class="nav-icon">✉️</span> DM Generator
+    </button>
+    <button class="nav-item" onclick="nav('email',this)">
+      <span class="nav-icon">📧</span> Email Outreach
+    </button>
+    <button class="nav-item" onclick="nav('pipeline',this)">
+      <span class="nav-icon">📊</span> Pipeline
+      <span class="nav-badge" id="followUpBadge" style="display:none;">!</span>
+    </button>
+
+    <div class="nav-section">Content</div>
+    <button class="nav-item" onclick="nav('schedule',this)">
+      <span class="nav-icon">📅</span> Scheduler
+    </button>
+    <button class="nav-item" onclick="nav('caption',this)">
+      <span class="nav-icon">✍️</span> Caption AI
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ══════════════════════════
+         PANEL: DM GENERATOR
+    ══════════════════════════ -->
+    <div class="panel active" id="panel-dm">
+      <div class="phead">
+        <div class="phead-eye">DM Generator · Instagram</div>
+        <h2>Personalized DM<br><em>in 10 Seconds</em></h2>
+        <p>Fill in the influencer's details, click Generate — get a ready-to-copy personalized DM. Then paste it directly into Instagram.</p>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label class="form-label">Instagram Handle</label>
+          <input class="form-input" id="dm-handle" placeholder="@erinnicoletv" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">Their First Name</label>
+          <input class="form-input" id="dm-name" placeholder="Erin" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Their Recent Post (what you saw)</label>
+        <input class="form-input" id="dm-post" placeholder='e.g. "Sublimage Le Concentré Lumière from Chanel Beauty"' />
+      </div>
+      <div class="form-row">
+        <label class="form-label">Which Product to Feature</label>
+        <select class="form-select" id="dm-product">
+          <option value="full ritual">Full Ritual (all 3 products) — Recommended</option>
+          <option value="24K Gold Serum">24K Gold & Black Truffle Anti-Aging Serum</option>
+          <option value="Glow Cleanser">24K Gold Hydrating Glow Cleanser</option>
+          <option value="Magnetic Brush">4-in-1 Magnetic Makeup Brush</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Tone</label>
+        <select class="form-select" id="dm-tone">
+          <option value="warm and personal">Warm & Personal</option>
+          <option value="professional and polished">Professional & Polished</option>
+          <option value="casual and friendly">Casual & Friendly</option>
+        </select>
+      </div>
+
+      <button class="btn btn-gold" onclick="generateDM()" id="dm-btn">
+        <span id="dm-btn-inner">✦ Generate DM</span>
+      </button>
+
+      <div class="output-box" id="dm-output" style="display:none;">
+        <div class="output-header">
+          <span class="output-label">Your Personalized DM</span>
+          <div class="output-actions">
+            <button class="btn btn-sm btn-outline" onclick="copyOutput('dm-text')">Copy</button>
+            <button class="btn btn-sm btn-gold" onclick="addToPipeline()">+ Add to Pipeline</button>
+          </div>
+        </div>
+        <div class="output-content" id="dm-text"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════
+         PANEL: EMAIL OUTREACH
+    ══════════════════════════ -->
+    <div class="panel" id="panel-email">
+      <div class="phead">
+        <div class="phead-eye">Email Outreach · Gmail Ready</div>
+        <h2>Draft Email &<br><em>Open in Gmail</em></h2>
+        <p>Generate a personalized outreach email, then click "Open in Gmail" — it opens directly in Gmail with everything filled in. One click to send.</p>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label class="form-label">Influencer's Name</label>
+          <input class="form-input" id="em-name" placeholder="Ashlee" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">Their Email Address</label>
+          <input class="form-input" id="em-email" placeholder="hello@influencer.com" />
+        </div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label class="form-label">Their Instagram Handle</label>
+          <input class="form-input" id="em-handle" placeholder="@intheglamroom" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">Their Follower Count</label>
+          <input class="form-input" id="em-followers" placeholder="12.1K" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Their Recent Post or Niche Focus</label>
+        <input class="form-input" id="em-post" placeholder='e.g. "Calling all my clean skincare girlies"' />
+      </div>
+      <div class="form-row">
+        <label class="form-label">Special Angle (optional)</label>
+        <input class="form-input" id="em-angle" placeholder='e.g. "Chicago local connection" or "luxury beauty specialist"' />
+      </div>
+
+      <button class="btn btn-gold" onclick="generateEmail()" id="em-btn">
+        <span id="em-btn-inner">✦ Generate Email</span>
+      </button>
+
+      <div class="output-box" id="em-output" style="display:none;">
+        <div class="output-header">
+          <span class="output-label">Your Outreach Email</span>
+          <div class="output-actions">
+            <button class="btn btn-sm btn-outline" onclick="copyOutput('em-text')">Copy</button>
+            <button class="btn btn-sm btn-green" onclick="openInGmail()" id="gmail-btn">📧 Open in Gmail</button>
+          </div>
+        </div>
+        <div style="padding:12px 20px 0; background:var(--s3); border-bottom:1px solid var(--gold-border);">
+          <span style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);">Subject: </span>
+          <span id="em-subject" style="font-size:11px;color:var(--gold-light);"></span>
+        </div>
+        <div class="output-content" id="em-text"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════
+         PANEL: PIPELINE
+    ══════════════════════════ -->
+    <div class="panel" id="panel-pipeline">
+      <div class="phead">
+        <div class="phead-eye">Influencer Pipeline · Tracker</div>
+        <h2>All Your<br><em>Conversations</em></h2>
+        <p>Track every influencer. Get auto-generated follow-up messages when 7 days have passed with no reply.</p>
+      </div>
+
+      <div class="stats-row" id="pipeStats"></div>
+
+      <div class="pipe-controls">
+        <button class="btn btn-gold btn-sm" onclick="toggleAddForm()">+ Add Influencer</button>
+        <button class="btn btn-outline btn-sm" onclick="generateFollowUps()">✦ Generate Follow-Ups</button>
+      </div>
+
+      <div class="pipe-add-form" id="addForm">
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label class="form-label">Handle</label>
+            <input class="form-input" id="add-handle" placeholder="@handle" />
+          </div>
+          <div class="form-row">
+            <label class="form-label">Name</label>
+            <input class="form-input" id="add-name" placeholder="First name" />
+          </div>
+          <div class="form-row">
+            <label class="form-label">Followers</label>
+            <input class="form-input" id="add-followers" placeholder="16.3K" />
+          </div>
+          <div class="form-row">
+            <label class="form-label">Platform</label>
+            <select class="form-select" id="add-platform">
+              <option>Instagram</option><option>TikTok</option><option>Email</option><option>YouTube</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Notes</label>
+          <input class="form-input" id="add-notes" placeholder="e.g. luxury beauty focus, Chicago local" />
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-gold btn-sm" onclick="addInfluencer()">Add to Pipeline</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleAddForm()">Cancel</button>
+        </div>
+      </div>
+
+      <table class="pipe-table">
+        <thead>
+          <tr>
+            <th class="pipe-th">Influencer</th>
+            <th class="pipe-th">Followers</th>
+            <th class="pipe-th">Contacted</th>
+            <th class="pipe-th">Status</th>
+            <th class="pipe-th">Action</th>
+          </tr>
+        </thead>
+        <tbody id="pipeBody"></tbody>
+      </table>
+
+      <div class="output-box" id="followup-output" style="display:none;margin-top:28px;">
+        <div class="output-header">
+          <span class="output-label">Auto-Generated Follow-Up Messages</span>
+          <div class="output-actions">
+            <button class="btn btn-sm btn-outline" onclick="copyOutput('followup-text')">Copy All</button>
+          </div>
+        </div>
+        <div class="output-content" id="followup-text"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════
+         PANEL: SCHEDULER
+    ══════════════════════════ -->
+    <div class="panel" id="panel-schedule">
+      <div class="phead">
+        <div class="phead-eye">Content Scheduler · Week View</div>
+        <h2>Your Posting<br><em>Plan This Week</em></h2>
+        <p>Click any task to mark it done. Click "Generate Caption" to instantly create a post caption for that content.</p>
+      </div>
+
+      <div id="todayCard"></div>
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+
+    <!-- ══════════════════════════
+         PANEL: CAPTION AI
+    ══════════════════════════ -->
+    <div class="panel" id="panel-caption">
+      <div class="phead">
+        <div class="phead-eye">Caption AI · Content Generator</div>
+        <h2>Generate Any<br><em>Post Caption</em></h2>
+        <p>Describe what you're posting and get a full Instagram/Facebook caption with hashtags, ready to copy and post.</p>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">What is this post about?</label>
+        <input class="form-input" id="cap-topic" placeholder='e.g. "Morning skincare ritual using Gold Serum" or "Benefits of 24K gold in skincare"' />
+      </div>
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label class="form-label">Platform</label>
+          <select class="form-select" id="cap-platform">
+            <option>Instagram</option>
+            <option>Facebook</option>
+            <option>TikTok</option>
+            <option>Instagram Story</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Content Type</label>
+          <select class="form-select" id="cap-type">
+            <option>Reel / Video</option>
+            <option>Photo Post</option>
+            <option>Carousel</option>
+            <option>Story</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Tone</label>
+          <select class="form-select" id="cap-tone">
+            <option>Luxury & aspirational</option>
+            <option>Educational & informative</option>
+            <option>Fun & casual</option>
+            <option>Emotional & personal</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Include CTA?</label>
+          <select class="form-select" id="cap-cta">
+            <option>Shop orrisoak.com</option>
+            <option>Save this post</option>
+            <option>Tag a friend</option>
+            <option>Comment below</option>
+            <option>No CTA</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="generateCaption()" id="cap-btn">
+        <span id="cap-btn-inner">✦ Generate Caption</span>
+      </button>
+
+      <div class="output-box" id="cap-output" style="display:none;">
+        <div class="output-header">
+          <span class="output-label">Your Caption</span>
+          <div class="output-actions">
+            <button class="btn btn-sm btn-outline" onclick="copyOutput('cap-text')">Copy Caption</button>
+          </div>
+        </div>
+        <div class="output-content" id="cap-text"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const BRAND = `You are an AI marketing assistant for Orris & Oak (brand name: Orrisoak), a luxury skincare and beauty brand based in Westmont, IL (Chicago area). 
+
+PRODUCTS:
+1. 24K Gold & Black Truffle Anti-Aging Serum — flagship product, real 24K gold particles + rare black truffle extract, peptides, retinol-alternative. Visibly lifts, firms, illuminates in 14 days.
+2. 24K Gold Black Truffle Hydrating Glow Cleanser — daily cleanser, gold + truffle + hyaluronic acid, melts away impurities, gold-infused radiance.
+3. 4-in-1 Magnetic Makeup Brush — $52, four professional brushes (foundation, contour, highlight, blend) in one magnetic PU leather case, vegan synthetic hair.
+
+BRAND VOICE: Luxury, crafted for daily life. Premium without pretension. Warm, confident, aspirational.
+WEBSITE: orrisoak.com
+PHONE: 312-985-6684
+PERKS: Free US shipping, 100% money-back guarantee, 24/7 support
+HASHTAGS: #OrriosakGlow #OrrisAndOak #LuxurySkincare #24KGoldSkincare #AntiAgingSkincare`;
+
+let pipeline = JSON.parse(localStorage.getItem('oo_pipeline') || '[]');
+if (!pipeline.length) {
+  pipeline = [
+    { handle:'@sincerelymissash', name:'Ashlee', followers:'16.3K', platform:'Instagram', status:'sent', date: daysAgo(8), notes:'Anti-aging skincare focus, Toronto' },
+    { handle:'@erinnicoletv', name:'Erin', followers:'39.4K', platform:'Instagram', status:'sent', date: daysAgo(1), notes:'Curated luxury beauty reviews, Miami' },
+    { handle:'@intheglamroom', name:'Ashlee', followers:'12.1K', platform:'Instagram', status:'sent', date: daysAgo(1), notes:'Licensed skincare consultant, Chicago LOCAL' },
+    { handle:'@beautypassionista', name:'', followers:'21.1K', platform:'Instagram', status:'todo', date:'', notes:'Midlife beauty + wellness' },
+    { handle:'@my.skinology', name:'', followers:'19.1K', platform:'Instagram', status:'todo', date:'', notes:'Skin beauty lifestyle' },
+  ];
+  savePipeline();
+}
+
+function daysAgo(n) {
+  const d = new Date(); d.setDate(d.getDate()-n);
+  return d.toISOString().split('T')[0];
+}
+function savePipeline() { localStorage.setItem('oo_pipeline', JSON.stringify(pipeline)); }
+
+// ── API ──
+function getKey() { return document.getElementById('apiKey').value.trim(); }
+function updateApiStatus() {
+  const k = getKey();
+  const el = document.getElementById('apiStatus');
+  if (k.startsWith('sk-ant-')) { el.textContent='Key Set ✓'; el.className='api-status ok'; }
+  else if (k.length > 5) { el.textContent='Check Key'; el.className='api-status empty'; }
+  else { el.textContent='No Key'; el.className='api-status empty'; }
+}
+
+async function callClaude(prompt, maxTokens=800) {
+  const key = getKey();
+  if (!key) { showToast('Please paste your Anthropic API key in the top bar','gold'); throw new Error('No key'); }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key': key,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body: JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      system: BRAND,
+      messages:[{ role:'user', content: prompt }]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || res.statusText);
+  }
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+function setLoading(btnId, innerId, loading) {
+  const btn = document.getElementById(btnId);
+  const inner = document.getElementById(innerId);
+  btn.disabled = loading;
+  inner.innerHTML = loading ? '<span class="spinner"></span> Generating...' : inner.dataset.orig || inner.innerHTML;
+  if (!loading && !inner.dataset.orig) inner.dataset.orig = inner.innerHTML;
+}
+
+// ── NAV ──
+function nav(name, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+  if (name==='pipeline') renderPipeline();
+  if (name==='schedule') renderSchedule();
+}
+
+// ── TOAST ──
+function showToast(msg, type='gold') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (type==='green'?' green':'');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── COPY ──
+function copyOutput(id) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard ✓','green')).catch(()=>alert('Select and copy the text manually.'));
+}
+
+// ── DM GENERATOR ──
+async function generateDM() {
+  const handle = document.getElementById('dm-handle').value.trim();
+  const name = document.getElementById('dm-name').value.trim();
+  const post = document.getElementById('dm-post').value.trim();
+  const product = document.getElementById('dm-product').value;
+  const tone = document.getElementById('dm-tone').value;
+  if (!name || !post) { showToast('Please fill in name and recent post'); return; }
+
+  setLoading('dm-btn','dm-btn-inner',true);
+  document.getElementById('dm-btn-inner').dataset.orig = '✦ Generate DM';
+
+  try {
+    const result = await callClaude(`Write a SHORT, personalized Instagram DM for an influencer outreach campaign for Orris & Oak.
+
+INFLUENCER DETAILS:
+- Handle: ${handle || 'unknown'}
+- First name: ${name}
+- Their recent post/content: "${post}"
+- Product to offer: ${product}
+- Tone: ${tone}
+
+RULES:
+- Start with "Hi ${name}! 👋"
+- Second sentence MUST reference their specific recent post: "${post}" in a genuine, specific way
+- Mention Orris & Oak and orrisoak.com
+- Offer the ${product} as a complimentary gift
+- Say "no strings attached" and that they can keep it even if they don't post
+- End with a soft question like "Would you be open to receiving them?"
+- Keep it under 120 words total
+- No hashtags in the DM
+- Sound like a real person, not a brand robot
+- Do not use the word "collab" or "collaboration"
+
+Output ONLY the DM message, nothing else.`);
+
+    document.getElementById('dm-text').textContent = result;
+    document.getElementById('dm-output').style.display = 'block';
+    document.getElementById('dm-output').scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  }
+  setLoading('dm-btn','dm-btn-inner',false);
+  document.getElementById('dm-btn-inner').innerHTML = '✦ Generate DM';
+}
+
+// ── ADD TO PIPELINE ──
+function addToPipeline() {
+  const handle = document.getElementById('dm-handle').value.trim();
+  const name = document.getElementById('dm-name').value.trim();
+  if (!handle) { showToast('Add a handle first'); return; }
+  const exists = pipeline.find(p=>p.handle===handle);
+  if (exists) { showToast('Already in pipeline'); return; }
+  pipeline.push({ handle, name, followers:'', platform:'Instagram', status:'todo', date:'', notes:'' });
+  savePipeline();
+  showToast(handle + ' added to pipeline ✓','green');
+  document.getElementById('followUpBadge').style.display='';
+}
+
+// ── EMAIL GENERATOR ──
+let currentEmailData = {};
+async function generateEmail() {
+  const name = document.getElementById('em-name').value.trim();
+  const email = document.getElementById('em-email').value.trim();
+  const handle = document.getElementById('em-handle').value.trim();
+  const followers = document.getElementById('em-followers').value.trim();
+  const post = document.getElementById('em-post').value.trim();
+  const angle = document.getElementById('em-angle').value.trim();
+  if (!name || !email) { showToast('Please fill in name and email'); return; }
+
+  setLoading('em-btn','em-btn-inner',true);
+  document.getElementById('em-btn-inner').dataset.orig = '✦ Generate Email';
+
+  try {
+    const result = await callClaude(`Write a professional influencer outreach EMAIL for Orris & Oak. Return ONLY valid JSON with two fields: "subject" and "body". No markdown, no extra text.
+
+INFLUENCER:
+- Name: ${name}
+- Handle: ${handle}
+- Followers: ${followers}
+- Recent post/niche: "${post}"
+- Special angle: "${angle || 'none'}"
+
+EMAIL RULES:
+- Subject: short, personal, mention their handle
+- Body: professional but warm, 150-180 words
+- Reference their content specifically in first paragraph
+- List all 3 products with ✦ bullet points
+- Say "No deliverables required" clearly
+- Sign off as "The Orris & Oak Team | orrisoak.com | 312-985-6684"
+- If angle mentions Chicago/local, emphasize that we're a Chicago-area brand (Westmont, IL)
+- Do NOT use the word "collab"
+
+Return JSON only: {"subject": "...", "body": "..."}`
+    , 600);
+
+    const clean = result.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    currentEmailData = { to: email, subject: parsed.subject, body: parsed.body };
+    document.getElementById('em-subject').textContent = parsed.subject;
+    document.getElementById('em-text').textContent = parsed.body;
+    document.getElementById('em-output').style.display = 'block';
+    document.getElementById('em-output').scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  }
+  setLoading('em-btn','em-btn-inner',false);
+  document.getElementById('em-btn-inner').innerHTML = '✦ Generate Email';
+}
+
+function openInGmail() {
+  const { to, subject, body } = currentEmailData;
+  if (!to) { showToast('Generate email first'); return; }
+  const url = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(url, '_blank');
+  showToast('Opening Gmail...','green');
+}
+
+// ── PIPELINE ──
+function toggleAddForm() {
+  const f = document.getElementById('addForm');
+  f.classList.toggle('open');
+}
+function addInfluencer() {
+  const handle = document.getElementById('add-handle').value.trim();
+  const name = document.getElementById('add-name').value.trim();
+  if (!handle) { showToast('Handle required'); return; }
+  pipeline.push({
+    handle, name,
+    followers: document.getElementById('add-followers').value.trim(),
+    platform: document.getElementById('add-platform').value,
+    status:'todo', date:'', notes: document.getElementById('add-notes').value.trim()
+  });
+  savePipeline();
+  toggleAddForm();
+  renderPipeline();
+  showToast(handle + ' added ✓','green');
+}
+
+function updateStatus(i, val) {
+  pipeline[i].status = val;
+  if (val === 'sent' && !pipeline[i].date) pipeline[i].date = new Date().toISOString().split('T')[0];
+  savePipeline();
+  renderPipeline();
+}
+
+function isFollowUpDue(item) {
+  if (item.status !== 'sent') return false;
+  if (!item.date) return false;
+  const sent = new Date(item.date);
+  const diff = (new Date() - sent) / (1000*60*60*24);
+  return diff >= 7;
+}
+
+function renderPipeline() {
+  const body = document.getElementById('pipeBody');
+  body.innerHTML = '';
+  let todo=0, sent=0, yes=0, posted=0;
+  pipeline.forEach(p => {
+    if (p.status==='todo') todo++;
+    if (p.status==='sent') sent++;
+    if (p.status==='yes') yes++;
+    if (p.status==='posted') posted++;
+  });
+  document.getElementById('pipeStats').innerHTML = `
+    <div class="stat-cell"><div class="stat-num">${pipeline.length}</div><div class="stat-label">Total<br>Targets</div></div>
+    <div class="stat-cell"><div class="stat-num" style="color:var(--gold)">${sent}</div><div class="stat-label">DMs<br>Sent</div></div>
+    <div class="stat-cell"><div class="stat-num" style="color:var(--green)">${yes}</div><div class="stat-label">Said<br>Yes</div></div>
+    <div class="stat-cell"><div class="stat-num" style="color:var(--blue)">${posted}</div><div class="stat-label">Posts<br>Live</div></div>
+  `;
+  const followUps = pipeline.filter(isFollowUpDue);
+  const badge = document.getElementById('followUpBadge');
+  badge.style.display = followUps.length ? '' : 'none';
+  badge.textContent = followUps.length;
+
+  const statuses = ['todo','sent','replied','yes','posted','no'];
+  const pillClasses = {todo:'pill-todo',sent:'pill-sent',replied:'pill-sent',yes:'pill-yes',posted:'pill-posted',no:''};
+  const statLabels = {todo:'To Contact',sent:'DM Sent',replied:'Replied',yes:'Agreed ✦',posted:'Posted 🌟',no:'Declined'};
+
+  pipeline.forEach((p,i) => {
+    const due = isFollowUpDue(p);
+    const tr = document.createElement('tr');
+    tr.className = 'pipe-tr';
+    tr.innerHTML = `
+      <td class="pipe-td">
+        <div class="pipe-handle">${p.handle}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px;">${p.name || ''} · ${p.platform}</div>
+        ${p.notes ? `<div style="font-size:9px;color:var(--muted);margin-top:2px;">${p.notes}</div>` : ''}
+      </td>
+      <td class="pipe-td" style="color:var(--muted);font-size:11px;">${p.followers || '—'}</td>
+      <td class="pipe-td" style="color:var(--muted);font-size:10px;">${p.date || '—'}${due ? '<br><span class="follow-up-alert">Follow-up due!</span>' : ''}</td>
+      <td class="pipe-td">
+        <select onchange="updateStatus(${i},this.value)" style="background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:1px;padding:5px 8px;cursor:pointer;width:100%;">
+          ${statuses.map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${statLabels[s]}</option>`).join('')}
+        </select>
+      </td>
+      <td class="pipe-td">
+        <button class="btn btn-outline btn-sm" onclick="quickDM(${i})" style="font-size:7px;padding:6px 12px;">DM</button>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function quickDM(i) {
+  const p = pipeline[i];
+  document.getElementById('dm-handle').value = p.handle;
+  document.getElementById('dm-name').value = p.name || '';
+  nav('dm', document.querySelector('[onclick*="nav(\'dm\'"]') || document.querySelector('.nav-item'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelector('[onclick*="\'dm\'"]').classList.add('active');
+  document.getElementById('panel-dm').parentElement.parentElement.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-dm').classList.add('active');
+}
+
+async function generateFollowUps() {
+  const due = pipeline.filter(isFollowUpDue);
+  if (!due.length) { showToast('No follow-ups due yet (need 7+ days after sending)'); return; }
+
+  const names = due.map(p=>`${p.handle} (${p.name||''})`).join(', ');
+  try {
+    const result = await callClaude(`Write short, friendly Instagram follow-up DMs for these influencers who haven't replied after 7 days:
+${due.map(p=>`- ${p.handle} (${p.name||'their name'})`).join('\n')}
+
+For each one, write a 2-3 sentence follow-up. Start each with "--- Follow-up for ${'{handle}'} ---" on its own line.
+Reference our Orris & Oak gifting offer. Keep it casual, no pressure, friendly emoji.
+Write all follow-ups together.`);
+
+    document.getElementById('followup-text').textContent = result;
+    document.getElementById('followup-output').style.display = 'block';
+    document.getElementById('followup-output').scrollIntoView({behavior:'smooth'});
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  }
+}
+
+// ── SCHEDULE ──
+const scheduleData = [
+  { day:0, tasks:[{text:'What is 24K Gold in skincare? Educational carousel', platform:'Instagram + Facebook', done:false},{text:'Morning ritual video showing all 3 products', platform:'Instagram Reel + TikTok', done:false}] },
+  { day:1, tasks:[{text:'Black Truffle — nature\'s rarest beauty secret', platform:'Facebook Post + Story', done:false}] },
+  { day:2, tasks:[{text:'Close-up product texture video — Gold Serum', platform:'Instagram Reel + TikTok', done:false},{text:'Story poll: "Which product would you try first?"', platform:'Instagram Story', done:false}] },
+  { day:3, tasks:[{text:'"Why luxury skincare is worth it" — opinion post', platform:'Instagram + Facebook', done:false}] },
+  { day:4, tasks:[{text:'4-in-1 Magnetic Brush demo video', platform:'Instagram Reel + TikTok', done:false}] },
+  { day:5, tasks:[{text:'Before & after transformation story', platform:'Facebook Post + Stories', done:false}] },
+  { day:6, tasks:[] },
+];
+const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function renderSchedule() {
+  const today = (new Date().getDay() + 6) % 7; // 0=Mon
+  const grid = document.getElementById('weekGrid');
+  const todayCard = document.getElementById('todayCard');
+  grid.innerHTML = '';
+
+  const todayData = scheduleData[today];
+  const todayTask = todayData?.tasks[0];
+  if (todayTask) {
+    todayCard.innerHTML = `
+      <div class="today-card">
+        <div class="today-label">Today · ${dayNames[today]}</div>
+        <div class="today-title">${todayTask.text}</div>
+        <div class="today-platform">${todayTask.platform}</div>
+        <div class="today-actions">
+          <button class="btn btn-gold btn-sm" onclick="quickCaption('${todayTask.text.replace(/'/g,"\\'")}', '${todayTask.platform.split('+')[0].trim()}')">✦ Generate Caption</button>
+          <button class="btn btn-outline btn-sm" onclick="markDone(${today},0,this)">Mark Done</button>
+        </div>
+      </div>`;
+  } else {
+    todayCard.innerHTML = `<div class="today-card"><div class="today-label">Today · ${dayNames[today]}</div><div class="today-title" style="color:var(--muted);font-family:'Cormorant Garamond',serif;font-style:italic;">Rest & engage with comments today 🌿</div></div>`;
+  }
+
+  scheduleData.forEach((d,i) => {
+    const col = document.createElement('div');
+    col.className = 'day-col';
+    const isToday = i === today;
+    col.innerHTML = `<div class="day-head ${isToday?'today':''}">${dayNames[i]}${isToday?' ★':''}</div><div class="day-tasks" id="daytasks-${i}"></div>`;
+    grid.appendChild(col);
+    const tasksEl = col.querySelector('.day-tasks');
+    if (!d.tasks.length) {
+      tasksEl.innerHTML = '<div class="day-rest">Rest & engage</div>';
+    } else {
+      d.tasks.forEach((t,j) => {
+        const task = document.createElement('div');
+        task.className = 'day-task' + (t.done?' done':'');
+        task.innerHTML = `${t.text}<div class="day-task-platform">${t.platform.split('+')[0].trim()}</div>`;
+        task.onclick = () => { t.done = !t.done; renderSchedule(); };
+        tasksEl.appendChild(task);
+      });
+    }
+  });
+}
+
+function quickCaption(topic, platform) {
+  document.getElementById('cap-topic').value = topic;
+  document.getElementById('cap-platform').value = platform.includes('Facebook') ? 'Facebook' : platform.includes('TikTok') ? 'TikTok' : 'Instagram';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelector('[onclick*="\'caption\'"]').classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-caption').classList.add('active');
+  generateCaption();
+}
+
+function markDone(day, taskIdx, btn) {
+  scheduleData[day].tasks[taskIdx].done = true;
+  renderSchedule();
+  showToast('Marked done ✓','green');
+}
+
+// ── CAPTION ──
+async function generateCaption() {
+  const topic = document.getElementById('cap-topic').value.trim();
+  const platform = document.getElementById('cap-platform').value;
+  const type = document.getElementById('cap-type').value;
+  const tone = document.getElementById('cap-tone').value;
+  const cta = document.getElementById('cap-cta').value;
+  if (!topic) { showToast('Please describe what this post is about'); return; }
+
+  setLoading('cap-btn','cap-btn-inner',true);
+  document.getElementById('cap-btn-inner').dataset.orig = '✦ Generate Caption';
+
+  try {
+    const result = await callClaude(`Write a ${platform} caption for Orris & Oak for the following content:
+
+CONTENT: ${topic}
+PLATFORM: ${platform}
+FORMAT: ${type}
+TONE: ${tone}
+CTA: ${cta}
+
+RULES:
+- Open with a hook line that stops the scroll (no generic openers like "Introducing" or "Say hello to")
+- 2-3 short paragraphs max
+- Include relevant emojis naturally (not forced)
+- End with the CTA: ${cta}
+- Add 10-15 relevant hashtags at the end, always including #OrriosakGlow #OrrisAndOak
+- For Instagram: use line breaks and white space
+- For TikTok: short, punchy, conversational
+- For Facebook: slightly longer, more informative
+- Sound like a real luxury brand, not a corporate bot
+
+Output ONLY the caption, ready to copy and paste.`, 600);
+
+    document.getElementById('cap-text').textContent = result;
+    document.getElementById('cap-output').style.display = 'block';
+    document.getElementById('cap-output').scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  }
+  setLoading('cap-btn','cap-btn-inner',false);
+  document.getElementById('cap-btn-inner').innerHTML = '✦ Generate Caption';
+}
+
+// ── INIT ──
+renderPipeline();
+renderSchedule();
+</script>
+</body>
+</html>

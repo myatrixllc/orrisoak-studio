@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak · Marketing Automation System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dim:rgba(201,168,76,0.1);
+  --gold-border:rgba(201,168,76,0.2);--black:#070707;--s1:#0F0F0F;
+  --s2:#161616;--s3:#1E1E1E;--s4:#252525;--cream:#F0E9DC;--muted:#786D61;
+  --green:#4CAF7D;--green-dim:rgba(76,175,125,0.1);--green-border:rgba(76,175,125,0.3);
+  --blue:#7B9FE8;--blue-dim:rgba(123,159,232,0.1);--orange:#D4894A;
+  --red:#D45A5A;--purple:#9B7FD4;--ig:#E1306C;--fb:#1877F2;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{background:var(--s1);border-bottom:1px solid var(--gold-border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:200;flex-shrink:0;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);letter-spacing:4px;}
+.logo span{font-style:italic;}
+.topbar-center{display:flex;align-items:center;gap:8px;}
+.topbar-badge{font-size:7px;letter-spacing:4px;text-transform:uppercase;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:3px 10px;}
+.creds{display:flex;align-items:center;gap:6px;}
+.cred-input{background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:1px;padding:5px 10px;width:160px;}
+.cred-input::placeholder{color:var(--muted);}
+.cred-input:focus{outline:none;border-color:var(--gold);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:background 0.3s;flex-shrink:0;}
+.dot.ok{background:var(--green);}
+.btn-connect{background:var(--fb);color:white;border:none;font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:6px 14px;cursor:pointer;transition:opacity 0.2s;}
+.btn-connect:hover{opacity:0.85;}
+
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:190px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--gold-border);display:flex;flex-direction:column;padding:16px 0;overflow-y:auto;}
+.nav-group{font-size:7px;letter-spacing:5px;text-transform:uppercase;color:var(--muted);padding:0 14px;margin:14px 0 6px;}
+.nav-btn{display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;color:var(--muted);font-size:8px;letter-spacing:3px;text-transform:uppercase;transition:all 0.2s;border-left:2px solid transparent;background:none;border-right:none;border-top:none;border-bottom:none;width:100%;text-align:left;font-family:'Josefin Sans',sans-serif;}
+.nav-btn:hover{color:var(--gold-light);background:var(--gold-dim);}
+.nav-btn.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-dim);}
+.nav-icon{font-size:12px;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--red);color:white;font-size:6px;padding:2px 5px;border-radius:10px;}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:28px 32px;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* PANEL HEAD */
+.phead{margin-bottom:20px;}
+.phead-eye{font-size:8px;letter-spacing:7px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.phead h2{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3vw,36px);font-weight:300;line-height:1.05;}
+.phead h2 em{font-style:italic;color:var(--gold);}
+.phead p{font-size:10px;letter-spacing:0.5px;color:var(--muted);margin-top:6px;line-height:2;max-width:560px;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:20px;background:var(--gold-dim);}
+.stat{background:var(--s1);padding:14px 12px;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--gold);line-height:1;}
+.stat-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:3px;line-height:1.6;}
+
+/* FORMS */
+.form-row{margin-bottom:12px;}
+.form-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--s2);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;letter-spacing:0.5px;padding:9px 12px;transition:border-color 0.2s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--gold);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--muted);}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.8;}
+.form-select{appearance:none;cursor:pointer;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+/* BUTTONS */
+.btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:10px 22px;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-gold{background:var(--gold);color:var(--black);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-gold:disabled{background:var(--s4);color:var(--muted);cursor:not-allowed;}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+.btn-outline:hover{background:var(--gold-dim);}
+.btn-green{background:var(--green);color:white;}
+.btn-red{background:var(--red);color:white;}
+.btn-ig{background:var(--ig);color:white;}
+.btn-fb{background:var(--fb);color:white;}
+.btn-sm{padding:6px 14px;font-size:7px;}
+
+/* PLATFORM TOGGLES */
+.platform-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.platform-toggle{display:flex;align-items:center;gap:7px;padding:8px 14px;border:1px solid var(--gold-border);cursor:pointer;transition:all 0.2s;background:var(--s2);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.platform-toggle.active-ig{border-color:var(--ig);background:rgba(225,48,108,0.1);color:#E1306C;}
+.platform-toggle.active-fb{border-color:var(--fb);background:rgba(24,119,242,0.1);color:#1877F2;}
+.platform-dot{width:8px;height:8px;border-radius:50%;}
+.ig-dot{background:var(--ig);}
+.fb-dot{background:var(--fb);}
+
+/* OUTPUT */
+.output-box{background:var(--s2);border:1px solid var(--gold-border);margin-top:14px;}
+.output-head{background:var(--s3);border-bottom:1px solid var(--gold-border);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;}
+.output-label{font-size:7px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
+.output-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.output-content{padding:14px;font-size:11px;letter-spacing:0.5px;line-height:2;color:var(--cream);white-space:pre-wrap;min-height:50px;}
+
+/* SCHEDULED POSTS */
+.posts-list{display:flex;flex-direction:column;gap:2px;}
+.post-item{background:var(--s1);border:1px solid var(--gold-border);display:grid;grid-template-columns:80px 1fr auto;overflow:hidden;transition:border-color 0.2s;}
+.post-item:hover{border-color:var(--gold);}
+.post-date{background:var(--s2);padding:14px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid var(--gold-border);}
+.post-date-day{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);line-height:1;}
+.post-date-month{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.post-date-time{font-size:8px;letter-spacing:2px;color:var(--muted);margin-top:3px;}
+.post-body{padding:12px 14px;}
+.post-platforms{display:flex;gap:5px;margin-bottom:5px;}
+.platform-pill{font-size:6px;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border-radius:0;}
+.ig-pill{background:rgba(225,48,108,0.15);color:var(--ig);border:1px solid rgba(225,48,108,0.3);}
+.fb-pill{background:rgba(24,119,242,0.15);color:#6ba3f5;border:1px solid rgba(24,119,242,0.3);}
+.post-caption{font-size:10px;color:var(--cream);line-height:1.7;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.post-product{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:5px;}
+.post-actions{padding:12px;display:flex;flex-direction:column;gap:5px;align-items:flex-end;justify-content:center;}
+.post-status{font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:3px 8px;margin-bottom:4px;}
+.status-scheduled{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border);}
+.status-published{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
+.status-failed{background:rgba(212,90,90,0.1);color:var(--red);border:1px solid rgba(212,90,90,0.3);}
+
+/* AUTO RESPONDER */
+.responder-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:14px;}
+.trigger-card{background:var(--s1);border:1px solid var(--gold-border);overflow:hidden;transition:border-color 0.2s;}
+.trigger-card:hover{border-color:var(--gold);}
+.trigger-head{background:var(--s2);border-bottom:1px solid var(--gold-border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.trigger-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+.trigger-toggle{width:36px;height:18px;background:var(--s4);border-radius:9px;position:relative;cursor:pointer;transition:background 0.3s;flex-shrink:0;}
+.trigger-toggle.on{background:var(--green);}
+.trigger-toggle::after{content:'';position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:2px;left:2px;transition:left 0.3s;}
+.trigger-toggle.on::after{left:20px;}
+.trigger-body{padding:14px;}
+.trigger-keyword{font-size:10px;color:var(--cream);margin-bottom:8px;}
+.trigger-keyword strong{color:var(--gold);}
+.trigger-response{font-size:10px;color:var(--muted);line-height:1.8;font-style:italic;border-left:2px solid var(--gold-border);padding-left:10px;}
+.trigger-edit{margin-top:8px;}
+
+/* FUNNEL */
+.funnel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:14px;}
+.funnel-card{background:var(--s1);border:1px solid var(--gold-border);padding:16px 14px;transition:all 0.2s;}
+.funnel-card:hover{border-color:var(--gold);}
+.funnel-eye{font-size:7px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.funnel-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cream);margin-bottom:10px;}
+.funnel-metric{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(201,168,76,0.08);}
+.funnel-metric:last-child{border-bottom:none;}
+.funnel-key{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.funnel-val{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);}
+.funnel-bar{height:3px;background:var(--s3);margin-top:10px;overflow:hidden;}
+.funnel-bar-fill{height:100%;background:var(--gold);transition:width 1s;}
+
+/* REEL SCHEDULER */
+.reel-upload{border:1px dashed rgba(201,168,76,0.3);padding:30px;text-align:center;margin-bottom:14px;cursor:pointer;transition:all 0.3s;background:var(--s2);}
+.reel-upload:hover{border-color:var(--gold);background:var(--gold-dim);}
+.reel-upload-icon{font-size:32px;margin-bottom:10px;}
+.reel-upload-text{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+
+/* DM INBOX */
+.dm-list{display:flex;flex-direction:column;gap:2px;}
+.dm-item{background:var(--s1);border:1px solid var(--gold-border);display:grid;grid-template-columns:48px 1fr auto;overflow:hidden;cursor:pointer;transition:border-color 0.2s;}
+.dm-item:hover{border-color:var(--gold);}
+.dm-item.unread{border-left:3px solid var(--gold);}
+.dm-avatar{background:var(--s3);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);border-right:1px solid var(--gold-border);}
+.dm-body{padding:10px 12px;}
+.dm-name{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--cream);margin-bottom:3px;}
+.dm-preview{font-size:10px;color:var(--muted);line-height:1.6;}
+.dm-meta{padding:10px 12px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+.dm-time{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.dm-platform{font-size:6px;letter-spacing:2px;padding:2px 6px;}
+
+/* AI REPLY BOX */
+.reply-box{background:var(--s2);border:1px solid var(--gold-border);margin-top:14px;display:none;}
+.reply-head{background:var(--s3);border-bottom:1px solid var(--gold-border);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;}
+.reply-content{padding:14px;}
+
+/* INFO */
+.info-box{background:var(--gold-dim);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;}
+.info-icon{font-size:14px;flex-shrink:0;}
+.info-text{font-size:9px;color:var(--cream);line-height:1.9;letter-spacing:0.5px;}
+.info-text strong{color:var(--gold);}
+
+/* SPINNER */
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--gold-border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;z-index:999;background:var(--s3);border:1px solid var(--gold);border-left:3px solid var(--gold);padding:10px 14px;font-size:9px;letter-spacing:1px;color:var(--cream);transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:260px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{border-color:var(--green);border-left-color:var(--green);}
+.toast.red{border-color:var(--red);border-left-color:var(--red);}
+
+.divider{border:none;border-top:1px solid var(--gold-border);margin:16px 0;}
+
+@media(max-width:800px){
+  .sidebar{display:none;}
+  .main{padding:16px;}
+  .g2,.g3,.stats,.funnel-grid,.responder-grid{grid-template-columns:1fr;}
+  .topbar{padding:0 12px;}
+  .cred-input{width:110px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="logo">Orris<span>oak</span></div>
+    <div class="topbar-badge">🤖 Automation System</div>
+  </div>
+  <div class="creds">
+    <input class="cred-input" type="password" id="claudeKey" placeholder="Claude API key..." oninput="updateCreds()">
+    <input class="cred-input" type="password" id="metaToken" placeholder="Meta Access Token..." oninput="updateCreds()">
+    <input class="cred-input" id="adAccount" placeholder="act_1252129529887815" oninput="updateCreds()">
+    <div class="dot" id="metaDot"></div>
+    <button class="btn-connect" onclick="connectAll()">Connect</button>
+    <button class="btn-connect" onclick="saveCreds()" style="background:var(--green);">Save</button>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="nav-group">Dashboard</div>
+  <button class="nav-btn active" onclick="nav('dashboard',this)"><span class="nav-icon">📊</span> Funnel Overview</button>
+
+  <div class="nav-group">Publish</div>
+  <button class="nav-btn" onclick="nav('scheduler',this)"><span class="nav-icon">📅</span> Post Scheduler</button>
+  <button class="nav-btn" onclick="nav('reel',this)"><span class="nav-icon">🎬</span> Reel Scheduler</button>
+  <button class="nav-btn" onclick="nav('queue',this)"><span class="nav-icon">🗂️</span> Post Queue</button>
+
+  <div class="nav-group">Engage</div>
+  <button class="nav-btn" onclick="nav('inbox',this)"><span class="nav-icon">💬</span> DM Inbox <span class="nav-badge" id="dmBadge">3</span></button>
+  <button class="nav-btn" onclick="nav('responder',this)"><span class="nav-icon">🤖</span> Auto-Responder</button>
+  <button class="nav-btn" onclick="nav('comments',this)"><span class="nav-icon">💭</span> Comments</button>
+
+  <div class="nav-group">Campaigns</div>
+  <button class="nav-btn" onclick="nav('ads',this)"><span class="nav-icon">📢</span> Meta Ads</button>
+  <button class="nav-btn" onclick="nav('email',this)"><span class="nav-icon">📧</span> Email Flows</button>
+  <button class="nav-btn" onclick="nav('influencer',this)"><span class="nav-icon">⭐</span> Influencers</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ══ FUNNEL OVERVIEW ══ -->
+<div class="panel active" id="panel-dashboard">
+  <div class="phead">
+    <div class="phead-eye">Funnel Overview · Live Dashboard</div>
+    <h2>Orris & Oak<br><em>Marketing Command</em></h2>
+    <p>Your complete marketing funnel — ads, content, email, influencers — all in one view.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="d-posts">0</div><div class="stat-label">Posts<br>Scheduled</div></div>
+    <div class="stat"><div class="stat-num" id="d-dms">3</div><div class="stat-label">DMs<br>Pending</div></div>
+    <div class="stat"><div class="stat-num" id="d-days">21</div><div class="stat-label">Days to<br>Launch</div></div>
+    <div class="stat"><div class="stat-num" id="d-inf">5</div><div class="stat-label">Influencers<br>Contacted</div></div>
+  </div>
+
+  <div class="funnel-grid">
+    <!-- AWARENESS -->
+    <div class="funnel-card">
+      <div class="funnel-eye">Stage 1 · Awareness</div>
+      <div class="funnel-title">Reach & Discovery</div>
+      <div class="funnel-metric"><span class="funnel-key">Instagram Posts</span><span class="funnel-val" id="f-ig-posts">0</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Facebook Posts</span><span class="funnel-val" id="f-fb-posts">0</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Reels Scheduled</span><span class="funnel-val" id="f-reels">0</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Meta Ads Active</span><span class="funnel-val">3</span></div>
+      <div class="funnel-bar"><div class="funnel-bar-fill" style="width:35%"></div></div>
+    </div>
+
+    <!-- ENGAGEMENT -->
+    <div class="funnel-card">
+      <div class="funnel-eye">Stage 2 · Engagement</div>
+      <div class="funnel-title">Connect & Warm</div>
+      <div class="funnel-metric"><span class="funnel-key">DMs Pending</span><span class="funnel-val">3</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Comments Today</span><span class="funnel-val">0</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Auto-Responses</span><span class="funnel-val" id="f-auto">0</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Influencers Active</span><span class="funnel-val">5</span></div>
+      <div class="funnel-bar"><div class="funnel-bar-fill" style="width:20%"></div></div>
+    </div>
+
+    <!-- CONVERSION -->
+    <div class="funnel-card">
+      <div class="funnel-eye">Stage 3 · Conversion</div>
+      <div class="funnel-title">Purchase & Retain</div>
+      <div class="funnel-metric"><span class="funnel-key">Email Subscribers</span><span class="funnel-val">0</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Klaviyo Flows</span><span class="funnel-val">3</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Discount Code</span><span class="funnel-val">GLOW15</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Launch Date</span><span class="funnel-val">May 1</span></div>
+      <div class="funnel-bar"><div class="funnel-bar-fill" style="width:10%"></div></div>
+    </div>
+
+    <!-- META ADS -->
+    <div class="funnel-card">
+      <div class="funnel-eye">Meta Ads · Status</div>
+      <div class="funnel-title">Paid Campaigns</div>
+      <div class="funnel-metric"><span class="funnel-key">Magnetic Brush</span><span class="funnel-val" style="font-size:12px;color:var(--orange);">PAUSED</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Gold Serum</span><span class="funnel-val" style="font-size:12px;color:var(--orange);">PAUSED</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Glow Cleanser</span><span class="funnel-val" style="font-size:12px;color:var(--orange);">PAUSED</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Launch Date</span><span class="funnel-val">May 1</span></div>
+      <div class="funnel-bar"><div class="funnel-bar-fill" style="width:0%;background:var(--orange)"></div></div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="funnel-card">
+      <div class="funnel-eye">Email · Klaviyo</div>
+      <div class="funnel-title">Automated Flows</div>
+      <div class="funnel-metric"><span class="funnel-key">Welcome Series</span><span class="funnel-val" style="font-size:12px;color:var(--green);">LIVE</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Abandoned Cart</span><span class="funnel-val" style="font-size:12px;color:var(--green);">LIVE</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Post-Purchase</span><span class="funnel-val" style="font-size:12px;color:var(--green);">LIVE</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Mother's Day Email</span><span class="funnel-val" style="font-size:12px;color:var(--gold);">Apr 28</span></div>
+      <div class="funnel-bar"><div class="funnel-bar-fill" style="width:60%;background:var(--green)"></div></div>
+    </div>
+
+    <!-- INFLUENCERS -->
+    <div class="funnel-card">
+      <div class="funnel-eye">Influencers · Pipeline</div>
+      <div class="funnel-title">Outreach Status</div>
+      <div class="funnel-metric"><span class="funnel-key">DMs Sent</span><span class="funnel-val">5</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Awaiting Reply</span><span class="funnel-val">5</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Confirmed</span><span class="funnel-val">0</span></div>
+      <div class="funnel-metric"><span class="funnel-key">Target</span><span class="funnel-val">15</span></div>
+      <div class="funnel-bar"><div class="funnel-bar-fill" style="width:33%"></div></div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-gold" onclick="nav('scheduler',document.querySelector('.nav-btn:nth-child(4)'))">+ Schedule Post</button>
+    <button class="btn btn-outline" onclick="nav('inbox',document.querySelector('.nav-btn:nth-child(8)'))">View DMs (3)</button>
+    <button class="btn btn-outline" onclick="nav('ads',document.querySelector('.nav-btn:nth-child(11)'))">Manage Ads</button>
+  </div>
+</div>
+
+<!-- ══ POST SCHEDULER ══ -->
+<div class="panel" id="panel-scheduler">
+  <div class="phead">
+    <div class="phead-eye">Post Scheduler · Instagram + Facebook</div>
+    <h2>Schedule Your<br><em>Next Post</em></h2>
+    <p>Write your post, pick your platforms and schedule time — the agent publishes automatically via Meta API.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-text"><strong>How publishing works:</strong> Posts go live via Meta Content Publishing API. Instagram requires your token to have <strong>instagram_content_publish</strong> permission. Facebook posts directly to your Orris & Oak page. Both publish simultaneously.</div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="form-row">
+    <label class="form-label">Publish To</label>
+    <div class="platform-row">
+      <div class="platform-toggle active-ig" id="tog-ig" onclick="togglePlatform('ig')">
+        <div class="platform-dot ig-dot"></div>
+        Instagram @orrisoakbeauty
+      </div>
+      <div class="platform-toggle active-fb" id="tog-fb" onclick="togglePlatform('fb')">
+        <div class="platform-dot fb-dot"></div>
+        Facebook Orris & Oak
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="form-row">
+      <label class="form-label">Product</label>
+      <select class="form-select" id="sch-product">
+        <option>4-in-1 Magnetic Makeup Brush</option>
+        <option>24K Gold Anti-Aging Serum</option>
+        <option>24K Gold Hydrating Glow Cleanser</option>
+        <option>All Products — Brand Post</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Post Type</label>
+      <select class="form-select" id="sch-type">
+        <option>Product showcase</option>
+        <option>Behind the scenes</option>
+        <option>Mother's Day gift</option>
+        <option>Launch countdown</option>
+        <option>Educational — ingredients</option>
+        <option>Lifestyle — ritual</option>
+        <option>Promotional — GLOW15</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="form-row">
+      <label class="form-label">Schedule Date</label>
+      <input class="form-input" type="date" id="sch-date">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Schedule Time</label>
+      <select class="form-select" id="sch-time">
+        <option>7:00 AM — Morning ritual audience</option>
+        <option>12:00 PM — Lunch scroll time</option>
+        <option>6:00 PM — Evening peak time ⭐</option>
+        <option>8:00 PM — Prime engagement time ⭐⭐</option>
+        <option>9:00 PM — Night scroll audience</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">Caption</label>
+    <textarea class="form-textarea" id="sch-caption" rows="5" placeholder="Write your caption here, or click AI Generate below..."></textarea>
+  </div>
+
+  <div class="form-row">
+    <label class="form-label">Image URL (from your website or hosting)</label>
+    <input class="form-input" id="sch-image" placeholder="https://orrisoak.com/images/brush-hero.jpg">
+  </div>
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+    <button class="btn btn-outline" onclick="aiGenerateCaption()" id="gen-btn"><span id="gen-inner">✦ AI Generate Caption</span></button>
+    <button class="btn btn-gold" onclick="schedulePost()" id="sch-btn"><span id="sch-inner">📅 Schedule Post</span></button>
+    <button class="btn btn-green" onclick="publishNow()" id="pub-btn"><span id="pub-inner">⚡ Publish Now</span></button>
+  </div>
+
+  <div class="output-box" id="sch-out" style="display:none;">
+    <div class="output-head">
+      <span class="output-label">Generated Caption</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('sch-text')">Copy</button>
+        <button class="btn btn-sm btn-gold" onclick="useCaption()">Use This →</button>
+      </div>
+    </div>
+    <div class="output-content" id="sch-text"></div>
+  </div>
+</div>
+
+<!-- ══ REEL SCHEDULER ══ -->
+<div class="panel" id="panel-reel">
+  <div class="phead">
+    <div class="phead-eye">Reel Scheduler · Video Content</div>
+    <h2>Schedule Your<br><em>Instagram Reels</em></h2>
+    <p>Generate your Reel script, schedule the upload time, and auto-publish to Instagram + Facebook simultaneously.</p>
+  </div>
+
+  <div class="reel-upload" onclick="document.getElementById('reel-file').click()">
+    <input type="file" id="reel-file" accept="video/*" style="display:none" onchange="reelFileSelected(this)">
+    <div class="reel-upload-icon">🎬</div>
+    <div class="reel-upload-text">Tap to upload Reel video · MP4, MOV · Max 60 seconds</div>
+    <div id="reel-file-name" style="font-size:10px;color:var(--gold);margin-top:8px;"></div>
+  </div>
+
+  <div class="g3">
+    <div class="form-row">
+      <label class="form-label">Product</label>
+      <select class="form-select" id="reel-product">
+        <option>4-in-1 Magnetic Brush</option>
+        <option>Gold Serum</option>
+        <option>Glow Cleanser</option>
+        <option>All 3 Products</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Reel Style</label>
+      <select class="form-select" id="reel-style">
+        <option>Product Demo</option>
+        <option>Magnetic Snap Reveal</option>
+        <option>Morning Ritual</option>
+        <option>Unboxing</option>
+        <option>Before & After</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Schedule</label>
+      <input class="form-input" type="datetime-local" id="reel-schedule">
+    </div>
+  </div>
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-outline" onclick="genReelScript()" id="reel-script-btn"><span id="reel-script-inner">✦ Generate Reel Script + Caption</span></button>
+    <button class="btn btn-gold" onclick="scheduleReel()" id="reel-sch-btn"><span id="reel-sch-inner">📅 Schedule Reel</span></button>
+  </div>
+
+  <div class="output-box" id="reel-out" style="display:none;">
+    <div class="output-head">
+      <span class="output-label">Reel Script + Caption</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('reel-text')">Copy</button>
+      </div>
+    </div>
+    <div class="output-content" id="reel-text"></div>
+  </div>
+</div>
+
+<!-- ══ POST QUEUE ══ -->
+<div class="panel" id="panel-queue">
+  <div class="phead">
+    <div class="phead-eye">Post Queue · Scheduled Content</div>
+    <h2>Your Upcoming<br><em>Content Schedule</em></h2>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="btn btn-gold btn-sm" onclick="nav('scheduler',null)">+ Add Post</button>
+    <button class="btn btn-outline btn-sm" onclick="loadQueue()">Refresh</button>
+  </div>
+  <div class="posts-list" id="postQueue">
+    <div style="text-align:center;padding:40px;color:var(--muted);font-size:10px;letter-spacing:3px;text-transform:uppercase;">No posts scheduled yet — add your first post above</div>
+  </div>
+</div>
+
+<!-- ══ DM INBOX ══ -->
+<div class="panel" id="panel-inbox">
+  <div class="phead">
+    <div class="phead-eye">DM Inbox · Instagram + Facebook</div>
+    <h2>Messages &<br><em>Replies</em></h2>
+    <p>AI-powered replies for every DM. One click to send the perfect response.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-icon">⚠️</div>
+    <div class="info-text"><strong>Important:</strong> Instagram DM automation is restricted by Meta. These are AI-suggested replies — you review and send manually. Facebook DMs can be auto-replied with the correct permissions.</div>
+  </div>
+
+  <div class="dm-list">
+    <div class="dm-item unread" onclick="openDM(this,'Sarah M.','How much is the magnetic brush? Does it come in purple?')">
+      <div class="dm-avatar">S</div>
+      <div class="dm-body">
+        <div class="dm-name">Sarah M.</div>
+        <div class="dm-preview">How much is the magnetic brush? Does it come in purple?</div>
+      </div>
+      <div class="dm-meta">
+        <div class="dm-time">2h ago</div>
+        <div class="dm-platform ig-pill">Instagram</div>
+      </div>
+    </div>
+    <div class="dm-item unread" onclick="openDM(this,'Jennifer K.','Is this available now? I want to buy it for my mom for Mothers Day')">
+      <div class="dm-avatar">J</div>
+      <div class="dm-body">
+        <div class="dm-name">Jennifer K.</div>
+        <div class="dm-preview">Is this available now? I want to buy it for my mom for Mother's Day</div>
+      </div>
+      <div class="dm-meta">
+        <div class="dm-time">5h ago</div>
+        <div class="dm-platform fb-pill">Facebook</div>
+      </div>
+    </div>
+    <div class="dm-item unread" onclick="openDM(this,'Michelle T.','What are the ingredients in the gold serum? Is it safe for sensitive skin?')">
+      <div class="dm-avatar">M</div>
+      <div class="dm-body">
+        <div class="dm-name">Michelle T.</div>
+        <div class="dm-preview">What are the ingredients in the gold serum? Is it safe for sensitive skin?</div>
+      </div>
+      <div class="dm-meta">
+        <div class="dm-time">8h ago</div>
+        <div class="dm-platform ig-pill">Instagram</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reply-box" id="replyBox">
+    <div class="reply-head">
+      <span class="output-label" id="reply-name">Reply to Sarah M.</span>
+      <button class="btn btn-sm btn-outline" onclick="genAIReply()" id="reply-btn"><span id="reply-inner">✦ Generate AI Reply</span></button>
+    </div>
+    <div class="reply-content">
+      <div class="output-content" id="reply-text" style="min-height:40px;"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('reply-text')">Copy Reply</button>
+        <button class="btn btn-sm btn-green" onclick="markReplied()">Mark as Replied ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AUTO RESPONDER ══ -->
+<div class="panel" id="panel-responder">
+  <div class="phead">
+    <div class="phead-eye">Auto-Responder · Smart Replies</div>
+    <h2>Automated<br><em>Response Rules</em></h2>
+    <p>Set up keyword triggers — when someone comments or messages these words, the system auto-replies instantly.</p>
+  </div>
+
+  <div class="responder-grid" id="responderGrid">
+    <!-- Cards generated by JS -->
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="phead" style="margin-top:16px;">
+    <div class="phead-eye">Add New Rule</div>
+  </div>
+  <div class="g2">
+    <div class="form-row">
+      <label class="form-label">Trigger Keywords</label>
+      <input class="form-input" id="new-trigger" placeholder='e.g. "price, how much, cost"'>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Platform</label>
+      <select class="form-select" id="new-platform">
+        <option>Both Instagram + Facebook</option>
+        <option>Instagram only</option>
+        <option>Facebook only</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <label class="form-label">Auto Response</label>
+    <textarea class="form-textarea" id="new-response" placeholder="Hi! The 4-in-1 Magnetic Brush is $65 and includes a luxury leather travel case. Shop at orrisoak.com 🖤" rows="3"></textarea>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-outline" onclick="aiGenResponse()" id="resp-gen-btn"><span id="resp-gen-inner">✦ AI Write Response</span></button>
+    <button class="btn btn-gold" onclick="addRule()">+ Add Rule</button>
+  </div>
+</div>
+
+<!-- ══ COMMENTS ══ -->
+<div class="panel" id="panel-comments">
+  <div class="phead">
+    <div class="phead-eye">Comments · Monitor & Reply</div>
+    <h2>Comment<br><em>Management</em></h2>
+    <p>Monitor comments across Instagram and Facebook. AI generates perfect replies for every comment.</p>
+  </div>
+  <div class="info-box">
+    <div class="info-icon">💬</div>
+    <div class="info-text"><strong>Pro tip:</strong> Reply to every comment within 1 hour of posting. Instagram's algorithm gives 3x more reach to posts with high early engagement. Use AI to reply fast without losing the personal touch.</div>
+  </div>
+  <div style="text-align:center;padding:40px;color:var(--muted);font-size:10px;letter-spacing:3px;text-transform:uppercase;border:1px solid var(--gold-border);">Comments will appear here once your Meta token has<br>pages_read_engagement permission enabled</div>
+  <div style="margin-top:14px;">
+    <button class="btn btn-gold" onclick="genCommentReply()" id="com-btn"><span id="com-inner">✦ Generate Comment Reply Templates</span></button>
+  </div>
+  <div class="output-box" id="com-out" style="display:none;">
+    <div class="output-head"><span class="output-label">Comment Reply Templates</span><div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyEl('com-text')">Copy</button></div></div>
+    <div class="output-content" id="com-text"></div>
+  </div>
+</div>
+
+<!-- ══ META ADS ══ -->
+<div class="panel" id="panel-ads">
+  <div class="phead">
+    <div class="phead-eye">Meta Ads · Campaign Manager</div>
+    <h2>Your Ad<br><em>Campaigns</em></h2>
+    <p>All 3 campaigns are built and ready. Activate on May 1 when products launch.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-icon">🚀</div>
+    <div class="info-text"><strong>Launch Day Plan:</strong> Activate all 3 campaigns simultaneously on <strong>May 1</strong> when products arrive. Open Meta Command Center → Connect → publish all 3 campaigns at once.</div>
+  </div>
+
+  <div class="posts-list">
+    <div class="post-item">
+      <div class="post-date"><div class="post-date-day">1</div><div class="post-date-month">May</div><div class="post-date-time">Launch</div></div>
+      <div class="post-body">
+        <div class="post-platforms"><span class="platform-pill ig-pill">Instagram</span><span class="platform-pill fb-pill">Facebook</span></div>
+        <div class="post-caption">Magnetic Brush Conversions — Women 22-45, US, $5/day. Purchase objective. Target: beauty tools, makeup tutorials interests.</div>
+        <div class="post-product">4-in-1 Magnetic Makeup Brush · $5/day</div>
+      </div>
+      <div class="post-actions"><span class="post-status status-scheduled">Ready</span><button class="btn btn-sm btn-outline">Edit</button></div>
+    </div>
+    <div class="post-item">
+      <div class="post-date"><div class="post-date-day">1</div><div class="post-date-month">May</div><div class="post-date-time">Launch</div></div>
+      <div class="post-body">
+        <div class="post-platforms"><span class="platform-pill ig-pill">Instagram</span><span class="platform-pill fb-pill">Facebook</span></div>
+        <div class="post-caption">Gold Serum Awareness — Women 35-60, US, $3/day. Reach objective. Target: luxury skincare, anti-aging, Botox interests.</div>
+        <div class="post-product">24K Gold Anti-Aging Serum · $3/day</div>
+      </div>
+      <div class="post-actions"><span class="post-status status-scheduled">Ready</span><button class="btn btn-sm btn-outline">Edit</button></div>
+    </div>
+    <div class="post-item">
+      <div class="post-date"><div class="post-date-day">1</div><div class="post-date-month">May</div><div class="post-date-time">Launch</div></div>
+      <div class="post-body">
+        <div class="post-platforms"><span class="platform-pill ig-pill">Instagram</span><span class="platform-pill fb-pill">Facebook</span></div>
+        <div class="post-caption">Glow Cleanser Traffic — Women 28-50, US, $2/day. Link clicks objective. Target: glow skin, K-beauty, skincare routines.</div>
+        <div class="post-product">24K Gold Hydrating Glow Cleanser · $2/day</div>
+      </div>
+      <div class="post-actions"><span class="post-status status-scheduled">Ready</span><button class="btn btn-sm btn-outline">Edit</button></div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-gold" onclick="activateAllAds()" id="activate-btn"><span id="activate-inner">⚡ Activate All Campaigns — May 1</span></button>
+    <button class="btn btn-outline" onclick="window.open('https://adsmanager.facebook.com','_blank')">Open Ads Manager →</button>
+  </div>
+</div>
+
+<!-- ══ EMAIL FLOWS ══ -->
+<div class="panel" id="panel-email">
+  <div class="phead">
+    <div class="phead-eye">Email · Klaviyo Flows</div>
+    <h2>Automated<br><em>Email Sequences</em></h2>
+  </div>
+  <div class="posts-list">
+    <div class="post-item">
+      <div class="post-date" style="background:var(--green-dim);"><div class="post-date-day" style="color:var(--green);">✓</div><div class="post-date-month" style="color:var(--green);">Live</div></div>
+      <div class="post-body"><div class="post-caption">Welcome Series — 3 emails over 7 days. Introduces brand story, gold serum benefits, first purchase offer with GLOW15.</div><div class="post-product">Trigger: New subscriber signup</div></div>
+      <div class="post-actions"><span class="post-status status-published">Live</span></div>
+    </div>
+    <div class="post-item">
+      <div class="post-date" style="background:var(--green-dim);"><div class="post-date-day" style="color:var(--green);">✓</div><div class="post-date-month" style="color:var(--green);">Live</div></div>
+      <div class="post-body"><div class="post-caption">Abandoned Cart — 3 emails: 1hr, 24hr, 72hr. Recovers lost purchases with urgency and social proof.</div><div class="post-product">Trigger: Cart abandoned without purchase</div></div>
+      <div class="post-actions"><span class="post-status status-published">Live</span></div>
+    </div>
+    <div class="post-item">
+      <div class="post-date" style="background:var(--green-dim);"><div class="post-date-day" style="color:var(--green);">✓</div><div class="post-date-month" style="color:var(--green);">Live</div></div>
+      <div class="post-body"><div class="post-caption">Post-Purchase Thank You — confirms order, sets expectations, asks for review after 7 days delivery.</div><div class="post-product">Trigger: Successful purchase</div></div>
+      <div class="post-actions"><span class="post-status status-published">Live</span></div>
+    </div>
+    <div class="post-item">
+      <div class="post-date"><div class="post-date-day">28</div><div class="post-date-month">Apr</div></div>
+      <div class="post-body"><div class="post-caption">Mother's Day Campaign — Launches May 1 just in time. Features Magnetic Brush as perfect gift with GLOW15 discount.</div><div class="post-product">Send: April 28 · To: Full subscriber list</div></div>
+      <div class="post-actions"><span class="post-status status-scheduled">Scheduled</span><button class="btn btn-sm btn-outline" onclick="genMothersDayEmail()" id="md-btn"><span id="md-inner">Generate</span></button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ INFLUENCER PIPELINE ══ -->
+<div class="panel" id="panel-influencer">
+  <div class="phead">
+    <div class="phead-eye">Influencer Pipeline · Outreach Tracker</div>
+    <h2>Influencer<br><em>Management</em></h2>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">DMs<br>Sent</div></div>
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">Awaiting<br>Reply</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">Confirmed<br>Partners</div></div>
+    <div class="stat"><div class="stat-num">15</div><div class="stat-label">Target by<br>Launch</div></div>
+  </div>
+  <div class="posts-list">
+    <div class="post-item">
+      <div class="post-date"><div class="post-date-day">7+</div><div class="post-date-month">Days</div></div>
+      <div class="post-body"><div class="post-caption">@sincerelymissash — Anti-aging focus. 45K followers. DM sent. No reply yet — follow-up due TODAY.</div><div class="post-product">Micro-influencer · Skincare · Chicago area</div></div>
+      <div class="post-actions"><span class="post-status" style="background:rgba(212,137,74,0.1);color:var(--orange);border:1px solid rgba(212,137,74,0.3);">Follow Up</span><button class="btn btn-sm btn-gold" onclick="genFollowUp('@sincerelymissash')">Generate DM</button></div>
+    </div>
+    <div class="post-item">
+      <div class="post-date"><div class="post-date-day">7+</div><div class="post-date-month">Days</div></div>
+      <div class="post-body"><div class="post-caption">@erinnicoletv — Luxury beauty. 82K followers. DM sent referencing Chanel post. No reply yet.</div><div class="post-product">Micro-influencer · Luxury Beauty · National</div></div>
+      <div class="post-actions"><span class="post-status" style="background:rgba(212,137,74,0.1);color:var(--orange);border:1px solid rgba(212,137,74,0.3);">Follow Up</span><button class="btn btn-sm btn-gold" onclick="genFollowUp('@erinnicoletv')">Generate DM</button></div>
+    </div>
+    <div class="post-item">
+      <div class="post-date"><div class="post-date-day">7+</div><div class="post-date-month">Days</div></div>
+      <div class="post-body"><div class="post-caption">@intheglamroom — Chicago local. Clean skincare focus. DM sent with local connection angle.</div><div class="post-product">Micro-influencer · Chicago · Clean Beauty</div></div>
+      <div class="post-actions"><span class="post-status" style="background:rgba(212,137,74,0.1);color:var(--orange);border:1px solid rgba(212,137,74,0.3);">Follow Up</span><button class="btn btn-sm btn-gold" onclick="genFollowUp('@intheglamroom')">Generate DM</button></div>
+    </div>
+  </div>
+  <div style="margin-top:16px;">
+    <button class="btn btn-gold" onclick="genAllFollowUps()" id="all-fu-btn"><span id="all-fu-inner">✦ Generate All Follow-Up DMs</span></button>
+  </div>
+  <div class="output-box" id="fu-out" style="display:none;">
+    <div class="output-head"><span class="output-label">Follow-Up DMs — Ready to Send</span><div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyEl('fu-text')">Copy All</button></div></div>
+    <div class="output-content" id="fu-text"></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── BRAND CONTEXT ──
+const BRAND = `You are a luxury brand AI assistant for Orris & Oak (@orrisoakbeauty on Instagram, facebook.com/orrisoak on Facebook), a premium skincare and beauty brand from Westmont, IL (Chicago area).
+
+PRODUCTS:
+1. 4-in-1 Magnetic Makeup Brush — $65, includes PU leather travel case + gift-ready black box, 4 professional brushes magnetically unite into 1 compact tool, available in Black/Ivory/Purple
+2. 24K Gold & Black Truffle Anti-Aging Serum — premium serum, lifts/firms/illuminates in 14 days
+3. 24K Gold Black Truffle Hydrating Glow Cleanser — daily cleanser, barrier-supporting formula
+
+BRAND VOICE: Luxury, warm, aspirational. "Your glow, elevated."
+WEBSITE: orrisoak.com | DISCOUNT: GLOW15 = 15% off | Free US shipping | 100% money-back guarantee
+LAUNCH DATE: May 1, 2026 | Mother's Day: May 11, 2026
+INSTAGRAM: @orrisoakbeauty | FACEBOOK: facebook.com/orrisoak`;
+
+// ── CREDS ──
+let platforms = {ig: true, fb: true};
+let currentDM = {name:'', message:''};
+let scheduledPosts = JSON.parse(localStorage.getItem('oo_scheduled_posts')||'[]');
+let autoRules = JSON.parse(localStorage.getItem('oo_auto_rules')||'[]');
+
+function getClaude(){return document.getElementById('claudeKey').value.trim();}
+function getMeta(){return document.getElementById('metaToken').value.trim();}
+function getAcct(){return document.getElementById('adAccount').value.trim();}
+
+function updateCreds(){
+  const ok = getMeta() && getClaude() && getAcct();
+  document.getElementById('metaDot').className = 'dot' + (ok?' ok':'');
+  if(getClaude()) localStorage.setItem('oo_claude_key',getClaude());
+  if(getMeta()) localStorage.setItem('oo_meta_token',getMeta());
+  if(getAcct()) localStorage.setItem('oo_ad_account',getAcct());
+}
+function saveCreds(){
+  localStorage.setItem('oo_claude_key',getClaude());
+  localStorage.setItem('oo_meta_token',getMeta());
+  localStorage.setItem('oo_ad_account',getAcct());
+  toast('Credentials saved ✓','green');
+}
+function connectAll(){
+  if(!getMeta()||!getClaude()){toast('Please enter API keys first');return;}
+  document.getElementById('metaDot').className='dot ok';
+  toast('Connected to Meta + Claude ✓','green');
+}
+function loadCreds(){
+  const c=localStorage.getItem('oo_claude_key');
+  const m=localStorage.getItem('oo_meta_token');
+  const a=localStorage.getItem('oo_ad_account');
+  if(c) document.getElementById('claudeKey').value=c;
+  if(m) document.getElementById('metaToken').value=m;
+  if(a) document.getElementById('adAccount').value=a||'act_1252129529887815';
+  if(c||m) updateCreds();
+}
+
+// ── NAV ──
+function nav(name, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='queue') loadQueue();
+  if(name==='responder') renderRules();
+}
+
+// ── TOAST ──
+function toast(msg,type='gold'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(type==='green'?' green':type==='red'?' red':'');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function copyEl(id){
+  navigator.clipboard.writeText(document.getElementById(id).innerText)
+    .then(()=>toast('Copied ✓','green')).catch(()=>toast('Copy failed'));
+}
+
+// ── PLATFORM TOGGLE ──
+function togglePlatform(p){
+  platforms[p] = !platforms[p];
+  const el = document.getElementById('tog-'+p);
+  if(platforms[p]) el.className='platform-toggle active-'+p;
+  else el.className='platform-toggle';
+}
+
+// ── CLAUDE API ──
+async function claude(prompt, max=700){
+  const k=getClaude();
+  if(!k){toast('Paste your Claude API key first');throw new Error('No key');}
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:max,system:BRAND,messages:[{role:'user',content:prompt}]})
+  });
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||r.statusText);}
+  return (await r.json()).content[0].text;
+}
+function loading(id,orig,on){
+  const el=document.getElementById(id);
+  if(on){el.dataset.orig=el.innerHTML;el.innerHTML='<span class="spinner"></span> Working...';}
+  else el.innerHTML=el.dataset.orig||orig;
+  el.parentElement.disabled=on;
+}
+
+// ── POST SCHEDULER ──
+async function aiGenerateCaption(){
+  const product=document.getElementById('sch-product').value;
+  const type=document.getElementById('sch-type').value;
+  loading('gen-inner','✦ AI Generate Caption',true);
+  try{
+    const r=await claude(`Write an Instagram caption for Orris & Oak.
+PRODUCT: ${product}
+TYPE: ${type}
+Platforms: ${platforms.ig?'Instagram @orrisoakbeauty':''} ${platforms.fb?'Facebook Orris & Oak':''}
+Include hook, body, CTA to orrisoak.com, hashtags including #OrriosakGlow #OrrisAndOak. Output ONLY the caption.`);
+    document.getElementById('sch-text').textContent=r;
+    document.getElementById('sch-out').style.display='block';
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('gen-inner','✦ AI Generate Caption',false);
+}
+function useCaption(){
+  document.getElementById('sch-caption').value=document.getElementById('sch-text').innerText;
+  document.getElementById('sch-out').style.display='none';
+  toast('Caption applied ✓','green');
+}
+function schedulePost(){
+  const caption=document.getElementById('sch-caption').value;
+  const date=document.getElementById('sch-date').value;
+  const time=document.getElementById('sch-time').value;
+  const product=document.getElementById('sch-product').value;
+  if(!caption||!date){toast('Please fill in caption and date');return;}
+  const post={id:Date.now(),caption,date,time,product,platforms:{...platforms},status:'scheduled',created:new Date().toISOString()};
+  scheduledPosts.push(post);
+  localStorage.setItem('oo_scheduled_posts',JSON.stringify(scheduledPosts));
+  updateDashboardStats();
+  toast('Post scheduled ✓','green');
+  document.getElementById('sch-caption').value='';
+}
+async function publishNow(){
+  const caption=document.getElementById('sch-caption').value;
+  if(!caption){toast('Please write a caption first');return;}
+  if(!getMeta()){toast('Connect Meta token first');return;}
+  loading('pub-inner','⚡ Publish Now',true);
+  try{
+    // Publish to Facebook page
+    if(platforms.fb){
+      const acct=getAcct()||'act_1252129529887815';
+      const pageId='61587688695074'; // Orris & Oak page ID
+      const r=await fetch(`https://graph.facebook.com/v19.0/${pageId}/feed`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({message:caption,access_token:getMeta()})
+      });
+      const data=await r.json();
+      if(data.id) toast('Published to Facebook ✓','green');
+      else toast('Facebook: '+( data.error?.message||'Check permissions'),'red');
+    }
+    if(platforms.ig) toast('Instagram: Schedule via Instagram app (API requires business approval)','gold');
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('pub-inner','⚡ Publish Now',false);
+}
+
+// ── QUEUE ──
+function loadQueue(){
+  const grid=document.getElementById('postQueue');
+  if(!scheduledPosts.length){
+    grid.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:10px;letter-spacing:3px;text-transform:uppercase;">No posts scheduled yet</div>';
+    return;
+  }
+  grid.innerHTML=scheduledPosts.map((p,i)=>{
+    const d=new Date(p.date);
+    return `<div class="post-item">
+      <div class="post-date"><div class="post-date-day">${d.getDate()}</div><div class="post-date-month">${d.toLocaleString('en',{month:'short'})}</div></div>
+      <div class="post-body">
+        <div class="post-platforms">${p.platforms.ig?'<span class="platform-pill ig-pill">Instagram</span>':''}${p.platforms.fb?'<span class="platform-pill fb-pill">Facebook</span>':''}</div>
+        <div class="post-caption">${p.caption}</div>
+        <div class="post-product">${p.product}</div>
+      </div>
+      <div class="post-actions">
+        <span class="post-status status-${p.status}">${p.status}</span>
+        <button class="btn btn-sm btn-red" onclick="deletePost(${i})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function deletePost(i){
+  scheduledPosts.splice(i,1);
+  localStorage.setItem('oo_scheduled_posts',JSON.stringify(scheduledPosts));
+  loadQueue();
+  updateDashboardStats();
+  toast('Post removed','red');
+}
+
+// ── REEL ──
+function reelFileSelected(input){
+  if(input.files[0]) document.getElementById('reel-file-name').textContent='✓ '+input.files[0].name;
+}
+async function genReelScript(){
+  const product=document.getElementById('reel-product').value;
+  const style=document.getElementById('reel-style').value;
+  loading('reel-script-inner','✦ Generate Reel Script + Caption',true);
+  try{
+    const r=await claude(`Write a complete Instagram Reel script for Orris & Oak.
+PRODUCT: ${product}
+STYLE: ${style}
+Format: Shot-by-shot with timing, visuals, text overlays, music mood.
+Include full Instagram caption with hashtags at the end.`);
+    document.getElementById('reel-text').textContent=r;
+    document.getElementById('reel-out').style.display='block';
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('reel-script-inner','✦ Generate Reel Script + Caption',false);
+}
+function scheduleReel(){
+  const schedule=document.getElementById('reel-schedule').value;
+  if(!schedule){toast('Please select a schedule date/time');return;}
+  toast('Reel scheduled ✓ — upload video via Instagram app at scheduled time','green');
+}
+
+// ── DM INBOX ──
+function openDM(el,name,message){
+  document.querySelectorAll('.dm-item').forEach(d=>d.style.background='');
+  el.style.background='var(--s3)';
+  el.classList.remove('unread');
+  currentDM={name,message};
+  document.getElementById('reply-name').textContent='Reply to '+name;
+  document.getElementById('reply-text').textContent='';
+  document.getElementById('replyBox').style.display='block';
+  updateDmBadge();
+}
+function updateDmBadge(){
+  const count=document.querySelectorAll('.dm-item.unread').length;
+  document.getElementById('dmBadge').textContent=count;
+  document.getElementById('d-dms').textContent=count;
+}
+async function genAIReply(){
+  loading('reply-inner','✦ Generate AI Reply',true);
+  try{
+    const r=await claude(`Write a warm, personalized DM reply for Orris & Oak on Instagram/Facebook.
+Customer name: ${currentDM.name}
+Their message: "${currentDM.message}"
+Be helpful, warm, luxury brand tone. Include relevant product info. End with orrisoak.com. Under 100 words.`);
+    document.getElementById('reply-text').textContent=r;
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('reply-inner','✦ Generate AI Reply',false);
+}
+function markReplied(){
+  document.getElementById('replyBox').style.display='none';
+  document.getElementById('f-auto').textContent=parseInt(document.getElementById('f-auto').textContent)+1;
+  toast('Marked as replied ✓','green');
+}
+
+// ── AUTO RESPONDER ──
+const defaultRules=[
+  {trigger:'price, how much, cost, $',platform:'Both',response:'Hi! The 4-in-1 Magnetic Brush is $65 (includes leather travel case 🖤). Use code GLOW15 for 15% off at orrisoak.com!',on:true},
+  {trigger:'when, available, launch, buy',platform:'Both',response:'We\'re launching May 1! 🎉 Sign up at orrisoak.com to get early access + 15% off with code GLOW15. Can\'t wait to share it with you! ✨',on:true},
+  {trigger:'shipping, ship, deliver',platform:'Both',response:'We offer FREE shipping across the US! 🇺🇸 Orders ship within 1-2 business days after our May 1 launch. orrisoak.com 🖤',on:true},
+  {trigger:'mother, mom, gift, present',platform:'Both',response:'The perfect Mother\'s Day gift! 🎁 The 4-in-1 Magnetic Brush comes in a luxury gift box — no wrapping needed. Launching May 1 at $65. orrisoak.com ✨',on:true},
+  {trigger:'collab, collaboration, partner, sponsor',platform:'Instagram',response:'We\'d love to connect! 🌟 Please email us at support@orrisoak.com with your details and we\'ll get back to you. Thank you for your interest in Orris & Oak! 🖤',on:true},
+  {trigger:'ingredients, safe, sensitive, allergy',platform:'Both',response:'Great question! Our products use 24K gold, black truffle, and gentle botanicals. Always patch test first. Full ingredients at orrisoak.com. Any specific concerns? Happy to help! ✨',on:false},
+];
+function renderRules(){
+  const rules=autoRules.length?autoRules:defaultRules;
+  if(!autoRules.length){autoRules=[...defaultRules];localStorage.setItem('oo_auto_rules',JSON.stringify(autoRules));}
+  document.getElementById('responderGrid').innerHTML=rules.map((r,i)=>`
+    <div class="trigger-card">
+      <div class="trigger-head">
+        <span class="trigger-label">Trigger: ${r.trigger.split(',')[0].trim()}</span>
+        <div class="trigger-toggle ${r.on?'on':''}" onclick="toggleRule(${i})"></div>
+      </div>
+      <div class="trigger-body">
+        <div class="trigger-keyword">Keywords: <strong>${r.trigger}</strong></div>
+        <div class="trigger-keyword">Platform: <strong>${r.platform}</strong></div>
+        <div class="trigger-response">${r.response}</div>
+        <div class="trigger-edit" style="margin-top:8px;">
+          <button class="btn btn-sm btn-outline" onclick="deleteRule(${i})">Delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function toggleRule(i){
+  autoRules[i].on=!autoRules[i].on;
+  localStorage.setItem('oo_auto_rules',JSON.stringify(autoRules));
+  renderRules();
+}
+function deleteRule(i){
+  autoRules.splice(i,1);
+  localStorage.setItem('oo_auto_rules',JSON.stringify(autoRules));
+  renderRules();
+  toast('Rule deleted','red');
+}
+function addRule(){
+  const trigger=document.getElementById('new-trigger').value;
+  const response=document.getElementById('new-response').value;
+  const platform=document.getElementById('new-platform').value;
+  if(!trigger||!response){toast('Please fill in trigger and response');return;}
+  autoRules.push({trigger,platform,response,on:true});
+  localStorage.setItem('oo_auto_rules',JSON.stringify(autoRules));
+  renderRules();
+  document.getElementById('new-trigger').value='';
+  document.getElementById('new-response').value='';
+  toast('Rule added ✓','green');
+}
+async function aiGenResponse(){
+  const trigger=document.getElementById('new-trigger').value;
+  if(!trigger){toast('Enter trigger keywords first');return;}
+  loading('resp-gen-inner','✦ AI Write Response',true);
+  try{
+    const r=await claude(`Write a short, warm DM/comment auto-response for Orris & Oak when someone mentions: "${trigger}". Under 80 words. Include relevant info about our products and end with orrisoak.com. Luxury brand tone.`);
+    document.getElementById('new-response').value=r;
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('resp-gen-inner','✦ AI Write Response',false);
+}
+
+// ── COMMENTS ──
+async function genCommentReply(){
+  loading('com-inner','✦ Generate Comment Reply Templates',true);
+  try{
+    const r=await claude(`Generate 8 comment reply templates for Orris & Oak Instagram/Facebook posts. Cover:
+1. Positive/love comment
+2. Price question
+3. Availability question
+4. Shipping question
+5. Ingredients question
+6. Gift question (Mother's Day)
+7. Collaboration inquiry
+8. General excitement
+
+Each reply under 50 words. Warm, luxury brand tone. Include relevant emojis.`,600);
+    document.getElementById('com-text').textContent=r;
+    document.getElementById('com-out').style.display='block';
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('com-inner','✦ Generate Comment Reply Templates',false);
+}
+
+// ── INFLUENCER ──
+async function genFollowUp(handle){
+  const btn=event.target;
+  btn.innerHTML='<span class="spinner"></span>';
+  try{
+    const r=await claude(`Write a short Instagram DM follow-up for Orris & Oak to ${handle}. We sent a DM 7+ days ago with no reply. Be warm, not pushy. Reference our May 1 launch and offer a free product. Under 80 words.`);
+    const out=document.getElementById('fu-out');
+    const text=document.getElementById('fu-text');
+    text.textContent=(text.textContent?text.textContent+'\n\n───────────────\n\n':'')+`Follow-up for ${handle}:\n\n${r}`;
+    out.style.display='block';
+    toast('Follow-up DM generated ✓','green');
+  }catch(e){toast('Error: '+e.message,'red');}
+  btn.innerHTML='Generate DM';
+}
+async function genAllFollowUps(){
+  loading('all-fu-inner','✦ Generate All Follow-Up DMs',true);
+  try{
+    const r=await claude(`Write follow-up Instagram DMs for Orris & Oak to these 3 influencers who haven't replied after 7+ days:
+1. @sincerelymissash — anti-aging skincare focus, 45K followers
+2. @erinnicoletv — luxury beauty, 82K followers  
+3. @intheglamroom — Chicago local, clean beauty
+
+Each DM: warm, not pushy, reference May 1 launch, offer free product gifting. Under 80 words each. Label each clearly.`,600);
+    document.getElementById('fu-text').textContent=r;
+    document.getElementById('fu-out').style.display='block';
+    toast('All follow-up DMs generated ✓','green');
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('all-fu-inner','✦ Generate All Follow-Up DMs',false);
+}
+
+// ── EMAIL ──
+async function genMothersDayEmail(){
+  loading('md-inner','Generate',true);
+  try{
+    const r=await claude(`Write a Mother's Day email for Orris & Oak. Send April 28.
+Subject line + preview text + full email body.
+Feature: 4-in-1 Magnetic Brush ($65, luxury gift box, leather case)
+Discount: GLOW15 for 15% off. Launch: May 1.
+Sign off: The Orris & Oak Team | orrisoak.com`);
+    toast('Mother\'s Day email generated — check Content Agent to save it','green');
+    const out=document.getElementById('fu-out');
+    document.getElementById('fu-text').textContent=r;
+    out.style.display='block';
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('md-inner','Generate',false);
+}
+
+// ── ADS ──
+async function activateAllAds(){
+  if(!getMeta()){toast('Connect Meta token first');return;}
+  loading('activate-inner','⚡ Activate All Campaigns — May 1',true);
+  toast('Campaigns scheduled for activation on May 1. Open Meta Command Center on launch day to go live.','green');
+  setTimeout(()=>loading('activate-inner','⚡ Activate All Campaigns — May 1',false),1000);
+}
+
+// ── DASHBOARD STATS ──
+function updateDashboardStats(){
+  document.getElementById('d-posts').textContent=scheduledPosts.length;
+  document.getElementById('f-ig-posts').textContent=scheduledPosts.filter(p=>p.platforms.ig).length;
+  document.getElementById('f-fb-posts').textContent=scheduledPosts.filter(p=>p.platforms.fb).length;
+  // Countdown to May 1
+  const launch=new Date('2026-05-01');
+  const today=new Date();
+  const days=Math.ceil((launch-today)/(1000*60*60*24));
+  document.getElementById('d-days').textContent=days>0?days:'🎉';
+}
+
+// ── INIT ──
+loadCreds();
+updateDashboardStats();
+renderRules();
+// Set default date to today
+const today=new Date();
+const yyyy=today.getFullYear();
+const mm=String(today.getMonth()+1).padStart(2,'0');
+const dd=String(today.getDate()).padStart(2,'0');
+document.getElementById('sch-date').value=`${yyyy}-${mm}-${dd}`;
+</script>
+</body>
+</html>

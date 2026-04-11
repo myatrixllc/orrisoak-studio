@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak AI Agent — Setup Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C; --gold-light: #E8D5A3; --gold-dim: rgba(201,168,76,0.12);
+    --black: #080808; --surface: #111111; --surface2: #181818;
+    --border: rgba(201,168,76,0.2); --cream: #F5EFE3; --muted: #7A6E60;
+    --green: #4CAF7D; --green-dim: rgba(76,175,125,0.1);
+    --blue: #5B8EE6; --blue-dim: rgba(91,142,230,0.1);
+    --red: #E05252; --red-dim: rgba(224,82,82,0.1);
+    --orange: #E08850; --orange-dim: rgba(224,136,80,0.1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--black); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-weight:300; line-height:1.8; }
+
+  .banner { background:var(--gold); padding:14px 60px; display:flex; align-items:center; justify-content:space-between; }
+  .banner-logo { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--black); letter-spacing:5px; text-transform:uppercase; }
+  .banner-logo em { font-style:italic; }
+  .banner-tag { font-size:8px; letter-spacing:5px; text-transform:uppercase; color:var(--black); opacity:0.7; }
+
+  .hero { padding:80px 60px 60px; background:linear-gradient(160deg,var(--surface) 0%,var(--black) 100%); border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-80px; right:-80px; width:500px; height:500px; background:radial-gradient(circle,rgba(201,168,76,0.06),transparent 65%); pointer-events:none; }
+  .hero-eyebrow { font-size:8px; letter-spacing:6px; text-transform:uppercase; color:var(--gold); margin-bottom:16px; }
+  .hero h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(36px,5vw,60px); font-weight:300; line-height:1.1; margin-bottom:20px; }
+  .hero h1 em { font-style:italic; color:var(--gold); }
+  .hero-desc { font-size:12px; letter-spacing:1px; color:var(--muted); max-width:600px; line-height:2.2; }
+  .hero-meta { display:flex; gap:30px; margin-top:36px; flex-wrap:wrap; }
+  .hero-meta-item { display:flex; align-items:center; gap:10px; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
+  .hero-meta-dot { width:8px; height:8px; border-radius:50%; }
+
+  .progress-nav { position:sticky; top:0; z-index:100; background:rgba(8,8,8,0.97); border-bottom:1px solid var(--border); padding:0 60px; display:flex; gap:0; overflow-x:auto; }
+  .pnav-item { display:flex; align-items:center; gap:8px; padding:14px 18px; white-space:nowrap; font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); text-decoration:none; border-bottom:2px solid transparent; transition:all 0.2s; flex-shrink:0; }
+  .pnav-item:hover { color:var(--gold-light); border-bottom-color:var(--gold-dim); }
+  .pnav-num { width:18px; height:18px; border-radius:50%; border:1px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:7px; flex-shrink:0; }
+
+  .content { max-width:900px; margin:0 auto; padding:60px 40px; }
+  .step-section { margin-bottom:70px; padding-bottom:70px; border-bottom:1px solid var(--border); }
+  .step-section:last-child { border-bottom:none; }
+
+  .step-header { display:flex; align-items:flex-start; gap:24px; margin-bottom:36px; }
+  .step-number { font-family:'Cormorant Garamond',serif; font-size:72px; font-weight:300; line-height:1; color:rgba(201,168,76,0.15); flex-shrink:0; margin-top:-8px; }
+  .step-eyebrow { font-size:8px; letter-spacing:5px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+  .step-title { font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:300; line-height:1.2; }
+  .step-title em { font-style:italic; color:var(--gold); }
+  .step-subtitle { font-size:11px; letter-spacing:1px; color:var(--muted); margin-top:8px; line-height:2; }
+
+  .alert { padding:18px 22px; margin:20px 0; border-left:3px solid; font-size:11px; letter-spacing:0.5px; line-height:2; }
+  .alert strong { display:block; font-weight:600; font-size:9px; letter-spacing:3px; text-transform:uppercase; margin-bottom:6px; }
+  .alert.tip { background:var(--green-dim); border-color:var(--green); color:#A8E6C4; }
+  .alert.tip strong { color:var(--green); }
+  .alert.warning { background:var(--orange-dim); border-color:var(--orange); color:#F0C490; }
+  .alert.warning strong { color:var(--orange); }
+  .alert.info { background:var(--blue-dim); border-color:var(--blue); color:#B0C8F0; }
+  .alert.info strong { color:var(--blue); }
+  .alert.important { background:var(--gold-dim); border-color:var(--gold); color:var(--gold-light); }
+  .alert.important strong { color:var(--gold); }
+  .alert a { color:inherit; }
+
+  .step-list { display:flex; flex-direction:column; gap:16px; }
+  .step-item { display:flex; gap:18px; padding:20px 22px; background:var(--surface); border:1px solid var(--border); transition:border-color 0.2s; }
+  .step-item:hover { border-color:rgba(201,168,76,0.4); }
+  .step-item-num { width:28px; height:28px; flex-shrink:0; background:var(--gold); color:var(--black); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; margin-top:2px; }
+  .step-item-title { font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--cream); margin-bottom:6px; }
+  .step-item-desc { font-size:11px; letter-spacing:0.5px; color:var(--muted); line-height:2; }
+  .step-item-desc strong { color:var(--cream); font-weight:400; }
+  .step-item-desc a { color:var(--gold); text-decoration:none; }
+
+  .code-block { background:#0D0D0D; border:1px solid var(--border); padding:20px 24px; margin:16px 0; position:relative; overflow-x:auto; }
+  .code-block pre { font-family:'Courier New',monospace; font-size:12px; color:var(--gold-light); line-height:1.8; white-space:pre-wrap; word-break:break-word; }
+  .code-label { font-size:7px; letter-spacing:4px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .code-label::after { content:''; flex:1; height:1px; background:var(--border); }
+  .copy-code-btn { position:absolute; top:14px; right:14px; background:var(--gold-dim); border:1px solid var(--border); color:var(--gold); font-family:'Josefin Sans',sans-serif; font-size:7px; letter-spacing:3px; text-transform:uppercase; padding:5px 12px; cursor:pointer; transition:all 0.2s; }
+  .copy-code-btn:hover { background:var(--gold); color:var(--black); }
+
+  .screen-box { border:1px solid var(--border); margin:16px 0; overflow:hidden; }
+  .screen-bar { background:var(--surface2); padding:10px 14px; display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--border); }
+  .screen-dot { width:8px; height:8px; border-radius:50%; }
+  .screen-url { margin-left:10px; font-size:9px; letter-spacing:1px; color:var(--muted); font-family:'Courier New',monospace; }
+  .screen-content { padding:20px 24px; background:var(--surface); font-size:11px; letter-spacing:0.5px; color:var(--muted); line-height:2; }
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0; }
+  .option-card { background:var(--surface); border:1px solid var(--border); padding:22px 20px; transition:border-color 0.2s; }
+  .option-card:hover { border-color:var(--gold); }
+  .option-card-title { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+  .option-card-desc { font-size:11px; letter-spacing:0.5px; color:var(--muted); line-height:2; }
+
+  .divider { display:flex; align-items:center; gap:16px; margin:30px 0; font-size:8px; letter-spacing:4px; text-transform:uppercase; color:var(--muted); }
+  .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .badge { display:inline-block; font-size:7px; letter-spacing:3px; text-transform:uppercase; padding:4px 12px; margin-left:10px; vertical-align:middle; }
+  .badge-free { background:var(--green-dim); color:var(--green); border:1px solid var(--green); }
+  .badge-required { background:var(--orange-dim); color:var(--orange); border:1px solid var(--orange); }
+  .badge-optional { background:var(--blue-dim); color:var(--blue); border:1px solid var(--blue); }
+
+  .checklist { list-style:none; margin:16px 0; }
+  .checklist li { display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid rgba(201,168,76,0.08); font-size:11px; letter-spacing:0.5px; color:var(--muted); line-height:1.8; }
+  .checklist li:last-child { border-bottom:none; }
+  .check-box { width:18px; height:18px; flex-shrink:0; border:1px solid var(--border); margin-top:2px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; font-size:10px; }
+  .check-box:hover { border-color:var(--gold); }
+  .check-box.checked { background:var(--gold); color:var(--black); border-color:var(--gold); }
+
+  .final { background:linear-gradient(135deg,var(--surface),var(--black)); border:1px solid var(--border); padding:50px; text-align:center; margin-top:40px; position:relative; overflow:hidden; }
+  .final::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(201,168,76,0.06),transparent); }
+  .final h2 { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:300; position:relative; }
+  .final h2 em { font-style:italic; color:var(--gold); }
+  .final p { color:var(--muted); font-size:11px; letter-spacing:1px; line-height:2.2; margin:16px auto; max-width:500px; position:relative; }
+  .final-actions { display:flex; justify-content:center; gap:14px; margin-top:28px; position:relative; flex-wrap:wrap; }
+  .btn-gold { background:var(--gold); color:var(--black); padding:14px 36px; font-family:'Josefin Sans',sans-serif; font-size:9px; letter-spacing:4px; text-transform:uppercase; border:none; cursor:pointer; text-decoration:none; display:inline-block; transition:all 0.2s; }
+  .btn-gold:hover { background:var(--gold-light); }
+  .btn-outline { background:transparent; color:var(--gold); padding:14px 36px; font-family:'Josefin Sans',sans-serif; font-size:9px; letter-spacing:4px; text-transform:uppercase; border:1px solid var(--gold); cursor:pointer; text-decoration:none; display:inline-block; transition:all 0.2s; }
+  .btn-outline:hover { background:var(--gold-dim); }
+
+  footer { border-top:1px solid var(--border); padding:30px 60px; display:flex; align-items:center; justify-content:space-between; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
+  .toast { position:fixed; bottom:24px; right:24px; z-index:999; background:var(--green); color:var(--black); padding:12px 24px; font-size:9px; letter-spacing:3px; text-transform:uppercase; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+  .toast.show { opacity:1; }
+
+  @media (max-width:768px) {
+    .banner, .content { padding-left:20px; padding-right:20px; }
+    .hero { padding:50px 20px 40px; }
+    .progress-nav { padding:0 20px; }
+    .two-col { grid-template-columns:1fr; }
+    .step-number { font-size:48px; }
+    footer { flex-direction:column; gap:10px; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <div class="banner-logo">Orris<em>oak</em></div>
+  <div class="banner-tag">AI Marketing Agent · Complete Setup Guide</div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Step-by-Step Guide · No Technical Knowledge Required · Beginner Friendly</div>
+  <h1>How to Set Up Your<br><em>AI Marketing Agent</em></h1>
+  <p class="hero-desc">This guide walks you through every single step — from downloading the file to having a fully working AI that writes Facebook ads, influencer outreach, Instagram captions, and more for your Orrisoak products. Zero coding required.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><div class="hero-meta-dot" style="background:var(--green)"></div>Total Time: 15–20 Minutes</div>
+    <div class="hero-meta-item"><div class="hero-meta-dot" style="background:var(--blue)"></div>Difficulty: Complete Beginner</div>
+    <div class="hero-meta-item"><div class="hero-meta-dot" style="background:var(--gold)"></div>Cost: ~$5–10/month</div>
+    <div class="hero-meta-item"><div class="hero-meta-dot" style="background:var(--orange)"></div>Need: Computer + Internet Only</div>
+  </div>
+</div>
+
+<nav class="progress-nav">
+  <a href="#overview" class="pnav-item"><span class="pnav-num">0</span>Overview</a>
+  <a href="#step1" class="pnav-item"><span class="pnav-num">1</span>Download File</a>
+  <a href="#step2" class="pnav-item"><span class="pnav-num">2</span>Get API Key</a>
+  <a href="#step3" class="pnav-item"><span class="pnav-num">3</span>Add Key to File</a>
+  <a href="#step4" class="pnav-item"><span class="pnav-num">4</span>Open &amp; Test</a>
+  <a href="#step5" class="pnav-item"><span class="pnav-num">5</span>Use the Agent</a>
+  <a href="#step6" class="pnav-item"><span class="pnav-num">6</span>Share It</a>
+  <a href="#faq" class="pnav-item"><span class="pnav-num">?</span>FAQ &amp; Fixes</a>
+</nav>
+
+<div class="content">
+
+  <!-- OVERVIEW -->
+  <div class="step-section" id="overview">
+    <div class="step-header">
+      <div class="step-number">00</div>
+      <div class="step-header-text">
+        <div class="step-eyebrow">Before You Start · Read This First</div>
+        <h2 class="step-title">What Is This &amp;<br><em>How Does It Work?</em></h2>
+        <p class="step-subtitle">A plain-English explanation before you begin.</p>
+      </div>
+    </div>
+
+    <div class="alert info">
+      <strong>🧠 What Is the Orrisoak AI Marketing Agent?</strong>
+      It is a single file — like a webpage — that you open in your browser (Chrome, Safari, Firefox). Inside it is an AI assistant that has been pre-programmed to know everything about your Orrisoak brand, your 3 products, your website, and your brand voice. You type a request and it instantly generates polished marketing content. No app to install. No subscription software. Just one file.
+    </div>
+
+    <div class="two-col">
+      <div class="option-card">
+        <div class="option-card-title">✅ What It Can Do For You</div>
+        <div class="option-card-desc">
+          · Write Facebook &amp; Instagram ads per product<br>
+          · Create influencer outreach DMs and emails<br>
+          · Generate Instagram captions with hashtags<br>
+          · Write Reel scripts and TikTok scripts<br>
+          · Plan email marketing campaigns<br>
+          · Answer any marketing question about your brand<br>
+          · Generate unlimited content — 24/7
+        </div>
+      </div>
+      <div class="option-card">
+        <div class="option-card-title">📦 What You Need (That's It)</div>
+        <div class="option-card-desc">
+          · The HTML file (already built — step 1)<br>
+          · An Anthropic account (free to sign up)<br>
+          · An API key (your AI password — step 2)<br>
+          · $5–10 credit added to your account<br>
+          · Any computer with a web browser<br>
+          · No coding, no software, no IT person
+        </div>
+      </div>
+    </div>
+
+    <div class="alert important">
+      <strong>💡 The Simple Analogy</strong>
+      Think of the HTML file as a car. The Anthropic API key is the fuel. The car is already built and ready — you just need to fill it with fuel (add the key) and it drives. Once you do this once, it works every time you open it.
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-section" id="step1">
+    <div class="step-header">
+      <div class="step-number">01</div>
+      <div class="step-header-text">
+        <div class="step-eyebrow">Step 1 · Takes 2 Minutes</div>
+        <h2 class="step-title">Download &amp;<br><em>Save Your File</em></h2>
+        <p class="step-subtitle">The AI agent file was already built for you in this conversation. You just need to save it.</p>
+      </div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-item-num">1</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Scroll up in this Claude conversation</div>
+          <div class="step-item-desc">Look for the file attachment called <strong>orrisoak-marketing-agent</strong> or <strong>orrisoak-marketing-agent.html</strong> — it appears as a file preview card in the message above this one.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">2</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Click the download button on the file</div>
+          <div class="step-item-desc">Click the <strong>download icon</strong> (looks like ↓ or a cloud with an arrow). Your browser will save it. On most computers it goes to your <strong>Downloads folder</strong> automatically.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">3</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Create a dedicated folder for it</div>
+          <div class="step-item-desc">Go to your Desktop. Right-click → New Folder → name it <strong>Orrisoak Marketing</strong>. Move the downloaded HTML file into this folder. This keeps things organized.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert tip">
+      <strong>✅ Done When:</strong>
+      You can see a file called <strong>orrisoak-marketing-agent.html</strong> in your Orrisoak Marketing folder. It should have a browser logo on it (Chrome circle, Safari compass, etc.).
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-section" id="step2">
+    <div class="step-header">
+      <div class="step-number">02</div>
+      <div class="step-header-text">
+        <div class="step-eyebrow">Step 2 · Takes 5 Minutes</div>
+        <h2 class="step-title">Get Your<br><em>Anthropic API Key</em></h2>
+        <p class="step-subtitle">This is the "key" that powers the AI. It's free to get, and you only need to do this once.</p>
+      </div>
+    </div>
+
+    <div class="alert warning">
+      <strong>⚠️ What Is an API Key?</strong>
+      An API key is a long password that lets your file connect to the AI brain (Claude). It looks like: <strong>sk-ant-api03-AbCdEf123456...</strong> You get it from Anthropic's website, paste it into your file once, and then it works automatically every time.
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-item-num">1</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Open Anthropic's Console Website</div>
+          <div class="step-item-desc">Open a new browser tab and go to: <a href="https://console.anthropic.com" target="_blank"><strong>console.anthropic.com</strong></a><br>This is the official Anthropic developer website — the company that makes Claude AI.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">2</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Create a free account</div>
+          <div class="step-item-desc">Click <strong>"Sign Up"</strong> on the page. Enter your email address and create a password. Verify your email when they send you a confirmation. <strong>Signing up is completely free.</strong></div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">3</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Add $5 or $10 of credit to your account</div>
+          <div class="step-item-desc">After logging in, click <strong>Settings</strong> or <strong>Billing</strong> in the left menu. Add a credit card and purchase <strong>$5 or $10 of credit</strong>. This is like a prepaid balance. Most users spend less than $2/month running this agent — so $10 lasts many months.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">4</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Go to the API Keys section</div>
+          <div class="step-item-desc">In the left sidebar menu of the console, look for and click <strong>"API Keys"</strong>. This is where you create and manage your keys.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">5</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Click "Create Key" and name it</div>
+          <div class="step-item-desc">Click the <strong>"Create Key"</strong> button (may also say "+ New Key"). A box will appear asking for a name — type <strong>Orrisoak Agent</strong> so you remember what it's for. Then click <strong>Create</strong>.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">6</div>
+        <div class="step-item-body">
+          <div class="step-item-title">⚠️ Copy your key RIGHT NOW — this is critical</div>
+          <div class="step-item-desc">Your full API key will appear on screen. It looks like <strong>sk-ant-api03-abc123xyz456...</strong><br><br>
+          <strong>IMPORTANT: Copy it immediately and save it somewhere.</strong> Open Notepad (Windows) or Notes app (Mac/iPhone) and paste it there. Anthropic will NEVER show you the full key again after you leave this screen. If you lose it, you'll need to create a new one.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-box">
+      <div class="screen-bar">
+        <div class="screen-dot" style="background:#E05252"></div>
+        <div class="screen-dot" style="background:#E0A852"></div>
+        <div class="screen-dot" style="background:#4CAF7D"></div>
+        <div class="screen-url">console.anthropic.com/api-keys</div>
+      </div>
+      <div class="screen-content">
+        <strong style="color:var(--cream)">Step-by-step on the Anthropic Console page:</strong><br><br>
+        1. You see the API Keys page<br>
+        2. Click <em style="color:var(--gold)">"Create Key"</em> button (top right)<br>
+        3. Type name: <em style="color:var(--gold)">Orrisoak Agent</em> → click Create<br>
+        4. Your key appears: <em style="color:var(--gold)">sk-ant-api03-AbCdEfGhIjKl...</em><br>
+        5. Click "Copy" button next to the key<br>
+        6. Open Notepad/Notes and paste it — DONE ✓
+      </div>
+    </div>
+
+    <div class="alert tip">
+      <strong>✅ Done When:</strong>
+      You have a key starting with <strong>sk-ant-</strong> saved somewhere safe on your phone or computer. Keep it private — it's like a password.
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-section" id="step3">
+    <div class="step-header">
+      <div class="step-number">03</div>
+      <div class="step-header-text">
+        <div class="step-eyebrow">Step 3 · Takes 3 Minutes · The Only "Technical" Step</div>
+        <h2 class="step-title">Paste Your Key<br><em>Into the File</em></h2>
+        <p class="step-subtitle">Open the file like a text document, find one specific spot, paste your key, and save. That's all.</p>
+      </div>
+    </div>
+
+    <div class="alert info">
+      <strong>🔧 Don't Be Scared — This Is Just Copy &amp; Paste</strong>
+      You are going to open the HTML file in a simple text editor (Notepad or TextEdit — programs already on your computer), find a placeholder text, replace it with your key, and save. It takes about 2 minutes. No coding involved.
+    </div>
+
+    <div class="divider">If You're on Windows</div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-item-num">1</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Right-click the file and open with Notepad</div>
+          <div class="step-item-desc">Find <strong>orrisoak-marketing-agent.html</strong> in your folder. <strong>Right-click</strong> on it → move your mouse over <strong>"Open with"</strong> → click <strong>"Notepad"</strong>. A window full of code will open. This is normal — don't change anything yet.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">2</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Open Find &amp; Replace with Ctrl+H</div>
+          <div class="step-item-desc">Hold the <strong>Ctrl key</strong> and press <strong>H</strong> at the same time. A small "Find and Replace" window opens.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">3</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Type in the Find box</div>
+          <div class="step-item-desc">Click inside the <strong>"Find what:"</strong> box and type exactly this:<br><strong>YOUR_ANTHROPIC_API_KEY_HERE</strong><br>(all caps, with underscores, no spaces)</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">4</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Paste your key in the Replace box</div>
+          <div class="step-item-desc">Click inside the <strong>"Replace with:"</strong> box and paste your API key (the sk-ant-... one you saved in Step 2). Use <strong>Ctrl+V</strong> to paste.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">5</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Click Replace All, then save</div>
+          <div class="step-item-desc">Click <strong>"Replace All"</strong>. Notepad will say "1 replacement made." Then press <strong>Ctrl+S</strong> to save the file. Close Notepad. Done!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider">If You're on a Mac</div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-item-num">1</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Right-click and open with TextEdit</div>
+          <div class="step-item-desc">Find the file. <strong>Right-click</strong> → <strong>"Open With"</strong> → <strong>"TextEdit"</strong>. If you see a warning about the file format, click <strong>"Edit Anyway."</strong> If the text looks strange, click the menu bar: <strong>Format → Make Plain Text</strong>, then try again.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">2</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Open Find &amp; Replace</div>
+          <div class="step-item-desc">Press <strong>Command (⌘) + Option + F</strong> at the same time. A Find &amp; Replace bar appears at the top or bottom of the screen.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">3</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Find the placeholder and replace with your key</div>
+          <div class="step-item-desc">In the <strong>Find</strong> field, type: <strong>YOUR_ANTHROPIC_API_KEY_HERE</strong><br>In the <strong>Replace</strong> field, paste your API key with <strong>Command+V</strong><br>Click <strong>Replace All</strong>.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">4</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Save the file</div>
+          <div class="step-item-desc">Press <strong>Command+S</strong> to save. Close TextEdit. Done!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider">What It Should Look Like Before &amp; After</div>
+
+    <div class="code-block">
+      <div class="code-label">BEFORE — what's in the file originally</div>
+      <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+      <pre>'x-api-key': 'YOUR_ANTHROPIC_API_KEY_HERE',</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">AFTER — once you paste your real key in</div>
+      <pre>'x-api-key': 'sk-ant-api03-abc123XYZdef456GHIjkl789...',</pre>
+    </div>
+
+    <div class="alert warning">
+      <strong>⚠️ Keep Your Key Private</strong>
+      Your API key is like a credit card number for the AI service. Don't share the HTML file publicly with your key inside it. If someone gets it, they can use your Anthropic credits. Only share the file with people you fully trust, like your own team.
+    </div>
+
+    <div class="alert tip">
+      <strong>✅ Done When:</strong>
+      You open the file in Notepad and search for <strong>YOUR_ANTHROPIC_API_KEY_HERE</strong> — if you get "0 results found," it means your key was successfully replaced. 
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-section" id="step4">
+    <div class="step-header">
+      <div class="step-number">04</div>
+      <div class="step-header-text">
+        <div class="step-eyebrow">Step 4 · Takes 2 Minutes · The Fun Part</div>
+        <h2 class="step-title">Open the Agent<br><em>&amp; Test It Live</em></h2>
+        <p class="step-subtitle">Double-click the file, send your first message, and watch your AI marketing agent come to life.</p>
+      </div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-item-num">1</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Double-click the HTML file to open it</div>
+          <div class="step-item-desc">Find <strong>orrisoak-marketing-agent.html</strong> in your folder and <strong>double-click</strong> it. It will open automatically in your default web browser. You should see a beautiful dark gold dashboard with "Orrisoak Marketing Intelligence" at the top.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">2</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Click "AI Chat Agent" in the left sidebar</div>
+          <div class="step-item-desc">On the left side of the screen, you'll see a dark sidebar with menu items. Click <strong>"AI Chat Agent"</strong> (it has a ✦ symbol next to it and a gold "Live" badge). The chat interface will open.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">3</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Type your first test message</div>
+          <div class="step-item-desc">Click in the text box at the bottom of the chat. Type this exactly:<br><br>
+          <strong>"Write a Facebook ad for the 24K Gold Serum targeting women aged 35-50"</strong><br><br>
+          Then press <strong>Enter</strong> on your keyboard, or click the gold <strong>"Send"</strong> button.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num">4</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Wait 5–10 seconds for the response</div>
+          <div class="step-item-desc">You'll see three gold dots bouncing (the AI is thinking). After a few seconds, a complete, polished Facebook ad will appear — written specifically for your Orrisoak Gold Serum. 🎉</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert tip">
+      <strong>✅ You Know It's Working When...</strong>
+      A full Facebook ad (headline + body text + call to action) appears in the chat, mentioning the 24K Gold Serum, Orrisoak, and your brand voice. Congratulations — your AI marketing agent is fully live!
+    </div>
+
+    <div class="alert warning">
+      <strong>⚠️ If It Doesn't Work — Common Fixes</strong>
+      <strong>Nothing happens at all:</strong> Your key wasn't saved in the file. Go back to Step 3 and try again.<br>
+      <strong>"Connection issue" message:</strong> Check your internet. Then verify your API key is correct.<br>
+      <strong>Error about credits:</strong> Go to console.anthropic.com/billing and add $5 credit.<br>
+      <strong>Still stuck?</strong> Come back to this Claude conversation and describe what you see — we'll fix it together.
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-section" id="step5">
+    <div class="step-header">
+      <div class="step-number">05</div>
+      <div class="step-header-text">
+        <div class="step-eyebrow">Step 5 · Your Daily Workflow</div>
+        <h2 class="step-title">How to Use<br><em>Every Feature</em></h2>
+        <p class="step-subtitle">A tour of every section and exactly how to get the most out of your agent every day.</p>
+      </div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--surface2);color:var(--gold);border:1px solid var(--gold);">◈</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Overview Dashboard — Your Home Base</div>
+          <div class="step-item-desc">The first page you land on. Shows your 3 products, your 90-day performance targets (50K reach/month, 3.5% CTR, 2.8× ROAS), and your brand strategy summary. Think of it as your marketing command center. No AI needed for this page.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--surface2);color:var(--gold);border:1px solid var(--gold);">✦</div>
+        <div class="step-item-body">
+          <div class="step-item-title">AI Chat Agent — Your Main Tool <span class="badge badge-required">AI Powered</span></div>
+          <div class="step-item-desc">
+            This is where you have a real conversation with your marketing AI. Just type what you need in plain English. Examples of what to ask:<br><br>
+            <strong>"Write a Facebook video ad script for the Magnetic Brush"</strong><br>
+            <strong>"Give me 5 Instagram captions for the Gold Cleanser with hashtags"</strong><br>
+            <strong>"Write a DM to send to a beauty influencer on Instagram"</strong><br>
+            <strong>"Create a 30-day content plan for all 3 products"</strong><br>
+            <strong>"Write a promotional email offering 15% off the Gold Serum"</strong><br><br>
+            Also — on the RIGHT side you'll see <strong>Quick Prompts</strong>. These are pre-written requests. Just click one and it fills in the chat box automatically. Perfect for when you're not sure what to ask.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--surface2);color:var(--gold);border:1px solid var(--gold);">⚡</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Content Generator — Structured Creation <span class="badge badge-required">AI Powered</span></div>
+          <div class="step-item-desc">
+            A form-based tool where you select options from dropdown menus instead of typing. Great for when you know exactly what you want:<br><br>
+            1. Pick the <strong>Product</strong> (Gold Serum, Cleanser, Brush, or Bundle)<br>
+            2. Pick the <strong>Content Type</strong> (Facebook ad, Instagram caption, email, Reel script, etc.)<br>
+            3. Pick the <strong>Tone</strong> (luxury, warm, bold, scientific, or aspirational)<br>
+            4. Pick your <strong>Target Audience</strong><br>
+            5. Add any special notes (e.g. "mention free shipping" or "include 20% off code")<br>
+            6. Click <strong>"Generate Content"</strong><br>
+            7. Click <strong>"Copy Content"</strong> to copy it and paste it wherever you need it
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--surface2);color:var(--gold);border:1px solid var(--gold);">▲</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Facebook Strategy — Your Campaign Playbook</div>
+          <div class="step-item-desc">Pre-built strategy showing exactly how to run 3 types of Facebook campaigns (Awareness $15–25/day, Retargeting $10–15/day, Conversion $20–30/day) plus your 3-month launch plan. Use this as your reference document when setting up Meta Ads Manager.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--surface2);color:var(--gold);border:1px solid var(--gold);">◉</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Influencer Plan — Who to Partner With</div>
+          <div class="step-item-desc">Shows the 3 tiers (Nano, Micro, Macro) with pricing, how many to target per month, what to offer each, and what to say in your outreach. Includes a full content brief for influencers. Use this when you're ready to start reaching out to creators.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--surface2);color:var(--gold);border:1px solid var(--gold);">◫</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Content Calendar — What to Post Every Day</div>
+          <div class="step-item-desc">A ready-made 4-week posting schedule. Monday/Wednesday/Friday posts planned for each week — what to post, what type of content (video, carousel, blog), and which platform (Facebook, Instagram, TikTok, YouTube, Email). Hand this to your social media manager or VA and they know exactly what to create.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--surface2);color:var(--gold);border:1px solid var(--gold);">✎</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Ad Copy Library — 6 Ready-to-Run Ads</div>
+          <div class="step-item-desc">Six complete Facebook ad scripts — 2 for the Gold Serum, 1 for the Cleanser, 1 for the Magnetic Brush, 1 Bundle offer, and 1 general brand ad. All written in Orrisoak's brand voice. Copy any of these directly into Meta Ads Manager and start running them today. Zero editing needed.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step-section" id="step6">
+    <div class="step-header">
+      <div class="step-number">06</div>
+      <div class="step-header-text">
+        <div class="step-eyebrow">Step 6 · Optional but Recommended</div>
+        <h2 class="step-title">Share With Your<br><em>Team or VA</em></h2>
+        <p class="step-subtitle">Want your social media manager, virtual assistant, or team to access the agent from anywhere?</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="option-card">
+        <div class="option-card-title">Option A — Email the File <span class="badge badge-free">Easiest</span></div>
+        <div class="option-card-desc">
+          Simply email the HTML file to your team member as an attachment. They download it, double-click to open in browser, and it works immediately on their computer. Best for 1–2 people you fully trust (your key is inside the file).
+        </div>
+      </div>
+      <div class="option-card">
+        <div class="option-card-title">Option B — Put It Online <span class="badge badge-optional">Best Option</span></div>
+        <div class="option-card-desc">
+          Upload the file to a free hosting service to get a private URL. Your whole team can access it from any device — computer, phone, tablet — without you sending files. Instructions below.
+        </div>
+      </div>
+    </div>
+
+    <div class="alert info">
+      <strong>🌐 How to Host It Online Free (Netlify — Takes 5 Minutes)</strong>
+      1. Go to <a href="https://netlify.com" target="_blank" style="color:var(--gold)"><strong>netlify.com</strong></a> and sign up for a free account (just email + password)<br>
+      2. Once logged in, you'll see a box that says <strong>"Drag and drop your site folder here"</strong><br>
+      3. Drag and drop your <strong>orrisoak-marketing-agent.html</strong> file directly onto that box<br>
+      4. Netlify instantly gives you a free URL like: <strong>random-name-123.netlify.app</strong><br>
+      5. You can rename it to something like: <strong>orrisoak-agent.netlify.app</strong><br>
+      6. Share that URL with your team — they open it in any browser, from anywhere
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="step-section" id="faq">
+    <div class="step-header">
+      <div class="step-number">?</div>
+      <div class="step-header-text">
+        <div class="step-eyebrow">Troubleshooting &amp; Questions</div>
+        <h2 class="step-title">Common Questions<br><em>&amp; Fixes</em></h2>
+      </div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red);">!</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Problem: The AI doesn't respond at all when I type</div>
+          <div class="step-item-desc">
+            <strong>Fix 1:</strong> Open the HTML file in Notepad and press Ctrl+F (or Cmd+F on Mac). Search for <strong>sk-ant-</strong>. If you don't find it, your key wasn't saved — go back to Step 3.<br>
+            <strong>Fix 2:</strong> Make sure you clicked "Save" (Ctrl+S) after pasting the key in Notepad.<br>
+            <strong>Fix 3:</strong> Log into <a href="https://console.anthropic.com/billing" target="_blank">console.anthropic.com/billing</a> and make sure you have credit balance.
+          </div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red);">!</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Problem: I see "Connection issue" or "error" message</div>
+          <div class="step-item-desc">
+            <strong>Fix 1:</strong> Check you have internet — try loading Google.com in a new tab.<br>
+            <strong>Fix 2:</strong> Your API key may have a typo. Go to console.anthropic.com, create a brand new key, and replace the old one in the file using Step 3 instructions again.
+          </div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange);">?</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Question: How much does this cost per month?</div>
+          <div class="step-item-desc">Very little. Each AI response costs approximately $0.001–$0.005 (fractions of a cent). If you generate 200 pieces of content in a month, the total cost is roughly <strong>$1–3</strong>. A $5 credit will last most users 2–5 months of daily use.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange);">?</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Question: Can I use this on my phone?</div>
+          <div class="step-item-desc">Not easily from a local file, but if you host it on Netlify (Step 6), you get a URL that works perfectly on any phone browser. Takes 5 minutes to set up and works on iPhone, Android, iPad — any device.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange);">?</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Question: Can I update the brand info or add new products?</div>
+          <div class="step-item-desc">Yes! Open the file in Notepad/TextEdit and press Ctrl+F (Cmd+F) and search for <strong>BRAND_CONTEXT</strong>. You'll find a section with all the product names, prices, brand voice, and website info. Edit that text to add new products or change any details, then save.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange);">?</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Question: I lost my API key — what do I do?</div>
+          <div class="step-item-desc">No problem. Go to <a href="https://console.anthropic.com/api-keys" target="_blank">console.anthropic.com/api-keys</a> and click <strong>"Create Key"</strong> to generate a new one. Your old one can be deleted for security. Follow Step 3 again to paste the new key into the file.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-item-num" style="background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue);">i</div>
+        <div class="step-item-body">
+          <div class="step-item-title">Question: Can Claude help me build more features?</div>
+          <div class="step-item-desc">Absolutely — just come back to this conversation and ask. We can add: a campaign performance tracker, email sequence builder, competitor analysis, a separate influencer database, Instagram post scheduler, product landing pages, and much more. All custom-built for Orrisoak, for free.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-number">✓</div>
+      <div class="step-header-text">
+        <div class="step-eyebrow">Your Setup Checklist</div>
+        <h2 class="step-title">Tick Each Box<br><em>As You Go</em></h2>
+      </div>
+    </div>
+    <ul class="checklist">
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Downloaded <strong>orrisoak-marketing-agent.html</strong> and saved to my computer</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Created a free account at <strong>console.anthropic.com</strong></span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Added <strong>$5–10 credit</strong> to my Anthropic billing account</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Created an API key named <strong>"Orrisoak Agent"</strong></span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Saved my API key (starts with <strong>sk-ant-</strong>) in Notes or Notepad</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Opened the HTML file in Notepad/TextEdit</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Used Find &amp; Replace to swap <strong>YOUR_ANTHROPIC_API_KEY_HERE</strong> with my real key</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Saved the file with <strong>Ctrl+S</strong> (or Cmd+S on Mac)</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Double-clicked the file to open it in my browser</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Sent a test message and received an AI response ✅</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Tried the <strong>Content Generator</strong> for at least one product</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div><span>Copied one ad from the <strong>Ad Copy Library</strong> ready to run</span></li>
+    </ul>
+  </div>
+
+  <!-- FINAL -->
+  <div class="final">
+    <h2>You Just Replaced<br><em>Your Marketing Agency</em></h2>
+    <p>Agencies charge $3,000–$15,000/month for what you now have at your fingertips — for about $5/month. An AI that knows your brand, your products, your voice, and your audience, available 24/7, generating unlimited content on demand.</p>
+    <div class="final-actions">
+      <a href="https://orrisoak.com" target="_blank" class="btn-gold">Visit Orrisoak.com</a>
+      <a href="https://console.anthropic.com" target="_blank" class="btn-outline">Get API Key</a>
+    </div>
+    <p style="margin-top:24px;font-size:10px;letter-spacing:2px;">
+      Need help at any step? Come back to this Claude conversation and ask — we're here 24/7 and will fix any issue with you.
+    </p>
+  </div>
+
+</div>
+
+<footer>
+  <span>Orrisoak · AI Marketing Agent</span>
+  <span>orrisoak.com · 312-985-6684</span>
+  <span>Setup Guide · 2025</span>
+</footer>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+    el.textContent = el.classList.contains('checked') ? '✓' : '';
+  }
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    });
+  }
+</script>
+</body>
+</html>

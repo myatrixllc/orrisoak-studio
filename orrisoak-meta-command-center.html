@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak · Meta Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dim:rgba(201,168,76,0.1);
+  --gold-border:rgba(201,168,76,0.2);--black:#070707;--s1:#0F0F0F;
+  --s2:#161616;--s3:#1E1E1E;--s4:#252525;--cream:#F0E9DC;--muted:#786D61;
+  --green:#4CAF7D;--green-dim:rgba(76,175,125,0.1);--green-border:rgba(76,175,125,0.3);
+  --blue:#7B9FE8;--blue-dim:rgba(123,159,232,0.1);
+  --orange:#D4894A;--orange-dim:rgba(212,137,74,0.1);
+  --red:#D45A5A;--meta:#1877F2;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{background:var(--s1);border-bottom:1px solid var(--gold-border);padding:0 36px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200;flex-shrink:0;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);letter-spacing:4px;}
+.logo span{font-style:italic;}
+.topbar-center{display:flex;align-items:center;gap:10px;}
+.topbar-badge{font-size:7px;letter-spacing:4px;text-transform:uppercase;background:rgba(24,119,242,0.15);border:1px solid rgba(24,119,242,0.3);color:var(--blue);padding:4px 12px;}
+.status-dot{width:8px;height:8px;border-radius:50%;}
+.dot-connected{background:var(--green);}
+.dot-disconnected{background:var(--red);}
+.dot-pending{background:var(--orange);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.token-input{background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:1px;padding:6px 12px;width:180px;}
+.token-input::placeholder{color:var(--muted);}
+.token-input:focus{outline:none;border-color:var(--gold);}
+.acct-input{background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:1px;padding:6px 12px;width:140px;}
+.acct-input::placeholder{color:var(--muted);}
+.acct-input:focus{outline:none;border-color:var(--gold);}
+.claude-input{background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:1px;padding:6px 12px;width:170px;}
+.claude-input::placeholder{color:var(--muted);}
+.claude-input:focus{outline:none;border-color:var(--gold);}
+.connect-btn{background:var(--meta);color:white;border:none;font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;padding:7px 16px;cursor:pointer;transition:opacity 0.2s;}
+.connect-btn:hover{opacity:0.9;}
+.conn-status{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:196px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--gold-border);display:flex;flex-direction:column;padding:20px 0;overflow-y:auto;}
+.nav-group{font-size:7px;letter-spacing:5px;text-transform:uppercase;color:var(--muted);padding:0 16px;margin:16px 0 7px;}
+.nav-group:first-child{margin-top:0;}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:10px 16px;cursor:pointer;color:var(--muted);font-size:8px;letter-spacing:3px;text-transform:uppercase;transition:all 0.2s;border-left:2px solid transparent;background:none;border-right:none;border-top:none;border-bottom:none;width:100%;text-align:left;font-family:'Josefin Sans',sans-serif;}
+.nav-btn:hover{color:var(--gold-light);background:var(--gold-dim);}
+.nav-btn.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-dim);}
+.nav-icon{font-size:13px;flex-shrink:0;}
+.nav-live{margin-left:auto;width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:32px 40px;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* PANEL HEAD */
+.phead{margin-bottom:24px;}
+.phead-eye{font-size:8px;letter-spacing:7px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.phead h2{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3vw,40px);font-weight:300;line-height:1.05;}
+.phead h2 em{font-style:italic;color:var(--gold);}
+.phead p{font-size:11px;letter-spacing:0.5px;color:var(--muted);margin-top:8px;line-height:2;max-width:560px;}
+
+/* SETUP SCREEN */
+.setup-screen{background:var(--s1);border:1px solid var(--gold);padding:40px;max-width:700px;margin:0 auto;text-align:center;position:relative;overflow:hidden;}
+.setup-screen::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.setup-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;margin-bottom:10px;}
+.setup-title em{font-style:italic;color:var(--gold);}
+.setup-desc{font-size:11px;letter-spacing:1px;color:var(--muted);line-height:2;margin-bottom:32px;}
+.setup-steps{display:flex;flex-direction:column;gap:12px;text-align:left;margin-bottom:32px;}
+.setup-step{background:var(--s2);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;}
+.setup-step-num{font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.setup-step-text{font-size:11px;color:var(--cream);line-height:1.9;}
+.setup-step-text strong{color:var(--gold);}
+.setup-fields{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.setup-field{display:flex;flex-direction:column;gap:6px;text-align:left;}
+.setup-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+.setup-input{background:var(--s2);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;padding:11px 14px;width:100%;}
+.setup-input:focus{outline:none;border-color:var(--gold);}
+.setup-input::placeholder{color:var(--muted);}
+
+/* FORMS */
+.form-row{margin-bottom:14px;}
+.form-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--s2);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;letter-spacing:0.5px;padding:10px 13px;transition:border-color 0.2s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--gold);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--muted);}
+.form-textarea{resize:vertical;min-height:70px;line-height:1.8;}
+.form-select{appearance:none;cursor:pointer;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;}
+
+/* BUTTONS */
+.btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:11px 24px;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-gold{background:var(--gold);color:var(--black);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-gold:disabled{background:var(--s4);color:var(--muted);cursor:not-allowed;}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+.btn-outline:hover{background:var(--gold-dim);}
+.btn-green{background:var(--green);color:white;}
+.btn-green:hover{opacity:0.9;}
+.btn-meta{background:var(--meta);color:white;}
+.btn-meta:hover{opacity:0.9;}
+.btn-red{background:var(--red);color:white;}
+.btn-sm{padding:7px 15px;font-size:7px;}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:var(--gold-dim);margin-bottom:24px;}
+.stat-box{background:var(--s1);padding:16px 14px;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);line-height:1;}
+.stat-num.green{color:var(--green);}
+.stat-num.red{color:var(--red);}
+.stat-num.orange{color:var(--orange);}
+.stat-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:4px;line-height:1.7;}
+.stat-change{font-size:9px;margin-top:2px;}
+.stat-change.up{color:var(--green);}
+.stat-change.down{color:var(--red);}
+
+/* CAMPAIGN BUILDER */
+.builder-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.builder-section{background:var(--s1);border:1px solid var(--gold-border);padding:20px;}
+.builder-section-title{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--gold-border);}
+.preview-box{background:var(--s1);border:1px solid var(--gold-border);padding:20px;}
+.preview-title{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+.preview-field{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(201,168,76,0.08);font-size:10px;}
+.preview-field:last-child{border-bottom:none;}
+.preview-key{color:var(--muted);}
+.preview-val{color:var(--cream);text-align:right;max-width:60%;font-size:9px;}
+.publish-bar{background:linear-gradient(135deg,var(--s2),var(--s1));border:1px solid var(--gold);padding:20px 24px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.publish-info{font-size:11px;letter-spacing:0.5px;color:var(--muted);line-height:1.9;}
+.publish-info strong{color:var(--gold);}
+
+/* CAMPAIGN TABLE */
+.camp-table{width:100%;border-collapse:collapse;}
+.camp-th{background:var(--s2);padding:9px 13px;font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);text-align:left;border-bottom:1px solid var(--gold-border);}
+.camp-td{padding:12px 13px;border-bottom:1px solid rgba(201,168,76,0.07);font-size:11px;vertical-align:middle;}
+.camp-tr{background:var(--s1);transition:background 0.2s;}
+.camp-tr:hover{background:var(--s2);}
+.pill{font-size:7px;letter-spacing:2px;text-transform:uppercase;padding:3px 9px;border:1px solid;display:inline-block;}
+.pill-live{color:var(--green);border-color:var(--green-border);background:var(--green-dim);}
+.pill-paused{color:var(--orange);border-color:rgba(212,137,74,0.4);background:var(--orange-dim);}
+.pill-draft{color:var(--muted);border-color:var(--gold-border);}
+.pill-review{color:var(--blue);border-color:rgba(123,159,232,0.4);background:var(--blue-dim);}
+
+/* AD PREVIEW CARD */
+.ad-preview{background:white;border-radius:8px;overflow:hidden;max-width:380px;margin:0 auto;}
+.ad-preview-header{padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e5e5e5;}
+.ad-preview-avatar{width:36px;height:36px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--black);}
+.ad-preview-name{font-size:13px;font-weight:600;color:#1c1e21;}
+.ad-preview-sponsored{font-size:11px;color:#65676b;}
+.ad-preview-img{background:linear-gradient(135deg,#1A1208,#2C1F0A,#3D2B0E);height:200px;display:flex;align-items:center;justify-content:center;}
+.ad-preview-img span{font-family:'Cormorant Garamond',serif;font-size:60px;color:rgba(201,168,76,0.3);font-style:italic;}
+.ad-preview-body{padding:12px 14px;}
+.ad-preview-text{font-size:13px;color:#1c1e21;line-height:1.5;margin-bottom:10px;}
+.ad-preview-link{background:#f0f2f5;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;}
+.ad-preview-url{font-size:11px;color:#65676b;text-transform:uppercase;}
+.ad-preview-headline{font-size:14px;font-weight:600;color:#1c1e21;}
+.ad-preview-cta{background:var(--meta);color:white;border:none;padding:7px 16px;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;}
+
+/* AI RECO */
+.reco-card{background:var(--s1);border:1px solid var(--gold-border);padding:18px 20px;margin-bottom:3px;display:flex;align-items:flex-start;gap:14px;transition:border-color 0.2s;}
+.reco-card:hover{border-color:var(--gold);}
+.reco-verdict{font-size:8px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;border:1px solid;flex-shrink:0;margin-top:2px;}
+.verdict-scale{color:var(--green);border-color:var(--green-border);background:var(--green-dim);}
+.verdict-watch{color:var(--blue);border-color:rgba(123,159,232,0.4);background:var(--blue-dim);}
+.verdict-fix{color:var(--orange);border-color:rgba(212,137,74,0.4);background:var(--orange-dim);}
+.verdict-pause{color:var(--red);border-color:rgba(212,90,90,0.4);background:rgba(212,90,90,0.08);}
+.reco-body{flex:1;}
+.reco-name{font-family:'Cormorant Garamond',serif;font-size:18px;margin-bottom:4px;}
+.reco-text{font-size:10px;letter-spacing:0.5px;color:var(--muted);line-height:1.9;}
+.reco-action{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:8px;}
+
+/* OUTPUT */
+.output-box{background:var(--s2);border:1px solid var(--gold-border);margin-top:16px;}
+.output-head{background:var(--s3);border-bottom:1px solid var(--gold-border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.output-label{font-size:7px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
+.output-actions{display:flex;gap:7px;flex-wrap:wrap;}
+.output-content{padding:18px;font-size:12px;letter-spacing:0.5px;line-height:2.2;color:var(--cream);white-space:pre-wrap;min-height:60px;}
+
+/* INFO */
+.info-box{background:var(--gold-dim);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:12px 16px;margin-bottom:18px;display:flex;gap:10px;}
+.info-icon{font-size:16px;flex-shrink:0;}
+.info-text{font-size:10px;color:var(--cream);line-height:2;letter-spacing:0.5px;}
+.info-text strong{color:var(--gold);}
+
+/* SPINNER */
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--gold-border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--s3);border:1px solid var(--gold);border-left:3px solid var(--gold);padding:12px 16px;font-size:10px;letter-spacing:1px;color:var(--cream);transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:280px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{border-color:var(--green);border-left-color:var(--green);}
+.toast.red{border-color:var(--red);border-left-color:var(--red);}
+
+.divider{border:none;border-top:1px solid var(--gold-border);margin:20px 0;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .main{padding:20px;}
+  .g2,.g3,.builder-grid,.stats-grid{grid-template-columns:1fr;}
+  .topbar{padding:0 14px;flex-wrap:wrap;height:auto;padding:10px 14px;gap:8px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">Orris<span>oak</span></div>
+  <div class="topbar-center">
+    <div class="topbar-badge">⚡ Meta Command Center</div>
+    <div class="status-dot dot-disconnected" id="metaDot"></div>
+    <span class="conn-status" id="connStatus">Not Connected</span>
+  </div>
+  <div class="topbar-right">
+    <input class="claude-input" type="password" id="claudeKey" placeholder="Claude API key..." oninput="updateKeys()">
+    <input class="token-input" type="password" id="metaToken" placeholder="Meta Access Token..." oninput="updateKeys()">
+    <input class="acct-input" id="adAccount" placeholder="act_XXXXXXXXXX" oninput="updateKeys()">
+    <button class="connect-btn" onclick="connectMeta()">Connect Meta</button>
+    <button class="connect-btn" onclick="saveCredentials()" style="background:var(--green);">Save Keys</button>
+    <button class="connect-btn" onclick="clearCredentials()" style="background:var(--s4);color:var(--muted);">Clear</button>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="nav-group">Live Data</div>
+  <button class="nav-btn active" onclick="nav('dashboard',this)"><span class="nav-icon">📊</span> Dashboard<span class="nav-live"></span></button>
+  <button class="nav-btn" onclick="nav('campaigns',this)"><span class="nav-icon">📋</span> Campaigns</button>
+
+  <div class="nav-group">Create</div>
+  <button class="nav-btn" onclick="nav('builder',this)"><span class="nav-icon">⚡</span> Campaign Builder</button>
+  <button class="nav-btn" onclick="nav('adgen',this)"><span class="nav-icon">✍️</span> Ad Generator</button>
+  <button class="nav-btn" onclick="nav('creative',this)"><span class="nav-icon">🖼️</span> Creatives</button>
+
+  <div class="nav-group">Optimize</div>
+  <button class="nav-btn" onclick="nav('optimizer',this)"><span class="nav-icon">🤖</span> AI Optimizer</button>
+  <button class="nav-btn" onclick="nav('audiences',this)"><span class="nav-icon">👥</span> Audiences</button>
+
+  <div class="nav-group">Content</div>
+  <button class="nav-btn" onclick="nav('caption',this)"><span class="nav-icon">✨</span> Caption AI</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="panel active" id="panel-dashboard">
+  <div class="phead">
+    <div class="phead-eye">Live Dashboard · Meta Ads</div>
+    <h2>Orrisoak <em>Command Center</em></h2>
+    <p>Your real-time Meta advertising performance. Connect your Meta account using the fields in the top bar to see live data.</p>
+  </div>
+
+  <div id="dashContent">
+    <!-- Setup prompt shown when not connected -->
+    <div class="setup-screen" id="setupPrompt">
+      <div class="setup-title">Connect <em>Meta Ads</em></div>
+      <p class="setup-desc">Paste your credentials in the top bar to connect your Meta Ads account and unlock the full command center.</p>
+      <div class="setup-steps">
+        <div class="setup-step">
+          <div class="setup-step-num">Step 1 · Claude API Key</div>
+          <div class="setup-step-text">Paste your Anthropic API key — starts with <strong>sk-ant-</strong>. This powers the AI copy generation and optimization recommendations.</div>
+        </div>
+        <div class="setup-step">
+          <div class="setup-step-num">Step 2 · Meta Access Token</div>
+          <div class="setup-step-text">Go to <strong>developers.facebook.com → Tools → Graph API Explorer</strong>. Generate a token with permissions: <strong>ads_management, ads_read, pages_manage_ads</strong>. Paste it above.</div>
+        </div>
+        <div class="setup-step">
+          <div class="setup-step-num">Step 3 · Ad Account ID</div>
+          <div class="setup-step-text">Go to <strong>Meta Business Settings → Ad Accounts</strong>. Copy your account ID — it looks like <strong>act_123456789</strong>. Paste it above.</div>
+        </div>
+      </div>
+      <button class="btn btn-gold" onclick="connectMeta()" style="width:100%;">⚡ Connect Meta Account</button>
+      <div style="margin-top:14px;">
+        <button class="btn btn-outline btn-sm" onclick="loadDemo()">Preview with Demo Data →</button>
+      </div>
+    </div>
+
+    <!-- Live dashboard (shown when connected) -->
+    <div id="liveDash" style="display:none;">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-box"><div class="stat-num" id="d-spend">—</div><div class="stat-label">Today's Spend</div></div>
+        <div class="stat-box"><div class="stat-num" id="d-reach">—</div><div class="stat-label">Reach Today</div></div>
+        <div class="stat-box"><div class="stat-num" id="d-ctr">—</div><div class="stat-label">Avg CTR</div></div>
+        <div class="stat-box"><div class="stat-num" id="d-cpc">—</div><div class="stat-label">Avg CPC</div></div>
+        <div class="stat-box"><div class="stat-num" id="d-camps">—</div><div class="stat-label">Active Campaigns</div></div>
+      </div>
+      <div id="dashCampaigns"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CAMPAIGNS ══ -->
+<div class="panel" id="panel-campaigns">
+  <div class="phead">
+    <div class="phead-eye">All Campaigns · Live Data</div>
+    <h2>Your Active<br><em>Campaigns</em></h2>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+    <button class="btn btn-gold btn-sm" onclick="nav('builder',document.querySelector('[onclick*=builder]'))">+ New Campaign</button>
+    <button class="btn btn-outline btn-sm" onclick="fetchCampaigns()">↻ Refresh</button>
+    <button class="btn btn-outline btn-sm" onclick="nav('optimizer',document.querySelector('[onclick*=optimizer]'))">✦ AI Optimize All</button>
+  </div>
+  <div id="campTableWrap">
+    <div class="info-box"><div class="info-icon">ℹ️</div><div class="info-text">Connect your Meta account to see live campaign data here.</div></div>
+  </div>
+</div>
+
+<!-- ══ CAMPAIGN BUILDER ══ -->
+<div class="panel" id="panel-builder">
+  <div class="phead">
+    <div class="phead-eye">Campaign Builder · One Click Publish</div>
+    <h2>Build & Launch<br><em>In Minutes</em></h2>
+    <p>Fill in the details. AI generates your ad copy. Review the preview. Click Publish — campaign goes live in Meta instantly.</p>
+  </div>
+
+  <div class="builder-grid">
+    <div>
+      <div class="builder-section">
+        <div class="builder-section-title">Campaign Settings</div>
+        <div class="form-row">
+          <label class="form-label">Campaign Name</label>
+          <input class="form-input" id="b-name" placeholder="Orrisoak Gold Serum Awareness" oninput="updatePreview()">
+        </div>
+        <div class="g2">
+          <div class="form-row">
+            <label class="form-label">Objective</label>
+            <select class="form-select" id="b-obj" onchange="updatePreview()">
+              <option value="REACH">Awareness · Reach</option>
+              <option value="LINK_CLICKS">Traffic · Link Clicks</option>
+              <option value="CONVERSIONS">Conversions · Purchase</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Daily Budget</label>
+            <input class="form-input" id="b-budget" placeholder="5.00" type="number" oninput="updatePreview()">
+          </div>
+        </div>
+      </div>
+
+      <div class="builder-section" style="margin-top:3px;">
+        <div class="builder-section-title">Audience</div>
+        <div class="g2">
+          <div class="form-row">
+            <label class="form-label">Age Range</label>
+            <select class="form-select" id="b-age" onchange="updatePreview()">
+              <option value="35,60">35–60 (Gold Serum)</option>
+              <option value="28,50">28–50 (Cleanser)</option>
+              <option value="22,45">22–45 (Brush)</option>
+              <option value="28,60">28–60 (All Products)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Location</label>
+            <select class="form-select" id="b-geo">
+              <option>United States</option>
+              <option>United States + Canada</option>
+              <option>Worldwide</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Interests (comma separated)</label>
+          <input class="form-input" id="b-interests" value="Anti-aging skincare, Luxury beauty, Skincare routines, Botox" oninput="updatePreview()">
+        </div>
+      </div>
+
+      <div class="builder-section" style="margin-top:3px;">
+        <div class="builder-section-title">Ad Creative</div>
+        <div class="form-row">
+          <label class="form-label">Product</label>
+          <select class="form-select" id="b-product" onchange="updatePreview()">
+            <option>24K Gold & Black Truffle Anti-Aging Serum</option>
+            <option>24K Gold Hydrating Glow Cleanser</option>
+            <option>4-in-1 Magnetic Makeup Brush</option>
+            <option>Complete Ritual Bundle</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Ad Tone</label>
+          <select class="form-select" id="b-tone">
+            <option>Luxury & aspirational</option>
+            <option>Educational & informative</option>
+            <option>Urgent & promotional</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Special Offer</label>
+          <input class="form-input" id="b-offer" placeholder='e.g. "Use code GLOW15 for 15% off"'>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="generateBuilderAd()" id="gen-ad-btn"><span id="gen-ad-inner">✦ AI Generate Ad Copy</span></button>
+        <div id="gen-ad-result" style="margin-top:10px;font-size:10px;color:var(--muted);line-height:1.9;display:none;background:var(--s2);border:1px solid var(--gold-border);padding:12px;border-left:2px solid var(--gold);white-space:pre-wrap;"></div>
+      </div>
+    </div>
+
+    <div>
+      <!-- LIVE PREVIEW -->
+      <div style="font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Live Ad Preview</div>
+      <div class="ad-preview">
+        <div class="ad-preview-header">
+          <div class="ad-preview-avatar">O</div>
+          <div>
+            <div class="ad-preview-name">Orris & Oak</div>
+            <div class="ad-preview-sponsored">Sponsored · 🌐</div>
+          </div>
+        </div>
+        <div class="ad-preview-img"><span>✦</span></div>
+        <div class="ad-preview-body">
+          <div class="ad-preview-text" id="prev-text">Your ad copy will appear here after generating...</div>
+          <div class="ad-preview-link">
+            <div>
+              <div class="ad-preview-url">ORRISOAK.COM</div>
+              <div class="ad-preview-headline" id="prev-headline">Your headline here</div>
+            </div>
+            <button class="ad-preview-cta">Shop Now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMPAIGN SUMMARY -->
+      <div class="preview-box" style="margin-top:12px;">
+        <div class="preview-title">Campaign Summary</div>
+        <div class="preview-field"><span class="preview-key">Name</span><span class="preview-val" id="prev-name">—</span></div>
+        <div class="preview-field"><span class="preview-key">Objective</span><span class="preview-val" id="prev-obj">Reach</span></div>
+        <div class="preview-field"><span class="preview-key">Budget</span><span class="preview-val" id="prev-budget">—</span></div>
+        <div class="preview-field"><span class="preview-key">Audience</span><span class="preview-val" id="prev-aud">Women 35–60 · US</span></div>
+        <div class="preview-field"><span class="preview-key">Interests</span><span class="preview-val" id="prev-int">Anti-aging, Luxury beauty...</span></div>
+        <div class="preview-field"><span class="preview-key">Product</span><span class="preview-val" id="prev-prod">Gold Serum</span></div>
+        <div class="preview-field"><span class="preview-key">Est. Daily Reach</span><span class="preview-val" style="color:var(--green)">500–2,000 people</span></div>
+      </div>
+
+      <!-- PUBLISH BAR -->
+      <div class="publish-bar">
+        <div class="publish-info">
+          Ready to go live? This will create a real campaign in your Meta Ads account.<br>
+          <strong>Budget: $<span id="pub-budget">5</span>/day · Orris & Oak page</strong>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="saveDraft()">Save Draft</button>
+          <button class="btn btn-meta" onclick="publishCampaign()" id="pub-btn"><span id="pub-inner">⚡ Publish to Meta</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AD GENERATOR ══ -->
+<div class="panel" id="panel-adgen">
+  <div class="phead">
+    <div class="phead-eye">Ad Generator · AI Powered</div>
+    <h2>Generate Any Ad<br><em>Instantly</em></h2>
+  </div>
+  <div class="g2">
+    <div class="form-row"><label class="form-label">Product</label>
+      <select class="form-select" id="ag-product">
+        <option>24K Gold & Black Truffle Anti-Aging Serum</option>
+        <option>24K Gold Hydrating Glow Cleanser</option>
+        <option>4-in-1 Magnetic Makeup Brush</option>
+        <option>Complete Ritual Bundle</option>
+      </select></div>
+    <div class="form-row"><label class="form-label">Goal</label>
+      <select class="form-select" id="ag-goal">
+        <option>Brand Awareness</option><option>Drive Traffic</option>
+        <option>Get Purchases</option><option>Retargeting</option>
+      </select></div>
+    <div class="form-row"><label class="form-label">Format</label>
+      <select class="form-select" id="ag-format">
+        <option>Single Image</option><option>Video</option>
+        <option>Carousel (3 slides)</option><option>Story</option>
+      </select></div>
+    <div class="form-row"><label class="form-label">Tone</label>
+      <select class="form-select" id="ag-tone">
+        <option>Luxury & aspirational</option><option>Educational</option>
+        <option>Urgent & promotional</option><option>Emotional</option>
+      </select></div>
+  </div>
+  <div class="form-row"><label class="form-label">Special Offer</label>
+    <input class="form-input" id="ag-offer" placeholder='e.g. "GLOW15 for 15% off"'></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-gold" onclick="generateAdCopy()" id="ag-btn"><span id="ag-inner">✦ Generate Ad</span></button>
+    <button class="btn btn-outline" onclick="generateABTest()" id="ab-btn"><span id="ab-inner">Generate A/B/C Variations</span></button>
+  </div>
+  <div class="output-box" id="ag-out" style="display:none;">
+    <div class="output-head">
+      <span class="output-label">Ready to Paste into Meta</span>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-outline" onclick="copyEl('ag-text')">Copy All</button>
+        <button class="btn btn-sm btn-meta" onclick="window.open('https://adsmanager.facebook.com','_blank')">Open Ads Manager</button>
+      </div>
+    </div>
+    <div class="output-content" id="ag-text"></div>
+  </div>
+</div>
+
+<!-- ══ CREATIVES ══ -->
+<div class="panel" id="panel-creative">
+  <div class="phead">
+    <div class="phead-eye">Creative Briefs · Image Prompts</div>
+    <h2>Generate Luxury<br><em>Product Images</em></h2>
+    <p>Copy any prompt into Bing Image Creator (free) to generate professional ad images instantly.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;" id="promptList"></div>
+  <div class="divider"></div>
+  <div class="form-row"><label class="form-label">Custom Creative Brief</label>
+    <input class="form-input" id="cc-input" placeholder='e.g. "Before and after 14 days Gold Serum"'></div>
+  <button class="btn btn-gold" onclick="genCustomCreative()" id="cc-btn"><span id="cc-inner">✦ Generate Custom Brief</span></button>
+  <div class="output-box" id="cc-out" style="display:none;">
+    <div class="output-head"><span class="output-label">Custom Creative Brief</span>
+      <div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyEl('cc-text')">Copy</button></div>
+    </div>
+    <div class="output-content" id="cc-text"></div>
+  </div>
+</div>
+
+<!-- ══ AI OPTIMIZER ══ -->
+<div class="panel" id="panel-optimizer">
+  <div class="phead">
+    <div class="phead-eye">AI Optimizer · Smart Recommendations</div>
+    <h2>Scale, Pause<br><em>or Fix?</em></h2>
+    <p>Paste your ad metrics or connect Meta to get AI-powered optimization recommendations with one-click actions.</p>
+  </div>
+  <div class="form-row"><label class="form-label">Paste Ad Performance Data</label>
+    <textarea class="form-textarea" id="opt-input" style="min-height:110px;" placeholder="e.g. Gold Serum ad: 7 days running, $35 spent, CTR 1.2%, CPC $1.80, 0 purchases. What should I do?"></textarea></div>
+  <button class="btn btn-gold" onclick="runOptimizer()" id="opt-btn"><span id="opt-inner">✦ Analyze & Recommend</span></button>
+  <div id="opt-results" style="margin-top:20px;display:none;">
+    <div style="font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">AI Recommendations</div>
+    <div id="opt-cards"></div>
+  </div>
+  <div class="output-box" id="opt-out" style="display:none;">
+    <div class="output-head"><span class="output-label">Full Analysis</span>
+      <div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyEl('opt-text')">Copy</button></div>
+    </div>
+    <div class="output-content" id="opt-text"></div>
+  </div>
+</div>
+
+<!-- ══ AUDIENCES ══ -->
+<div class="panel" id="panel-audiences">
+  <div class="phead">
+    <div class="phead-eye">Audience Targeting</div>
+    <h2>Exact Settings<br><em>Per Product</em></h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:20px;">
+    <div style="background:var(--s1);border:1px solid var(--gold-border);padding:18px;cursor:pointer;" onclick="genAudBrief('serum')">
+      <div style="font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Gold Serum</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:17px;margin-bottom:10px;">Anti-Aging Women</div>
+      <div style="font-size:9px;color:var(--muted);line-height:1.9;">Age: 35–60 · Women · US<br>Anti-aging, Luxury beauty, Botox<br>Est: 2M–5M people</div>
+      <div style="margin-top:10px;font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);">Click for full brief →</div>
+    </div>
+    <div style="background:var(--s1);border:1px solid var(--gold-border);padding:18px;cursor:pointer;" onclick="genAudBrief('cleanser')">
+      <div style="font-size:7px;letter-spacing:4px;text-transform:uppercase;color:#4CC97A;margin-bottom:6px;">Glow Cleanser</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:17px;margin-bottom:10px;">Glow Seekers</div>
+      <div style="font-size:9px;color:var(--muted);line-height:1.9;">Age: 28–50 · Women · US<br>Glow skin, K-beauty, Face masks<br>Est: 3M–8M people</div>
+      <div style="margin-top:10px;font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);">Click for full brief →</div>
+    </div>
+    <div style="background:var(--s1);border:1px solid var(--gold-border);padding:18px;cursor:pointer;" onclick="genAudBrief('brush')">
+      <div style="font-size:7px;letter-spacing:4px;text-transform:uppercase;color:#8890E8;margin-bottom:6px;">Magnetic Brush</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:17px;margin-bottom:10px;">Makeup Lovers</div>
+      <div style="font-size:9px;color:var(--muted);line-height:1.9;">Age: 22–45 · Women · US<br>Makeup tutorials, Beauty tools<br>Est: 4M–10M people</div>
+      <div style="margin-top:10px;font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);">Click for full brief →</div>
+    </div>
+  </div>
+  <div class="output-box" id="aud-out" style="display:none;">
+    <div class="output-head"><span class="output-label">Audience Setup Brief</span>
+      <div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyEl('aud-text')">Copy</button></div>
+    </div>
+    <div class="output-content" id="aud-text"></div>
+  </div>
+</div>
+
+<!-- ══ CAPTION AI ══ -->
+<div class="panel" id="panel-caption">
+  <div class="phead">
+    <div class="phead-eye">Caption AI</div>
+    <h2>Generate Any<br><em>Post Caption</em></h2>
+  </div>
+  <div class="form-row"><label class="form-label">What is this post about?</label>
+    <input class="form-input" id="cap-topic" placeholder='e.g. "Morning skincare ritual using Gold Serum"'></div>
+  <div class="g2">
+    <div class="form-row"><label class="form-label">Platform</label>
+      <select class="form-select" id="cap-plat"><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>Instagram Story</option></select></div>
+    <div class="form-row"><label class="form-label">Tone</label>
+      <select class="form-select" id="cap-tone"><option>Luxury & aspirational</option><option>Educational</option><option>Fun & casual</option><option>Emotional</option></select></div>
+  </div>
+  <button class="btn btn-gold" onclick="genCaption()" id="cap-btn"><span id="cap-inner">✦ Generate Caption</span></button>
+  <div class="output-box" id="cap-out" style="display:none;">
+    <div class="output-head"><span class="output-label">Your Caption</span>
+      <div class="output-actions"><button class="btn btn-sm btn-outline" onclick="copyEl('cap-text')">Copy</button></div>
+    </div>
+    <div class="output-content" id="cap-text"></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+<div class="toast" id="toast"></div>
+
+<script>
+const BRAND=`Expert Meta advertising strategist for Orris & Oak (Orrisoak), luxury skincare brand, Westmont IL Chicago.
+PRODUCTS: 1) 24K Gold & Black Truffle Anti-Aging Serum — flagship, lifts/firms/illuminates in 14 days. 2) Gold Hydrating Glow Cleanser. 3) 4-in-1 Magnetic Makeup Brush $52.
+BRAND: "Your glow, elevated." Luxury made accessible. orrisoak.com | support@orrisoak.com | 312-985-6684
+OFFER: GLOW15 = 15% off | Free US shipping | 100% money-back guarantee
+SOCIAL: @orrisoak Instagram | Orris & Oak Facebook`;
+
+let metaConnected=false;
+let campaigns=[];
+
+// KEYS — auto-save to localStorage
+function getClaude(){return document.getElementById('claudeKey').value.trim();}
+function getMeta(){return document.getElementById('metaToken').value.trim();}
+function getAcct(){return document.getElementById('adAccount').value.trim();}
+function updateKeys(){
+  const m=getMeta(),c=getClaude(),a=getAcct();
+  const dot=document.getElementById('metaDot');
+  const st=document.getElementById('connStatus');
+  if(m&&a&&c){dot.className='status-dot dot-pending';st.textContent='Ready to Connect';}
+  else{dot.className='status-dot dot-disconnected';st.textContent='Not Connected';}
+  // Auto-save to localStorage
+  if(c) localStorage.setItem('oo_claude_key', c);
+  if(m) localStorage.setItem('oo_meta_token', m);
+  if(a) localStorage.setItem('oo_ad_account', a);
+}
+function saveCredentials(){
+  localStorage.setItem('oo_claude_key', getClaude());
+  localStorage.setItem('oo_meta_token', getMeta());
+  localStorage.setItem('oo_ad_account', getAcct());
+  toast('Credentials saved ✓ — auto-loads next time','green');
+}
+function clearCredentials(){
+  localStorage.removeItem('oo_claude_key');
+  localStorage.removeItem('oo_meta_token');
+  localStorage.removeItem('oo_ad_account');
+  document.getElementById('claudeKey').value='';
+  document.getElementById('metaToken').value='';
+  document.getElementById('adAccount').value='';
+  updateKeys();
+  toast('Credentials cleared','gold');
+}
+// Load saved credentials on startup
+function loadSavedCredentials(){
+  const c=localStorage.getItem('oo_claude_key');
+  const m=localStorage.getItem('oo_meta_token');
+  const a=localStorage.getItem('oo_ad_account');
+  if(c) document.getElementById('claudeKey').value=c;
+  if(m) document.getElementById('metaToken').value=m;
+  if(a) document.getElementById('adAccount').value=a;
+  if(c||m||a) updateKeys();
+}
+
+// NAV
+function nav(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(btn&&btn.classList)btn.classList.add('active');
+  else document.querySelectorAll('.nav-btn').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+name+"'"))b.classList.add('active');});
+}
+
+// TOAST
+function toast(msg,type='gold'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(type==='green'?' green':type==='red'?' red':'');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+function copyEl(id){
+  navigator.clipboard.writeText(document.getElementById(id).innerText)
+    .then(()=>toast('Copied ✓','green')).catch(()=>alert('Select and copy manually.'));
+}
+
+// CLAUDE API
+async function claude(prompt,max=900){
+  const k=getClaude();
+  if(!k){toast('Paste your Claude API key first');throw new Error('No Claude key');}
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:max,system:BRAND,messages:[{role:'user',content:prompt}]})
+  });
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||r.statusText);}
+  return (await r.json()).content[0].text;
+}
+
+// META GRAPH API
+async function metaCall(endpoint,method='GET',body=null){
+  const token=getMeta();
+  if(!token){toast('Connect Meta first');throw new Error('No Meta token');}
+  const url=`https://graph.facebook.com/v18.0/${endpoint}${endpoint.includes('?')?'&':'?'}access_token=${token}`;
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(url,opts);
+  const data=await r.json();
+  if(data.error)throw new Error(data.error.message);
+  return data;
+}
+
+// CONNECT META
+async function connectMeta(){
+  const token=getMeta(),acct=getAcct(),claude_k=getClaude();
+  if(!token||!acct){toast('Please paste both Meta token and Ad Account ID');return;}
+  if(!claude_k){toast('Please paste your Claude API key too');return;}
+  const btn=document.getElementById('metaDot');
+  document.getElementById('connStatus').textContent='Connecting...';
+  try{
+    const data=await metaCall(`${acct}?fields=name,currency,account_status`);
+    metaConnected=true;
+    document.getElementById('metaDot').className='status-dot dot-connected';
+    document.getElementById('connStatus').textContent=`Connected · ${data.name||acct}`;
+    document.getElementById('setupPrompt').style.display='none';
+    document.getElementById('liveDash').style.display='block';
+    toast('Meta connected ✓','green');
+    fetchDashboard();
+  }catch(e){
+    document.getElementById('metaDot').className='status-dot dot-disconnected';
+    document.getElementById('connStatus').textContent='Connection Failed';
+    toast('Error: '+e.message,'red');
+  }
+}
+
+// FETCH DASHBOARD
+async function fetchDashboard(){
+  try{
+    const acct=getAcct();
+    const today=new Date().toISOString().split('T')[0];
+    const data=await metaCall(`${acct}/insights?fields=spend,reach,ctr,cpc,impressions&date_preset=today`);
+    const ins=data.data?.[0]||{};
+    document.getElementById('d-spend').textContent='$'+(parseFloat(ins.spend)||0).toFixed(2);
+    document.getElementById('d-reach').textContent=ins.reach?Number(ins.reach).toLocaleString():'0';
+    document.getElementById('d-ctr').textContent=ins.ctr?parseFloat(ins.ctr).toFixed(2)+'%':'0%';
+    document.getElementById('d-cpc').textContent=ins.cpc?'$'+parseFloat(ins.cpc).toFixed(2):'$0';
+    fetchCampaigns();
+  }catch(e){
+    document.getElementById('d-spend').textContent='$0';
+    document.getElementById('d-reach').textContent='0';
+    document.getElementById('d-ctr').textContent='0%';
+    document.getElementById('d-cpc').textContent='$0';
+    document.getElementById('d-camps').textContent='0';
+  }
+}
+
+// FETCH CAMPAIGNS
+async function fetchCampaigns(){
+  const acct=getAcct();
+  if(!acct||!metaConnected){return;}
+  try{
+    const data=await metaCall(`${acct}/campaigns?fields=name,status,daily_budget,objective,insights.date_preset(last_7d){spend,reach,ctr,cpc}`);
+    campaigns=data.data||[];
+    document.getElementById('d-camps').textContent=campaigns.filter(c=>c.status==='ACTIVE').length;
+    renderCampaignTable();
+    renderDashCamps();
+  }catch(e){
+    document.getElementById('campTableWrap').innerHTML=`<div class="info-box"><div class="info-icon">⚠️</div><div class="info-text">Could not load campaigns: ${e.message}</div></div>`;
+  }
+}
+
+function renderCampaignTable(){
+  const rows=campaigns.map((c,i)=>{
+    const ins=c.insights?.data?.[0]||{};
+    const pill=c.status==='ACTIVE'?'pill-live':c.status==='PAUSED'?'pill-paused':'pill-draft';
+    return `<tr class="camp-tr">
+      <td class="camp-td" style="font-family:'Cormorant Garamond',serif;font-size:16px;">${c.name}</td>
+      <td class="camp-td" style="color:var(--muted);font-size:10px;">${c.objective||'—'}</td>
+      <td class="camp-td" style="color:var(--gold);">$${((c.daily_budget||0)/100).toFixed(2)}/day</td>
+      <td class="camp-td">${ins.spend?'$'+parseFloat(ins.spend).toFixed(2):'$0'}</td>
+      <td class="camp-td">${ins.ctr?parseFloat(ins.ctr).toFixed(2)+'%':'—'}</td>
+      <td class="camp-td">${ins.cpc?'$'+parseFloat(ins.cpc).toFixed(2):'—'}</td>
+      <td class="camp-td"><span class="pill ${pill}">${c.status}</span></td>
+      <td class="camp-td">
+        <button class="btn btn-sm btn-outline" onclick="toggleCampaign('${c.id}','${c.status}')">
+          ${c.status==='ACTIVE'?'Pause':'Resume'}
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('campTableWrap').innerHTML=`
+    <table class="camp-table">
+      <thead><tr>
+        <th class="camp-th">Campaign</th><th class="camp-th">Objective</th>
+        <th class="camp-th">Budget</th><th class="camp-th">7d Spend</th>
+        <th class="camp-th">CTR</th><th class="camp-th">CPC</th>
+        <th class="camp-th">Status</th><th class="camp-th">Action</th>
+      </tr></thead>
+      <tbody>${rows||'<tr><td class="camp-td" colspan="8" style="color:var(--muted);text-align:center;">No campaigns yet — create your first one →</td></tr>'}</tbody>
+    </table>`;
+}
+
+function renderDashCamps(){
+  const wrap=document.getElementById('dashCampaigns');
+  if(!campaigns.length){wrap.innerHTML='<div style="color:var(--muted);font-size:11px;text-align:center;padding:20px;">No campaigns yet. Go to Campaign Builder to create your first.</div>';return;}
+  wrap.innerHTML='<div style="font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Active Campaigns</div>'+
+    campaigns.slice(0,3).map(c=>{
+      const ins=c.insights?.data?.[0]||{};
+      return `<div style="background:var(--s1);border:1px solid var(--gold-border);padding:14px 18px;margin-bottom:3px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:17px;">${c.name}</div>
+          <div style="font-size:8px;letter-spacing:2px;color:var(--muted);margin-top:2px;">${c.status} · $${((c.daily_budget||0)/100).toFixed(2)}/day</div>
+        </div>
+        <div style="display:flex;gap:20px;">
+          <div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);">${ins.spend?'$'+parseFloat(ins.spend).toFixed(0):'$0'}</div><div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">7d Spend</div></div>
+          <div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:${parseFloat(ins.ctr)>2?'var(--green)':'var(--cream)'};">${ins.ctr?parseFloat(ins.ctr).toFixed(1)+'%':'—'}</div><div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">CTR</div></div>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+// TOGGLE CAMPAIGN STATUS
+async function toggleCampaign(id,status){
+  const newStatus=status==='ACTIVE'?'PAUSED':'ACTIVE';
+  try{
+    await metaCall(`${id}`,`POST`,{status:newStatus});
+    toast(`Campaign ${newStatus==='ACTIVE'?'resumed':'paused'} ✓`,'green');
+    fetchCampaigns();
+  }catch(e){toast('Error: '+e.message,'red');}
+}
+
+// CAMPAIGN BUILDER - PREVIEW
+function updatePreview(){
+  const name=document.getElementById('b-name').value||'—';
+  const obj=document.getElementById('b-obj').value;
+  const budget=document.getElementById('b-budget').value;
+  const age=document.getElementById('b-age').value.split(',');
+  const geo=document.getElementById('b-geo').value;
+  const interests=document.getElementById('b-interests').value;
+  const product=document.getElementById('b-product').value;
+  const objMap={REACH:'Awareness · Reach',LINK_CLICKS:'Traffic · Clicks',CONVERSIONS:'Conversions · Purchase'};
+  document.getElementById('prev-name').textContent=name;
+  document.getElementById('prev-obj').textContent=objMap[obj]||obj;
+  document.getElementById('prev-budget').textContent=budget?'$'+budget+'/day':'—';
+  document.getElementById('prev-aud').textContent=`Women ${age[0]}–${age[1]} · ${geo}`;
+  document.getElementById('prev-int').textContent=interests.split(',').slice(0,3).join(', ')+'...';
+  document.getElementById('prev-prod').textContent=product.split(' ').slice(0,3).join(' ')+'...';
+  document.getElementById('pub-budget').textContent=budget||'5';
+}
+
+// GENERATE AD FOR BUILDER
+async function generateBuilderAd(){
+  const product=document.getElementById('b-product').value;
+  const tone=document.getElementById('b-tone').value;
+  const offer=document.getElementById('b-offer').value;
+  const btn=document.getElementById('gen-ad-inner');
+  btn.innerHTML='<span class="spinner"></span> Generating...';
+  document.getElementById('gen-ad-btn').disabled=true;
+  try{
+    const r=await claude(`Write a Meta single image ad for Orris & Oak.
+PRODUCT: ${product} | TONE: ${tone} | OFFER: ${offer||'Free US shipping'}
+
+Return ONLY JSON: {"primary_text":"...","headline":"...","description":"..."}
+Primary text: 80-100 words, luxury hook opener.
+Headline: under 40 chars.
+Description: under 25 chars.`,400);
+    const clean=r.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    document.getElementById('prev-text').textContent=parsed.primary_text;
+    document.getElementById('prev-headline').textContent=parsed.headline;
+    const result=`PRIMARY TEXT:\n${parsed.primary_text}\n\nHEADLINE:\n${parsed.headline}\n\nDESCRIPTION:\n${parsed.description}`;
+    document.getElementById('gen-ad-result').textContent=result;
+    document.getElementById('gen-ad-result').style.display='block';
+    window._adCopy={primary_text:parsed.primary_text,headline:parsed.headline,description:parsed.description};
+    toast('Ad copy generated ✓','green');
+  }catch(e){toast('Error: '+e.message,'red');}
+  btn.innerHTML='✦ AI Generate Ad Copy';
+  document.getElementById('gen-ad-btn').disabled=false;
+}
+
+// PUBLISH CAMPAIGN
+async function publishCampaign(){
+  if(!metaConnected){toast('Connect Meta first — click Connect Meta button');return;}
+  const name=document.getElementById('b-name').value;
+  const budget=document.getElementById('b-budget').value;
+  const obj=document.getElementById('b-obj').value;
+  const age=document.getElementById('b-age').value.split(',');
+  if(!name||!budget){toast('Please fill in campaign name and budget');return;}
+  const btn=document.getElementById('pub-inner');
+  btn.innerHTML='<span class="spinner"></span> Publishing...';
+  document.getElementById('pub-btn').disabled=true;
+  try{
+    const acct=getAcct();
+    // 1. Create Campaign
+    const camp=await metaCall(`${acct}/campaigns`,`POST`,{
+      name,objective:obj,status:'PAUSED',
+      special_ad_categories:[],
+      daily_budget:Math.round(parseFloat(budget)*100)
+    });
+    // 2. Create Ad Set
+    const adSet=await metaCall(`${acct}/adsets`,`POST`,{
+      name:`${name} · Ad Set`,
+      campaign_id:camp.id,
+      daily_budget:Math.round(parseFloat(budget)*100),
+      billing_event:'IMPRESSIONS',
+      optimization_goal:'REACH',
+      bid_strategy:'LOWEST_COST_WITHOUT_CAP',
+      status:'PAUSED',
+      targeting:{
+        geo_locations:{countries:['US']},
+        age_min:parseInt(age[0]),
+        age_max:parseInt(age[1]),
+        genders:[2]
+      }
+    });
+    toast(`Campaign "${name}" created in Meta! Go to Ads Manager to add your image and activate.`,'green');
+    fetchCampaigns();
+    nav('campaigns',document.querySelector('[onclick*=campaigns]'));
+  }catch(e){toast('Publish error: '+e.message,'red');}
+  btn.innerHTML='⚡ Publish to Meta';
+  document.getElementById('pub-btn').disabled=false;
+}
+
+function saveDraft(){toast('Draft saved locally ✓','green');}
+
+// AD GENERATOR
+function loading(id,orig,on){
+  const el=document.getElementById(id);
+  if(on){el.dataset.orig=el.innerHTML;el.innerHTML='<span class="spinner"></span> Generating...';}
+  else el.innerHTML=el.dataset.orig||orig;
+  el.parentElement.disabled=on;
+}
+async function generateAdCopy(){
+  const product=document.getElementById('ag-product').value;
+  const goal=document.getElementById('ag-goal').value;
+  const format=document.getElementById('ag-format').value;
+  const tone=document.getElementById('ag-tone').value;
+  const offer=document.getElementById('ag-offer').value;
+  loading('ag-inner','✦ Generate Ad',true);
+  try{
+    const r=await claude(`Write complete Meta ad for Orris & Oak.
+PRODUCT: ${product} | GOAL: ${goal} | FORMAT: ${format} | TONE: ${tone}
+OFFER: ${offer||'Free US shipping · 100% money-back'}
+
+Label sections:
+═══ PRIMARY TEXT ═══
+(100-120 words, hook opener, end with orrisoak.com)
+═══ HEADLINE ═══ (under 40 chars)
+═══ DESCRIPTION ═══ (under 30 chars)
+═══ CTA BUTTON ═══ (Shop Now / Learn More / Get Offer)
+═══ WEBSITE URL ═══
+https://orrisoak.com
+${format.includes('Carousel')?'═══ SLIDE 1/2/3 HEADLINES ═══':''}`);
+    document.getElementById('ag-text').textContent=r;
+    document.getElementById('ag-out').style.display='block';
+    document.getElementById('ag-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('ag-inner','✦ Generate Ad',false);
+}
+async function generateABTest(){
+  const product=document.getElementById('ag-product').value;
+  loading('ab-inner','Generate A/B/C Variations',true);
+  try{
+    const r=await claude(`Generate 3 distinct Meta ad variations for A/B/C testing for Orris & Oak.
+PRODUCT: ${product}
+
+━━━ VARIATION A — [angle] ━━━
+Primary Text: (80 words)
+Headline: (under 40 chars)
+CTA: ...
+
+━━━ VARIATION B — [angle] ━━━
+...
+
+━━━ VARIATION C — [angle] ━━━
+...
+
+━━━ TESTING PLAN ━━━
+Split $5/day = $1.67 each. Run 7 days. Winner = lowest CPC. Make each angle genuinely different.`);
+    document.getElementById('ag-text').textContent=r;
+    document.getElementById('ag-out').style.display='block';
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('ab-inner','Generate A/B/C Variations',false);
+}
+
+// CREATIVES
+const prompts=[
+  {label:'Gold Serum · Hero Shot',text:'Luxury gold skincare serum bottle on dark black marble, single dramatic spotlight from above, 24K gold particles floating around bottle, ultra cinematic, beauty editorial photography, 8K, deep shadows, luxury brand aesthetic'},
+  {label:'Gold Serum · Texture Close-up',text:'Extreme macro close-up of golden serum drop on elegant fingertip, shimmering 24K gold particles, black velvet background, dramatic soft lighting, luxury beauty macro photography, ultra sharp, 8K'},
+  {label:'Glow Cleanser · Lifestyle',text:'Elegant woman with glowing luminous skin applying gold skincare cleanser, marble bathroom, soft morning window light, luxury beauty lifestyle, warm golden tones, editorial aesthetic, 8K'},
+  {label:'Magnetic Brush · Product',text:'Luxury magnetic makeup brush with gold accents on white marble, soft dramatic studio lighting, premium beauty tool editorial photography, clean minimal luxury, 8K'},
+  {label:'Bundle · All 3 Products',text:'Three luxury skincare products arranged elegantly on dark marble — gold serum, cleanser bottle, magnetic brush — cinematic golden light, black truffle and gold leaf props, luxury beauty brand photography, 8K'},
+];
+document.getElementById('promptList').innerHTML=prompts.map(p=>`
+  <div style="background:var(--s1);border:1px solid var(--gold-border);padding:16px 18px;">
+    <div style="font-size:7px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;">${p.label}</div>
+    <div style="font-size:11px;color:var(--cream);line-height:1.9;background:var(--s2);padding:12px;border-left:2px solid var(--gold);margin-bottom:10px;">${p.text}</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(this.closest('div[style]').querySelector('div[style*=border-left]').textContent).then(()=>toast('Copied ✓','green'))">Copy Prompt</button>
+      <button class="btn btn-sm btn-gold" onclick="window.open('https://bing.com/images/create','_blank')">Open Bing →</button>
+    </div>
+  </div>`).join('');
+
+async function genCustomCreative(){
+  const input=document.getElementById('cc-input').value.trim();
+  if(!input){toast('Describe your creative idea');return;}
+  loading('cc-inner','✦ Generate Custom Brief',true);
+  try{
+    const r=await claude(`Creative brief for Meta ad for Orris & Oak: "${input}"
+1. AI IMAGE PROMPT (detailed, cinematic, luxury beauty for Bing Image Creator)
+2. VIDEO CONCEPT (3 shots × 3-5 seconds each)
+3. TEXT OVERLAYS on screen
+4. MUSIC MOOD
+5. CAPTION HOOK (first line)`);
+    document.getElementById('cc-text').textContent=r;
+    document.getElementById('cc-out').style.display='block';
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('cc-inner','✦ Generate Custom Brief',false);
+}
+
+// OPTIMIZER
+async function runOptimizer(){
+  const input=document.getElementById('opt-input').value.trim();
+  if(!input){toast('Describe your ad performance');return;}
+  loading('opt-inner','✦ Analyze & Recommend',true);
+  try{
+    const r=await claude(`Analyze Meta ad performance for Orris & Oak and give specific recommendations:
+
+${input}
+
+For each ad/situation:
+VERDICT: Scale / Keep Watching / Fix / Pause / Stop
+WHY: Specific metric-based reason
+ACTION: Exact step in Meta Ads Manager
+BENCHMARK: What good performance looks like for luxury beauty at $5-10/day
+
+Be direct. No fluff. Specific numbers.`,700);
+    document.getElementById('opt-text').textContent=r;
+    document.getElementById('opt-out').style.display='block';
+    document.getElementById('opt-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('opt-inner','✦ Analyze & Recommend',false);
+}
+
+// AUDIENCES
+async function genAudBrief(type){
+  const map={serum:'24K Gold Anti-Aging Serum, Women 35-60, anti-aging interests',cleanser:'Hydrating Glow Cleanser, Women 28-50, glow and K-beauty interests',brush:'4-in-1 Magnetic Brush, Women 22-45, makeup tutorial interests'};
+  loading('aud-text','',false);
+  document.getElementById('aud-out').style.display='block';
+  document.getElementById('aud-text').innerHTML='<span class="spinner"></span> Generating audience brief...';
+  try{
+    const r=await claude(`Detailed Meta Ads Manager audience setup for Orris & Oak: ${map[type]}
+
+Include:
+1. EXACT INTERESTS to search in Meta (20+ specific keywords, exact phrases)
+2. BEHAVIORS (engaged shoppers, luxury goods buyers etc)
+3. STEP-BY-STEP setup in Ads Manager
+4. EXCLUSIONS
+5. LOOKALIKE AUDIENCE setup for month 3
+
+Be specific — exact words to type into Meta's search boxes.`);
+    document.getElementById('aud-text').textContent=r;
+  }catch(e){toast('Error: '+e.message,'red');document.getElementById('aud-out').style.display='none';}
+}
+
+// CAPTION
+async function genCaption(){
+  const topic=document.getElementById('cap-topic').value.trim();
+  if(!topic){toast('Describe the post');return;}
+  loading('cap-inner','✦ Generate Caption',true);
+  try{
+    const r=await claude(`${document.getElementById('cap-plat').value} caption for Orris & Oak.
+CONTENT: ${topic} | TONE: ${document.getElementById('cap-tone').value}
+Hook first line. 2-3 paragraphs. Natural emojis. End with shop orrisoak.com. 12-15 hashtags including #OrriosakGlow #OrrisAndOak.
+Output ONLY the caption.`,500);
+    document.getElementById('cap-text').textContent=r;
+    document.getElementById('cap-out').style.display='block';
+  }catch(e){toast('Error: '+e.message,'red');}
+  loading('cap-inner','✦ Generate Caption',false);
+}
+
+// DEMO MODE
+function loadDemo(){
+  document.getElementById('setupPrompt').style.display='none';
+  document.getElementById('liveDash').style.display='block';
+  document.getElementById('d-spend').textContent='$5.24';
+  document.getElementById('d-reach').textContent='1,847';
+  document.getElementById('d-ctr').textContent='2.4%';
+  document.getElementById('d-cpc').textContent='$0.82';
+  document.getElementById('d-camps').textContent='1';
+  document.getElementById('dashCampaigns').innerHTML=`
+    <div style="font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Active Campaigns · Demo Data</div>
+    <div style="background:var(--s1);border:1px solid var(--gold-border);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:17px;">Orrisoak Gold Serum Awareness</div>
+        <div style="font-size:8px;letter-spacing:2px;color:var(--green);margin-top:2px;">ACTIVE · $5.00/day</div>
+      </div>
+      <div style="display:flex;gap:20px;">
+        <div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);">$34</div><div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">7d Spend</div></div>
+        <div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--green);">2.4%</div><div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">CTR</div></div>
+        <div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cream);">$0.82</div><div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">CPC</div></div>
+      </div>
+    </div>`;
+  toast('Demo mode loaded — connect Meta for live data','green');
+}
+
+// INIT
+loadSavedCredentials();
+updatePreview();
+</script>
+</body>
+</html>

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orris & Oak · 4-in-1 Magnetic Makeup Brush</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8D5A3;
+  --gold-dim: rgba(201,168,76,0.12);
+  --black: #000000;
+  --deep: #080808;
+  --cream: #F5EFE3;
+  --muted: #7A6E62;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--black);
+  color: var(--cream);
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 200;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 60px 80px 80px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-right {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-bg-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 70% 50%, rgba(201,168,76,0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.hero-line-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.brand-tag {
+  font-size: 8px;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: fadeUp 1s 0.3s both;
+}
+.brand-tag::before {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(48px, 6vw, 88px);
+  font-weight: 300;
+  line-height: 0.92;
+  margin-bottom: 32px;
+  animation: fadeUp 1s 0.5s both;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+  display: block;
+}
+
+.hero-sub {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  line-height: 2.2;
+  max-width: 400px;
+  margin-bottom: 48px;
+  animation: fadeUp 1s 0.7s both;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 48px;
+  animation: fadeUp 1s 0.9s both;
+}
+.hero-stat {}
+.hero-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  color: var(--gold);
+  line-height: 1;
+}
+.hero-stat-label {
+  font-size: 7px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  animation: fadeUp 1s 1.1s both;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: var(--black);
+  border: none;
+  padding: 16px 44px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.4);
+  padding: 16px 44px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-secondary:hover { border-color: var(--gold); background: var(--gold-dim); transform: translateY(-2px); }
+
+/* PRODUCT IMAGE */
+.product-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-img {
+  height: 85vh;
+  width: auto;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  animation: floatIn 1.5s 0.8s both cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  filter: drop-shadow(0 40px 80px rgba(201,168,76,0.15));
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+.product-img:hover {
+  transform: scale(1.03) translateY(-8px);
+  filter: drop-shadow(0 60px 100px rgba(201,168,76,0.25));
+}
+
+.img-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(201,168,76,0.2), transparent 70%);
+  border-radius: 50%;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: glowPulse 3s infinite;
+  pointer-events: none;
+}
+
+@keyframes glowPulse {
+  0%,100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.15); }
+}
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── DIVIDER LINE ── */
+.divider-section {
+  padding: 0 80px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+}
+.divider-icon {
+  font-size: 10px;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* ── FEATURE SECTION ── */
+.features {
+  padding: 100px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.features-visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.case-img {
+  width: 280px;
+  height: auto;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  animation: floatSlow 6s ease-in-out infinite;
+  filter: drop-shadow(0 30px 60px rgba(201,168,76,0.2));
+}
+
+@keyframes floatSlow {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.features-content {}
+.features-eye {
+  font-size: 8px;
+  letter-spacing: 7px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.features-eye::before {
+  content: '';
+  width: 30px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.features-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 300;
+  line-height: 1.1;
+  margin-bottom: 40px;
+}
+.features-title em { font-style: italic; color: var(--gold); }
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.feature-item {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+  transition: background 0.3s;
+  cursor: default;
+}
+.feature-item:first-child { border-top: 1px solid rgba(201,168,76,0.1); }
+.feature-item:hover .feature-num { color: var(--gold); }
+
+.feature-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  color: rgba(201,168,76,0.2);
+  line-height: 1;
+  transition: color 0.3s;
+  padding-top: 2px;
+}
+
+.feature-body {}
+.feature-name {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--cream);
+  margin-bottom: 6px;
+}
+.feature-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.9;
+  letter-spacing: 0.5px;
+}
+
+/* ── 4-IN-1 EXPLAINER ── */
+.explainer {
+  padding: 100px 80px;
+  background: linear-gradient(160deg, #0A0A0A 0%, #000 100%);
+  position: relative;
+  overflow: hidden;
+}
+.explainer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(201,168,76,0.04), transparent);
+}
+
+.explainer-header {
+  text-align: center;
+  margin-bottom: 80px;
+  position: relative;
+}
+.explainer-eye {
+  font-size: 8px;
+  letter-spacing: 7px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.explainer-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 300;
+  line-height: 1.1;
+}
+.explainer-title em { font-style: italic; color: var(--gold); }
+
+.brush-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  position: relative;
+}
+
+.brush-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(201,168,76,0.12);
+  padding: 40px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s;
+  cursor: default;
+}
+.brush-card:hover {
+  background: rgba(201,168,76,0.05);
+  border-color: rgba(201,168,76,0.35);
+  transform: translateY(-6px);
+}
+.brush-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.4s;
+}
+.brush-card:hover::before { transform: scaleX(1); }
+
+.brush-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 64px;
+  font-weight: 300;
+  color: rgba(201,168,76,0.08);
+  line-height: 1;
+  margin-bottom: 16px;
+  transition: color 0.4s;
+}
+.brush-card:hover .brush-number { color: rgba(201,168,76,0.2); }
+
+.brush-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+
+.brush-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.brush-use {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.brush-desc {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.9;
+  letter-spacing: 0.5px;
+}
+
+.magnetic-badge {
+  text-align: center;
+  margin-top: 60px;
+  position: relative;
+}
+.magnetic-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.mag-dot {
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: magPulse 1.5s infinite;
+}
+.mag-dot:nth-child(2) { animation-delay: 0.3s; }
+.mag-dot:nth-child(3) { animation-delay: 0.6s; }
+@keyframes magPulse {
+  0%,100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+.magnetic-text {
+  font-size: 9px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* ── COLOR VARIANTS ── */
+.variants {
+  padding: 100px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.variants-content {}
+.variants-eye {
+  font-size: 8px;
+  letter-spacing: 7px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.variants-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 300;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+.variants-title em { font-style: italic; color: var(--gold); }
+.variants-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 2.2;
+  margin-bottom: 40px;
+  max-width: 400px;
+}
+
+.color-options {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 40px;
+}
+.color-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid rgba(201,168,76,0.1);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.color-option:hover, .color-option.active {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+.color-swatch {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  flex-shrink: 0;
+}
+.swatch-black { background: #111; }
+.swatch-ivory { background: #E8E0D0; }
+.swatch-purple { background: #7B5EA7; }
+.color-name {
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--cream);
+  flex: 1;
+}
+.color-tag {
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  color: var(--gold);
+  line-height: 1;
+}
+.price-note {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.variants-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* ── GIFT SECTION ── */
+.gift-section {
+  padding: 100px 80px;
+  background: linear-gradient(135deg, #0A0A0A 0%, #0F0A05 50%, #0A0A0A 100%);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.gift-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(201,168,76,0.06), transparent);
+}
+.gift-eye {
+  font-size: 8px;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  position: relative;
+}
+.gift-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 300;
+  line-height: 1.05;
+  margin-bottom: 20px;
+  position: relative;
+}
+.gift-title em { font-style: italic; color: var(--gold); }
+.gift-desc {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  line-height: 2.2;
+  max-width: 500px;
+  margin: 0 auto 48px;
+  position: relative;
+}
+
+.gift-includes {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+  position: relative;
+}
+.gift-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.gift-item-icon { font-size: 24px; }
+.gift-item-text {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.gift-cta { position: relative; display: flex; justify-content: center; gap: 16px; }
+
+/* ── MARQUEE ── */
+.marquee-wrap {
+  background: var(--gold);
+  padding: 14px 0;
+  overflow: hidden;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+.marquee-track span {
+  font-size: 8px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--black);
+  padding: 0 36px;
+  white-space: nowrap;
+  font-weight: 400;
+}
+.marquee-track span::before { content: '✦'; margin-right: 36px; opacity: 0.4; }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ── FOOTER ── */
+.footer {
+  padding: 48px 80px;
+  border-top: 1px solid rgba(201,168,76,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--gold);
+  letter-spacing: 4px;
+}
+.footer-logo span { font-style: italic; }
+.footer-copy {
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.footer-link {
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+.footer-link:hover { opacity: 0.7; }
+
+/* ── RESPONSIVE ── */
+@media(max-width: 900px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-left { padding: 60px 30px; order: 2; }
+  .hero-right { height: 60vh; order: 1; }
+  .product-img { height: 55vh; }
+  .features, .variants { grid-template-columns: 1fr; }
+  .brush-grid { grid-template-columns: repeat(2, 1fr); }
+  .features, .explainer, .variants, .gift-section { padding: 60px 30px; }
+  .footer { padding: 40px 30px; flex-direction: column; text-align: center; }
+  .hero-stats { gap: 24px; }
+  .divider-section { padding: 0 30px; }
+}
+</style>
+</head>
+<body>
+
+<!-- MARQUEE TOP -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>4-in-1 Magnetic Brush</span><span>Professional Edition</span><span>Luxury Travel Case</span>
+    <span>Orris & Oak</span><span>4 Brushes · 1 Tool</span><span>Gift Ready</span><span>Free US Shipping</span>
+    <span>4-in-1 Magnetic Brush</span><span>Professional Edition</span><span>Luxury Travel Case</span>
+    <span>Orris & Oak</span><span>4 Brushes · 1 Tool</span><span>Gift Ready</span><span>Free US Shipping</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-glow"></div>
+  <div class="hero-line-top"></div>
+
+  <div class="hero-left">
+    <div class="brand-tag">Orris & Oak · Professional Edition</div>
+    <h1 class="hero-title">
+      Four Brushes.<br>
+      <em>One Genius.</em>
+    </h1>
+    <p class="hero-sub">Four professional-grade brushes that magnetically unite into one compact tool. Stored as one. Deployed as four. Housed in luxury.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">4</div>
+        <div class="hero-stat-label">Pro Brushes</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">1</div>
+        <div class="hero-stat-label">Magnetic Tool</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">3</div>
+        <div class="hero-stat-label">Colorways</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">$65</div>
+        <div class="hero-stat-label">With Case</div>
+      </div>
+    </div>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="window.open('https://orrisoak.com','_blank')">Shop Now — $65</button>
+      <button class="btn-secondary">Learn More</button>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="product-img-wrap">
+      <div class="img-glow"></div>
+      <img src="/mnt/user-data/uploads/makeup-brush-set-orrisoak-noir-front.png" alt="Orris & Oak 4-in-1 Magnetic Makeup Brush" class="product-img">
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider-section" style="padding:40px 80px;">
+  <div class="divider-line"></div>
+  <div class="divider-icon">✦ The Professional Ritual ✦</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="features-visual">
+    <img src="/mnt/user-data/uploads/24aa8cdceef6af94c21ac9efb4d5563b__1___1_.png" alt="Orris & Oak Leather Travel Case" class="case-img">
+  </div>
+  <div class="features-content">
+    <div class="features-eye">What's Inside</div>
+    <h2 class="features-title">Luxury<br><em>Crafted to Last</em></h2>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-num">01</div>
+        <div class="feature-body">
+          <div class="feature-name">Magnetic System</div>
+          <div class="feature-desc">Precision magnetic attachment connects each brush with a satisfying click. No loose parts. No fumbling. Pure engineering.</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">02</div>
+        <div class="feature-body">
+          <div class="feature-name">PU Leather Travel Case</div>
+          <div class="feature-desc">Each set arrives in a premium PU leather cylindrical travel case — embossed in gold. Built for the woman on the move.</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">03</div>
+        <div class="feature-body">
+          <div class="feature-name">Vegan Synthetic Hair</div>
+          <div class="feature-desc">Ultra-soft, cruelty-free synthetic bristles that perform like natural hair — without compromise.</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">04</div>
+        <div class="feature-body">
+          <div class="feature-name">Gift-Ready Packaging</div>
+          <div class="feature-desc">Arrives in a luxury matte black box. No wrapping needed. The perfect gift — for her, or yourself.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4-IN-1 EXPLAINER -->
+<section class="explainer">
+  <div class="explainer-header">
+    <div class="explainer-eye">The System</div>
+    <h2 class="explainer-title">One Tool.<br><em>Four Possibilities.</em></h2>
+  </div>
+
+  <div class="brush-grid">
+    <div class="brush-card">
+      <div class="brush-number">01</div>
+      <span class="brush-icon">🪮</span>
+      <div class="brush-name">Face Brush</div>
+      <div class="brush-use">Foundation · Powder · Blush</div>
+      <div class="brush-desc">Large dome brush for seamless full-face application. Soft enough for the most sensitive skin.</div>
+    </div>
+    <div class="brush-card">
+      <div class="brush-number">02</div>
+      <span class="brush-icon">👁️</span>
+      <div class="brush-name">Eye Brush</div>
+      <div class="brush-use">Eyeshadow · Crease</div>
+      <div class="brush-desc">Precision tapered brush for detailed eye application and seamless blending.</div>
+    </div>
+    <div class="brush-card">
+      <div class="brush-number">03</div>
+      <span class="brush-icon">✏️</span>
+      <div class="brush-name">Brow Brush</div>
+      <div class="brush-use">Brows · Liner</div>
+      <div class="brush-desc">Angled flat brush for precise brow definition and sharp liner application.</div>
+    </div>
+    <div class="brush-card">
+      <div class="brush-number">04</div>
+      <span class="brush-icon">✨</span>
+      <div class="brush-name">Detail Brush</div>
+      <div class="brush-use">Highlight · Concealer</div>
+      <div class="brush-desc">Small flat brush for targeted concealer placement and precision highlight.</div>
+    </div>
+  </div>
+
+  <div class="magnetic-badge">
+    <div class="magnetic-line">
+      <div class="mag-dot"></div>
+      <div class="mag-dot"></div>
+      <div class="mag-dot"></div>
+    </div>
+    <div class="magnetic-text">All 3 precision brushes magnetically attach to the main handle</div>
+  </div>
+</section>
+
+<!-- COLOR VARIANTS -->
+<section class="variants">
+  <div class="variants-content">
+    <div class="variants-eye">Choose Your Ritual</div>
+    <h2 class="variants-title">Three Colors.<br><em>One Obsession.</em></h2>
+    <p class="variants-desc">Each colorway tells a different story. Bold and professional. Clean and minimal. Playful and vibrant. All magnetic. All Orris & Oak.</p>
+
+    <div class="color-options">
+      <div class="color-option active" onclick="selectColor(this)">
+        <div class="color-swatch swatch-black"></div>
+        <div class="color-name">Noir Black</div>
+        <div class="color-tag">Bold · Professional</div>
+      </div>
+      <div class="color-option" onclick="selectColor(this)">
+        <div class="color-swatch swatch-ivory"></div>
+        <div class="color-name">Ivory</div>
+        <div class="color-tag">Clean · Minimal</div>
+      </div>
+      <div class="color-option" onclick="selectColor(this)">
+        <div class="color-swatch swatch-purple"></div>
+        <div class="color-name">Violet Purple</div>
+        <div class="color-tag">Playful · Vibrant</div>
+      </div>
+    </div>
+
+    <div class="price-row">
+      <div class="price">$65</div>
+      <div class="price-note">Includes luxury PU<br>leather travel case</div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="window.open('https://orrisoak.com','_blank')">Add to Cart</button>
+      <button class="btn-secondary">Free US Shipping</button>
+    </div>
+  </div>
+
+  <div class="variants-visual">
+    <img src="/mnt/user-data/uploads/makeup-brush-set-orrisoak-noir-front.png" alt="Orris & Oak Brush" style="width:320px;height:auto;object-fit:contain;filter:drop-shadow(0 30px 60px rgba(201,168,76,0.2));transition:transform 0.6s;" onmouseenter="this.style.transform='scale(1.05) translateY(-8px)'" onmouseleave="this.style.transform='scale(1) translateY(0)'">
+  </div>
+</section>
+
+<!-- GIFT SECTION -->
+<section class="gift-section">
+  <div class="gift-eye">Mother's Day · May 11</div>
+  <h2 class="gift-title">The Gift<br><em>She Actually Wants</em></h2>
+  <p class="gift-desc">Four professional brushes. One magnetic system. One luxury leather case. Gift-ready black box. No wrapping needed.</p>
+
+  <div class="gift-includes">
+    <div class="gift-item">
+      <div class="gift-item-icon">🖤</div>
+      <div class="gift-item-text">Luxury Black Box</div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-item-icon">🧲</div>
+      <div class="gift-item-text">4-in-1 Magnetic Brush</div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-item-icon">👜</div>
+      <div class="gift-item-text">PU Leather Travel Case</div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-item-icon">🚚</div>
+      <div class="gift-item-text">Free US Shipping</div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-item-icon">✓</div>
+      <div class="gift-item-text">Money-Back Guarantee</div>
+    </div>
+  </div>
+
+  <div class="gift-cta">
+    <button class="btn-primary" onclick="window.open('https://orrisoak.com','_blank')">Shop the Gift — $65</button>
+    <button class="btn-secondary">Use Code GLOW15 · 15% Off</button>
+  </div>
+</section>
+
+<!-- FOOTER MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>Your Glow Elevated</span><span>Free US Shipping</span><span>100% Money-Back Guarantee</span>
+    <span>Orris & Oak</span><span>Chicago Made</span><span>Professional Edition</span><span>Gift Ready</span>
+    <span>Your Glow Elevated</span><span>Free US Shipping</span><span>100% Money-Back Guarantee</span>
+    <span>Orris & Oak</span><span>Chicago Made</span><span>Professional Edition</span><span>Gift Ready</span>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">Orris<span>oak</span></div>
+  <div class="footer-copy">© 2025 Orris & Oak · All Rights Reserved</div>
+  <a href="https://orrisoak.com" target="_blank" class="footer-link">orrisoak.com →</a>
+</footer>
+
+<script>
+function selectColor(el) {
+  document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

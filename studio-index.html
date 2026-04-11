@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dim:rgba(201,168,76,0.1);
+  --gold-border:rgba(201,168,76,0.2);--black:#070707;--s1:#0F0F0F;
+  --s2:#161616;--s3:#1E1E1E;--s4:#252525;--cream:#F0E9DC;--muted:#786D61;
+  --green:#4CAF7D;--blue:#7B9FE8;--orange:#D4894A;--red:#D45A5A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;}
+
+/* ── PASSWORD GATE ── */
+#gate{
+  position:fixed;inset:0;background:var(--black);z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:0;
+}
+.gate-logo{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--gold);letter-spacing:6px;margin-bottom:8px;}
+.gate-logo span{font-style:italic;}
+.gate-sub{font-size:8px;letter-spacing:8px;text-transform:uppercase;color:var(--muted);margin-bottom:40px;}
+.gate-box{background:var(--s1);border:1px solid var(--gold-border);padding:40px;width:340px;text-align:center;}
+.gate-label{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:block;}
+.gate-input{width:100%;background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:14px;letter-spacing:4px;padding:14px;text-align:center;margin-bottom:14px;}
+.gate-input:focus{outline:none;border-color:var(--gold);}
+.gate-btn{width:100%;background:var(--gold);color:var(--black);border:none;font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:5px;text-transform:uppercase;padding:14px;cursor:pointer;transition:all 0.3s;}
+.gate-btn:hover{background:var(--gold-light);}
+.gate-err{font-size:9px;letter-spacing:2px;color:var(--red);margin-top:10px;display:none;}
+.gate-line{width:60px;height:1px;background:var(--gold);margin:0 auto 20px;}
+
+/* ── STUDIO LAYOUT ── */
+#studio{display:none;}
+
+/* HEADER */
+.header{background:var(--s1);border-bottom:1px solid var(--gold-border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);letter-spacing:4px;}
+.logo span{font-style:italic;}
+.header-right{display:flex;align-items:center;gap:16px;}
+.header-date{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);}
+.header-badge{font-size:7px;letter-spacing:4px;text-transform:uppercase;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:4px 12px;}
+.logout-btn{background:none;border:1px solid rgba(201,168,76,0.2);color:var(--muted);font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:5px 12px;cursor:pointer;transition:all 0.2s;}
+.logout-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* HERO */
+.hero{padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--gold-border);position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(201,168,76,0.05),transparent);}
+.hero-eye{font-size:8px;letter-spacing:8px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;position:relative;}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,60px);font-weight:300;line-height:1.05;position:relative;}
+.hero-title em{font-style:italic;color:var(--gold);}
+.hero-sub{font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:14px;line-height:2;position:relative;}
+.hero-stats{display:flex;justify-content:center;gap:48px;margin-top:32px;position:relative;}
+.hero-stat-num{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--gold);line-height:1;}
+.hero-stat-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+
+/* CONTENT */
+.content{max-width:1200px;margin:0 auto;padding:40px;}
+
+/* SECTION */
+.section-head{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.section-eye{font-size:8px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);}
+.section-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent);}
+
+/* TOOLS GRID */
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:40px;}
+.tool-card{background:var(--s1);border:1px solid var(--gold-border);padding:24px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;text-decoration:none;display:block;}
+.tool-card:hover{border-color:var(--gold);transform:translateY(-3px);}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transition:transform 0.3s;}
+.tool-card:hover::before{transform:scaleX(1);}
+.tool-icon{font-size:28px;margin-bottom:14px;display:block;}
+.tool-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cream);margin-bottom:6px;}
+.tool-desc{font-size:9px;letter-spacing:1px;color:var(--muted);line-height:2;}
+.tool-tag{position:absolute;top:16px;right:16px;font-size:6px;letter-spacing:3px;text-transform:uppercase;padding:3px 8px;border:1px solid var(--gold-border);color:var(--gold);}
+.tool-tag.new{background:rgba(76,175,125,0.1);border-color:rgba(76,175,125,0.3);color:#4CAF7D;}
+.tool-tag.live{background:rgba(201,168,76,0.1);color:var(--gold);}
+
+/* GITHUB GUIDE */
+.github-section{background:var(--s1);border:1px solid var(--gold-border);margin-bottom:40px;overflow:hidden;}
+.github-head{background:var(--s2);border-bottom:1px solid var(--gold-border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+.github-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cream);}
+.github-body{padding:24px;}
+
+.step-list{display:flex;flex-direction:column;gap:2px;}
+.step-item{display:grid;grid-template-columns:48px 1fr;background:var(--s2);overflow:hidden;border:1px solid rgba(201,168,76,0.08);}
+.step-num{background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);border-right:1px solid var(--gold-border);}
+.step-body{padding:14px 18px;}
+.step-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.step-text{font-size:10px;color:var(--muted);line-height:2;}
+.code-block{background:var(--black);border:1px solid rgba(201,168,76,0.15);padding:12px 14px;margin-top:10px;font-family:monospace;font-size:11px;color:#98C98A;line-height:1.8;overflow-x:auto;white-space:pre;}
+.copy-code{background:none;border:1px solid rgba(201,168,76,0.2);color:var(--gold);font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;cursor:pointer;margin-top:8px;transition:all 0.2s;}
+.copy-code:hover{background:var(--gold-dim);}
+
+/* FILE STRUCTURE */
+.file-tree{background:var(--black);border:1px solid rgba(201,168,76,0.15);padding:16px 20px;font-family:monospace;font-size:11px;color:var(--muted);line-height:2;}
+.file-tree .folder{color:var(--gold);}
+.file-tree .file{color:#98C98A;}
+.file-tree .comment{color:rgba(201,168,76,0.4);}
+
+/* SUBDOMAIN GUIDE */
+.subdomain-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:40px;}
+.sub-card{background:var(--s1);border:1px solid var(--gold-border);padding:20px;}
+.sub-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.sub-desc{font-size:10px;color:var(--muted);line-height:2;}
+
+/* FILE MANAGER */
+.file-manager{background:var(--s1);border:1px solid var(--gold-border);margin-bottom:40px;}
+.fm-head{background:var(--s2);border-bottom:1px solid var(--gold-border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+.fm-title{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
+.fm-body{display:grid;grid-template-columns:200px 1fr;min-height:300px;}
+.fm-sidebar{border-right:1px solid var(--gold-border);padding:16px 0;}
+.fm-folder{padding:10px 16px;cursor:pointer;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.fm-folder:hover,.fm-folder.active{background:var(--gold-dim);color:var(--gold);}
+.fm-folder-icon{font-size:12px;}
+.fm-main{padding:20px;}
+.fm-breadcrumb{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.fm-breadcrumb span{color:var(--gold);}
+.fm-files{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.fm-file{background:var(--s2);border:1px solid var(--gold-border);padding:12px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.fm-file:hover{border-color:var(--gold);}
+.fm-file-icon{font-size:22px;margin-bottom:6px;}
+.fm-file-name{font-size:8px;letter-spacing:1px;color:var(--cream);word-break:break-all;line-height:1.5;}
+.fm-empty{color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:40px;text-align:center;grid-column:1/-1;}
+
+/* COUNTDOWN */
+.countdown-bar{background:var(--s1);border:1px solid var(--gold-border);padding:20px 24px;margin-bottom:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.countdown-label{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
+.countdown-nums{display:flex;gap:20px;}
+.countdown-unit{text-align:center;}
+.countdown-num{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--gold);line-height:1;}
+.countdown-unit-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.launch-btn{background:var(--gold);color:var(--black);border:none;font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:12px 24px;cursor:pointer;transition:all 0.3s;}
+.launch-btn:hover{background:var(--gold-light);}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--gold-border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold);letter-spacing:4px;}
+.footer-logo span{font-style:italic;}
+.footer-text{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+
+/* BTN */
+.btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:10px 22px;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-gold{background:var(--gold);color:var(--black);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+.btn-outline:hover{background:var(--gold-dim);}
+
+.toast{position:fixed;bottom:20px;right:20px;z-index:9999;background:var(--s3);border:1px solid var(--gold);border-left:3px solid var(--gold);padding:10px 14px;font-size:9px;letter-spacing:1px;color:var(--cream);transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:260px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{border-color:var(--green);border-left-color:var(--green);}
+
+@media(max-width:900px){
+  .tools-grid{grid-template-columns:1fr 1fr;}
+  .subdomain-grid{grid-template-columns:1fr;}
+  .fm-body{grid-template-columns:1fr;}
+  .fm-sidebar{border-right:none;border-bottom:1px solid var(--gold-border);display:flex;flex-wrap:wrap;padding:8px;}
+  .fm-folder{padding:8px 12px;}
+  .content{padding:20px;}
+  .header{padding:0 20px;}
+  .hero{padding:40px 20px 30px;}
+  .hero-stats{gap:24px;}
+  .footer{padding:20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── PASSWORD GATE ── -->
+<div id="gate">
+  <div class="gate-logo">Orris<span>oak</span></div>
+  <div class="gate-sub">Studio · Private Access</div>
+  <div class="gate-box">
+    <span class="gate-label">Enter Studio Password</span>
+    <div class="gate-line"></div>
+    <input class="gate-input" type="password" id="gatePass" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPass()">
+    <button class="gate-btn" onclick="checkPass()">Enter Studio →</button>
+    <div class="gate-err" id="gateErr">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- ── STUDIO ── -->
+<div id="studio">
+
+<!-- HEADER -->
+<div class="header">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div class="logo">Orris<span>oak</span></div>
+    <div class="header-badge">✦ Studio</div>
+  </div>
+  <div class="header-right">
+    <div class="header-date" id="headerDate"></div>
+    <div class="header-badge" id="launchCountdown">21 days to launch</div>
+    <button class="logout-btn" onclick="logout()">Lock Studio</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eye">studio.orrisoak.com · Marketing Command Centre</div>
+  <h1 class="hero-title">Welcome Back,<br><em>Julary.</em></h1>
+  <p class="hero-sub">Your complete marketing infrastructure — all tools, all content, all in one place.</p>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num" id="h-tools">9</div>
+      <div class="hero-stat-label">Tools<br>Available</div>
+    </div>
+    <div>
+      <div class="hero-stat-num" id="h-posts">0</div>
+      <div class="hero-stat-label">Posts<br>Scheduled</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">May 1</div>
+      <div class="hero-stat-label">Launch<br>Date</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">$65</div>
+      <div class="hero-stat-label">Brush<br>Price</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- LAUNCH COUNTDOWN -->
+  <div class="countdown-bar">
+    <div>
+      <div class="countdown-label">🚀 Launch Countdown · May 1, 2026</div>
+    </div>
+    <div class="countdown-nums">
+      <div class="countdown-unit"><div class="countdown-num" id="cd-days">21</div><div class="countdown-unit-label">Days</div></div>
+      <div class="countdown-unit"><div class="countdown-num" id="cd-hours">00</div><div class="countdown-unit-label">Hours</div></div>
+      <div class="countdown-unit"><div class="countdown-num" id="cd-mins">00</div><div class="countdown-unit-label">Mins</div></div>
+      <div class="countdown-unit"><div class="countdown-num" id="cd-secs">00</div><div class="countdown-unit-label">Secs</div></div>
+    </div>
+    <button class="launch-btn" onclick="openTool('automation')">Open Automation System →</button>
+  </div>
+
+  <!-- TOOLS -->
+  <div class="section-head">
+    <div class="section-eye">✦ Your Tools</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="tools-grid">
+    <a class="tool-card" onclick="openTool('automation')">
+      <div class="tool-tag new">New</div>
+      <span class="tool-icon">🤖</span>
+      <div class="tool-name">Automation System</div>
+      <div class="tool-desc">Post scheduler, DM inbox, auto-responder, reel scheduler, full funnel dashboard</div>
+    </a>
+    <a class="tool-card" onclick="openTool('content')">
+      <div class="tool-tag live">AI Powered</div>
+      <span class="tool-icon">✨</span>
+      <div class="tool-name">Content Agent</div>
+      <div class="tool-desc">Generate captions, ad copy, reel scripts, image prompts, emails — AI suggests ideas first</div>
+    </a>
+    <a class="tool-card" onclick="openTool('meta')">
+      <div class="tool-tag live">Connected</div>
+      <span class="tool-icon">📢</span>
+      <div class="tool-name">Meta Command Center</div>
+      <div class="tool-desc">Build and publish Meta campaigns. 3 campaigns ready to activate on May 1</div>
+    </a>
+    <a class="tool-card" onclick="openTool('outreach')">
+      <span class="tool-icon">⭐</span>
+      <div class="tool-name">Influencer Outreach</div>
+      <div class="tool-desc">DM generator, pipeline tracker, follow-up automation. 5 contacts in progress</div>
+    </a>
+    <a class="tool-card" onclick="openTool('brand')">
+      <span class="tool-icon">🖤</span>
+      <div class="tool-name">Brand Page</div>
+      <div class="tool-desc">Full brand story, products, strategy, ad copy — shareable with partners and press</div>
+    </a>
+    <a class="tool-card" onclick="openTool('shopify')">
+      <span class="tool-icon">🛍️</span>
+      <div class="tool-name">Shopify Theme Preview</div>
+      <div class="tool-desc">Custom dark luxury theme preview for orrisoak.com — ready to implement</div>
+    </a>
+    <a class="tool-card" onclick="openTool('setup')">
+      <span class="tool-icon">📋</span>
+      <div class="tool-name">Setup Guide</div>
+      <div class="tool-desc">Step-by-step setup for Meta, Klaviyo, Shopify and all marketing channels</div>
+    </a>
+    <a class="tool-card" onclick="openTool('traffic')">
+      <span class="tool-icon">📈</span>
+      <div class="tool-name">Traffic Strategy</div>
+      <div class="tool-desc">Complete organic and paid traffic plan — month by month breakdown</div>
+    </a>
+    <a class="tool-card" onclick="nav('files')">
+      <div class="tool-tag new">New</div>
+      <span class="tool-icon">📁</span>
+      <div class="tool-name">Content File Manager</div>
+      <div class="tool-desc">Organised content library — content/&lt;product&gt;/images structure</div>
+    </a>
+  </div>
+
+  <!-- FILE MANAGER -->
+  <div class="section-head">
+    <div class="section-eye">✦ Content File Manager</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="file-manager" id="fileManager">
+    <div class="fm-head">
+      <span class="fm-title">📁 orrisoak-content / <span id="fm-path" style="color:var(--cream);">Select a folder</span></span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" style="font-size:7px;padding:6px 14px;" onclick="document.getElementById('fm-upload').click()">+ Upload File</button>
+        <input type="file" id="fm-upload" multiple style="display:none" onchange="fmUpload(this)">
+      </div>
+    </div>
+    <div class="fm-body">
+      <div class="fm-sidebar">
+        <div class="fm-folder active" onclick="fmOpen('magnetic-brush','images')" id="fm-brush-img">
+          <span class="fm-folder-icon">🖌️</span> Brush / Images
+        </div>
+        <div class="fm-folder" onclick="fmOpen('magnetic-brush','videos')">
+          <span class="fm-folder-icon">🎬</span> Brush / Videos
+        </div>
+        <div class="fm-folder" onclick="fmOpen('magnetic-brush','captions')">
+          <span class="fm-folder-icon">📝</span> Brush / Captions
+        </div>
+        <div class="fm-folder" onclick="fmOpen('magnetic-brush','ads')">
+          <span class="fm-folder-icon">📢</span> Brush / Ads
+        </div>
+        <div class="fm-folder" onclick="fmOpen('gold-serum','images')">
+          <span class="fm-folder-icon">✨</span> Serum / Images
+        </div>
+        <div class="fm-folder" onclick="fmOpen('gold-serum','captions')">
+          <span class="fm-folder-icon">📝</span> Serum / Captions
+        </div>
+        <div class="fm-folder" onclick="fmOpen('glow-cleanser','images')">
+          <span class="fm-folder-icon">💧</span> Cleanser / Images
+        </div>
+        <div class="fm-folder" onclick="fmOpen('glow-cleanser','captions')">
+          <span class="fm-folder-icon">📝</span> Cleanser / Captions
+        </div>
+        <div class="fm-folder" onclick="fmOpen('brand','logos')">
+          <span class="fm-folder-icon">🖤</span> Brand / Logos
+        </div>
+        <div class="fm-folder" onclick="fmOpen('campaigns','launch-may1')">
+          <span class="fm-folder-icon">🚀</span> Campaigns / May1
+        </div>
+        <div class="fm-folder" onclick="fmOpen('campaigns','mothers-day')">
+          <span class="fm-folder-icon">🎁</span> Campaigns / MothersDay
+        </div>
+        <div class="fm-folder" onclick="fmOpen('email','welcome-series')">
+          <span class="fm-folder-icon">📧</span> Email / Welcome
+        </div>
+      </div>
+      <div class="fm-main">
+        <div class="fm-breadcrumb">orrisoak-content / <span id="fm-breadcrumb">magnetic-brush / images</span></div>
+        <div class="fm-files" id="fmFiles">
+          <div class="fm-empty">Click a folder to view files<br>Upload files using the button above</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GITHUB SETUP -->
+  <div class="section-head">
+    <div class="section-eye">✦ GitHub Setup Guide</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="github-section">
+    <div class="github-head">
+      <div class="github-title">Set Up Your Content Repository</div>
+      <button class="btn btn-outline" style="font-size:7px;padding:7px 14px;" onclick="window.open('https://github.com/new','_blank')">Create GitHub Repo →</button>
+    </div>
+    <div class="github-body">
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Create Private GitHub Repository</div>
+            <div class="step-text">Go to github.com → Click "New repository" → Name it <strong>orrisoak-content</strong> → Set to <strong>Private</strong> → Click "Create repository"</div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Install Git on Your Computer</div>
+            <div class="step-text">Download Git from git-scm.com and install. Then open Terminal (Mac) or Command Prompt (Windows).</div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Create the Folder Structure</div>
+            <div class="step-text">Run these commands in your terminal:</div>
+            <div class="code-block" id="code-structure">mkdir orrisoak-content
+cd orrisoak-content
+mkdir -p content/magnetic-brush/images
+mkdir -p content/magnetic-brush/videos
+mkdir -p content/magnetic-brush/captions
+mkdir -p content/magnetic-brush/ads
+mkdir -p content/gold-serum/images
+mkdir -p content/gold-serum/captions
+mkdir -p content/gold-serum/ads
+mkdir -p content/glow-cleanser/images
+mkdir -p content/glow-cleanser/captions
+mkdir -p content/glow-cleanser/ads
+mkdir -p content/brand/images
+mkdir -p content/brand/logos
+mkdir -p campaigns/pre-launch-april
+mkdir -p campaigns/launch-may1
+mkdir -p campaigns/mothers-day
+mkdir -p email/welcome-series
+mkdir -p email/mothers-day
+mkdir -p email/abandoned-cart
+mkdir -p social/instagram
+mkdir -p social/facebook
+mkdir -p tools</div>
+            <button class="copy-code" onclick="copyCode('code-structure')">Copy Commands</button>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Add Your Tools to the Repo</div>
+            <div class="step-text">Copy all your Orrisoak HTML tools into the <strong>tools/</strong> folder. These will be version-controlled alongside your content.</div>
+            <div class="code-block">tools/
+├── automation-system.html
+├── content-agent.html
+├── meta-command-center.html
+├── outreach-agent.html
+└── studio-index.html  ← this file</div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Initialize Git and Push to GitHub</div>
+            <div class="step-text">Connect your local folder to GitHub:</div>
+            <div class="code-block" id="code-git">git init
+git add .
+git commit -m "Initial Orrisoak content structure"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/orrisoak-content.git
+git push -u origin main</div>
+            <button class="copy-code" onclick="copyCode('code-git')">Copy Commands</button>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <div class="step-title">Daily Workflow — Save Your Content</div>
+            <div class="step-text">Every time you create new content or update a file, run these 3 commands to save it to GitHub:</div>
+            <div class="code-block" id="code-daily">git add .
+git commit -m "Add April 10 magnetic brush caption"
+git push</div>
+            <button class="copy-code" onclick="copyCode('code-daily')">Copy Commands</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SUBDOMAIN SETUP -->
+  <div class="section-head">
+    <div class="section-eye">✦ Subdomain Setup · studio.orrisoak.com</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="subdomain-grid">
+    <div class="sub-card">
+      <div class="sub-title">Step 1 · Cloudflare DNS</div>
+      <div class="sub-desc">Log in to Cloudflare → Select orrisoak.com → DNS → Add Record:</div>
+      <div class="code-block" id="code-dns" style="margin-top:10px;">Type:  CNAME
+Name:  studio
+Target: orrisoak.com
+Proxy: DNS Only (grey cloud ☁️)
+TTL:   Auto</div>
+      <button class="copy-code" onclick="copyCode('code-dns')">Copy</button>
+    </div>
+    <div class="sub-card">
+      <div class="sub-title">Step 2 · Hostinger File Upload</div>
+      <div class="sub-desc">Log in to Hostinger → File Manager → public_html → Create folder "studio" → Upload all your HTML tool files into it.</div>
+      <div class="code-block" style="margin-top:10px;">public_html/
+└── studio/
+    ├── index.html ← this file
+    ├── automation.html
+    ├── content-agent.html
+    ├── meta-command-center.html
+    └── outreach-agent.html</div>
+    </div>
+    <div class="sub-card">
+      <div class="sub-title">Step 3 · Cloudflare Access (Free Password)</div>
+      <div class="sub-desc">Cloudflare → Zero Trust → Access → Applications → Add Application → Self-hosted → Domain: studio.orrisoak.com → Add your email as allowed user → Save. Now only you can access it.</div>
+    </div>
+    <div class="sub-card">
+      <div class="sub-title">Step 4 · Test Your Studio</div>
+      <div class="sub-desc">Wait 5-10 minutes for DNS to propagate → Visit studio.orrisoak.com → You should see this password screen → Enter your password → Your studio loads.</div>
+      <div style="margin-top:14px;">
+        <button class="btn btn-gold" onclick="window.open('https://studio.orrisoak.com','_blank')">Test studio.orrisoak.com →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSWORD CHANGE -->
+  <div class="section-head">
+    <div class="section-eye">✦ Studio Password</div>
+    <div class="section-line"></div>
+  </div>
+  <div style="background:var(--s1);border:1px solid var(--gold-border);padding:24px;margin-bottom:40px;">
+    <div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Change Studio Password</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
+      <div>
+        <label style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;">New Password</label>
+        <input type="password" id="newPass1" placeholder="Enter new password" style="width:100%;background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;padding:9px 12px;">
+      </div>
+      <div>
+        <label style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;">Confirm Password</label>
+        <input type="password" id="newPass2" placeholder="Confirm password" style="width:100%;background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;padding:9px 12px;">
+      </div>
+      <button class="btn btn-gold" onclick="changePassword()">Update Password</button>
+    </div>
+    <div style="font-size:9px;color:var(--muted);margin-top:10px;line-height:2;">Current password is saved in your browser. Share access by giving someone the URL + password. Never share your API keys.</div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-logo">Orris<span>oak</span> Studio</div>
+  <div class="footer-text">studio.orrisoak.com · Private</div>
+  <div class="footer-text" id="footerTime"></div>
+</div>
+
+</div><!-- /studio -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DEFAULT PASSWORD ──
+const DEFAULT_PASS = 'orrisoak2025';
+
+// ── AUTH ──
+function checkPass(){
+  const p = document.getElementById('gatePass').value;
+  const saved = localStorage.getItem('oo_studio_pass') || DEFAULT_PASS;
+  if(p === saved){
+    localStorage.setItem('oo_studio_auth', Date.now());
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('studio').style.display = 'block';
+    initStudio();
+  } else {
+    document.getElementById('gateErr').style.display = 'block';
+    document.getElementById('gatePass').value = '';
+  }
+}
+function logout(){
+  localStorage.removeItem('oo_studio_auth');
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('studio').style.display = 'none';
+  document.getElementById('gatePass').value = '';
+  document.getElementById('gateErr').style.display = 'none';
+}
+function changePassword(){
+  const p1 = document.getElementById('newPass1').value;
+  const p2 = document.getElementById('newPass2').value;
+  if(!p1){ toast('Enter a password'); return; }
+  if(p1 !== p2){ toast('Passwords do not match', 'red'); return; }
+  if(p1.length < 6){ toast('Password must be at least 6 characters', 'red'); return; }
+  localStorage.setItem('oo_studio_pass', p1);
+  document.getElementById('newPass1').value = '';
+  document.getElementById('newPass2').value = '';
+  toast('Password updated ✓', 'green');
+}
+// Auto-login if session fresh (24 hours)
+window.onload = () => {
+  const auth = localStorage.getItem('oo_studio_auth');
+  if(auth && Date.now() - parseInt(auth) < 86400000){
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('studio').style.display = 'block';
+    initStudio();
+  }
+};
+document.getElementById('gatePass').addEventListener('keydown', e => {
+  if(e.key === 'Enter') checkPass();
+});
+
+// ── INIT ──
+function initStudio(){
+  updateClock();
+  updateCountdown();
+  setInterval(updateClock, 1000);
+  setInterval(updateCountdown, 1000);
+  loadScheduledCount();
+  fmOpen('magnetic-brush', 'images');
+}
+
+// ── CLOCK ──
+function updateClock(){
+  const now = new Date();
+  document.getElementById('headerDate').textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  document.getElementById('footerTime').textContent = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── COUNTDOWN ──
+function updateCountdown(){
+  const launch = new Date('2026-05-01T09:00:00');
+  const now = new Date();
+  const diff = launch - now;
+  if(diff <= 0){
+    document.getElementById('cd-days').textContent = '🎉';
+    document.getElementById('launchCountdown').textContent = 'LAUNCH DAY!';
+    return;
+  }
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-days').textContent = days;
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent = String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent = String(secs).padStart(2,'0');
+  document.getElementById('launchCountdown').textContent = days + ' days to launch';
+}
+
+// ── SCHEDULED COUNT ──
+function loadScheduledCount(){
+  const posts = JSON.parse(localStorage.getItem('oo_scheduled_posts') || '[]');
+  document.getElementById('h-posts').textContent = posts.length;
+}
+
+// ── TOOL NAVIGATION ──
+const toolMap = {
+  automation: 'orrisoak-automation-system.html',
+  content: 'orrisoak-content-agent.html',
+  meta: 'orrisoak-meta-command-center.html',
+  outreach: 'orrisoak-outreach-agent.html',
+  brand: 'orrisoak-brand-page.html',
+  shopify: 'orrisoak-shopify-theme-preview.html',
+  setup: 'orrisoak-setup-guide.html',
+  traffic: 'orrisoak-traffic-strategy.html',
+};
+function openTool(name){
+  if(toolMap[name]) window.open(toolMap[name], '_blank');
+}
+function nav(section){
+  if(section === 'files'){
+    document.getElementById('fileManager').scrollIntoView({behavior:'smooth'});
+  }
+}
+
+// ── FILE MANAGER ──
+let fmStorage = JSON.parse(localStorage.getItem('oo_fm_files') || '{}');
+
+function fmOpen(product, folder){
+  document.querySelectorAll('.fm-folder').forEach(f => f.classList.remove('active'));
+  event && event.target.closest('.fm-folder') && event.target.closest('.fm-folder').classList.add('active');
+  document.getElementById('fm-path').textContent = `${product} / ${folder}`;
+  document.getElementById('fm-breadcrumb').textContent = `${product} / ${folder}`;
+  const key = `${product}/${folder}`;
+  const files = fmStorage[key] || [];
+  const grid = document.getElementById('fmFiles');
+  if(!files.length){
+    grid.innerHTML = '<div class="fm-empty">No files yet — upload files using the button above</div>';
+    return;
+  }
+  grid.innerHTML = files.map((f,i) => `
+    <div class="fm-file">
+      <div class="fm-file-icon">${fmIcon(f.type)}</div>
+      <div class="fm-file-name">${f.name}</div>
+      <div style="font-size:7px;color:var(--muted);margin-top:4px;">${f.size}</div>
+      <button onclick="fmDelete('${key}',${i})" style="background:none;border:none;color:var(--red);font-size:9px;cursor:pointer;margin-top:4px;">Remove</button>
+    </div>`).join('');
+  window._currentFmKey = key;
+}
+function fmIcon(type){
+  if(type.startsWith('image')) return '🖼️';
+  if(type.startsWith('video')) return '🎬';
+  if(type.includes('text') || type.includes('html')) return '📝';
+  return '📄';
+}
+function fmUpload(input){
+  const key = window._currentFmKey || 'magnetic-brush/images';
+  if(!fmStorage[key]) fmStorage[key] = [];
+  Array.from(input.files).forEach(f => {
+    fmStorage[key].push({
+      name: f.name,
+      type: f.type,
+      size: (f.size/1024).toFixed(0) + ' KB',
+      date: new Date().toLocaleDateString()
+    });
+  });
+  localStorage.setItem('oo_fm_files', JSON.stringify(fmStorage));
+  // Re-open current folder
+  const [product, folder] = key.split('/');
+  fmOpen(product, folder);
+  toast(`${input.files.length} file(s) added ✓`, 'green');
+  input.value = '';
+}
+function fmDelete(key, idx){
+  fmStorage[key].splice(idx, 1);
+  localStorage.setItem('oo_fm_files', JSON.stringify(fmStorage));
+  const [product, folder] = key.split('/');
+  fmOpen(product, folder);
+  toast('File removed', 'red');
+}
+
+// ── COPY CODE ──
+function copyCode(id){
+  navigator.clipboard.writeText(document.getElementById(id).innerText)
+    .then(() => toast('Copied ✓', 'green'))
+    .catch(() => toast('Copy failed'));
+}
+
+// ── TOAST ──
+function toast(msg, type='gold'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type==='green'?' green':'');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

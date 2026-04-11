@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak · Influencer Outreach Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --gold-dim: rgba(201,168,76,0.1);
+    --gold-border: rgba(201,168,76,0.22);
+    --black: #080808;
+    --s1: #101010;
+    --s2: #161616;
+    --s3: #1E1E1E;
+    --cream: #F2EBE0;
+    --muted: #796E63;
+    --green: #4CAF7D;
+    --green-dim: rgba(76,175,125,0.1);
+    --green-border: rgba(76,175,125,0.3);
+    --blue: #7B9FE8;
+    --blue-dim: rgba(123,159,232,0.1);
+    --orange: #D4894A;
+    --red: #D45A5A;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--black); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-weight:300; }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 56px 64px 44px;
+    background: var(--s1);
+    border-bottom: 1px solid var(--gold-border);
+    position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 40%, var(--gold-light) 60%, transparent 100%);
+  }
+  .header::after {
+    content: '';
+    position: absolute; inset:0;
+    background: radial-gradient(ellipse 50% 120% at 90% 50%, rgba(201,168,76,0.055), transparent);
+    pointer-events: none;
+  }
+  .header-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index:1; }
+  .eyebrow { font-size:8px; letter-spacing:8px; text-transform:uppercase; color:var(--gold); margin-bottom:16px; }
+  .header h1 {
+    font-family:'Cormorant Garamond',serif;
+    font-size: clamp(38px,5vw,66px); font-weight:300; line-height:1.0;
+  }
+  .header h1 em { font-style:italic; color:var(--gold); }
+  .header-sub {
+    font-size:12px; letter-spacing:1.5px; color:var(--muted);
+    margin-top:14px; max-width:600px; line-height:2.1;
+  }
+  .header-stats {
+    display:flex; gap:40px; margin-top:32px; flex-wrap:wrap;
+  }
+  .hstat { border-left: 2px solid var(--gold-border); padding-left:16px; }
+  .hstat-num { font-family:'Cormorant Garamond',serif; font-size:28px; color:var(--gold); line-height:1; }
+  .hstat-label { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+
+  /* ── NAV TABS ── */
+  .tabs {
+    background: var(--s1);
+    border-bottom: 1px solid var(--gold-border);
+    display:flex; padding:0 64px;
+    position:sticky; top:0; z-index:50;
+  }
+  .tab {
+    font-size:8px; letter-spacing:4px; text-transform:uppercase;
+    padding:18px 24px; cursor:pointer; color:var(--muted);
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+    background:none; border-top:none; border-left:none; border-right:none;
+    font-family:'Josefin Sans',sans-serif; transition:all 0.25s;
+  }
+  .tab:hover { color:var(--gold-light); }
+  .tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+
+  /* ── BODY ── */
+  .body { max-width:1200px; margin:0 auto; padding:52px 64px 80px; }
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  /* ── SECTION ── */
+  .sec-head { margin-bottom:28px; }
+  .sec-eye { font-size:8px; letter-spacing:7px; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+  .sec-title { font-family:'Cormorant Garamond',serif; font-size:clamp(28px,3vw,42px); font-weight:300; line-height:1.1; }
+  .sec-title em { font-style:italic; color:var(--gold); }
+  .sec-desc { font-size:11px; letter-spacing:1px; color:var(--muted); margin-top:10px; line-height:2.1; max-width:680px; }
+
+  /* ── INFLUENCER CARDS ── */
+  .inf-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; }
+  .inf-card {
+    background: var(--s1);
+    border: 1px solid var(--gold-border);
+    padding: 28px 24px 24px;
+    position: relative; overflow:hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: default;
+  }
+  .inf-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+  .inf-card.top-pick { border-color: var(--gold); background: linear-gradient(145deg, rgba(201,168,76,0.06), var(--s1)); }
+
+  .inf-pick-badge {
+    position:absolute; top:-1px; right:20px;
+    background:var(--gold); color:var(--black);
+    font-size:7px; letter-spacing:3px; text-transform:uppercase;
+    padding:4px 12px;
+  }
+
+  .inf-handle {
+    font-family:'Cormorant Garamond',serif;
+    font-size:20px; color:var(--cream); margin-bottom:4px;
+  }
+  .inf-handle a { color:inherit; text-decoration:none; }
+  .inf-handle a:hover { color:var(--gold); }
+  .inf-platform {
+    font-size:8px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--gold); margin-bottom:14px; opacity:0.8;
+  }
+  .inf-meta { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .inf-chip {
+    font-size:8px; letter-spacing:2px; text-transform:uppercase;
+    padding:4px 10px; border:1px solid var(--gold-border); color:var(--gold-light);
+  }
+  .inf-chip.green { border-color:var(--green-border); color:var(--green); background:var(--green-dim); }
+  .inf-chip.blue { border-color:rgba(123,159,232,0.3); color:var(--blue); background:var(--blue-dim); }
+
+  .inf-desc { font-size:10px; letter-spacing:0.5px; color:var(--muted); line-height:1.9; margin-bottom:16px; }
+
+  .inf-why {
+    background:var(--gold-dim); border-left:2px solid var(--gold);
+    padding:10px 14px; font-size:10px; color:var(--cream);
+    letter-spacing:0.5px; line-height:1.9;
+  }
+  .inf-why-label { font-size:7px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:4px; }
+
+  .inf-action {
+    margin-top:16px; display:flex; gap:8px; align-items:center;
+    cursor:pointer;
+  }
+  .inf-btn {
+    font-size:8px; letter-spacing:3px; text-transform:uppercase;
+    background:none; border:1px solid var(--gold-border);
+    color:var(--gold); padding:8px 16px; cursor:pointer;
+    font-family:'Josefin Sans',sans-serif;
+    transition:all 0.2s;
+  }
+  .inf-btn:hover { background:var(--gold-dim); border-color:var(--gold); }
+  .inf-btn.primary { background:var(--gold); color:var(--black); border-color:var(--gold); }
+  .inf-btn.primary:hover { background:var(--gold-light); }
+
+  /* STATUS */
+  .status-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .dot-todo { background:var(--muted); }
+  .dot-sent { background:var(--gold); }
+  .dot-yes { background:var(--green); }
+  .dot-no { background:var(--red); }
+
+  /* ── HOW TO FIND ── */
+  .find-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-top:8px; }
+  .find-card {
+    background:var(--s1); padding:26px 22px;
+    border-top:2px solid transparent; border:1px solid var(--gold-border);
+    transition:border-color 0.3s;
+  }
+  .find-card:hover { border-color:var(--gold); }
+  .find-step { font-family:'Cormorant Garamond',serif; font-size:36px; color:rgba(201,168,76,0.15); line-height:1; margin-bottom:10px; }
+  .find-title { font-family:'Cormorant Garamond',serif; font-size:18px; color:var(--cream); margin-bottom:8px; }
+  .find-desc { font-size:10px; letter-spacing:0.5px; color:var(--muted); line-height:1.9; }
+  .find-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+  .find-tag {
+    font-size:8px; letter-spacing:1px; color:var(--gold-light);
+    background:var(--gold-dim); border:1px solid var(--gold-border);
+    padding:3px 10px;
+  }
+
+  /* ── DM TEMPLATES ── */
+  .dm-grid { display:flex; flex-direction:column; gap:20px; }
+  .dm-card {
+    background:var(--s1); border:1px solid var(--gold-border);
+    overflow:hidden; transition:border-color 0.3s;
+  }
+  .dm-card:hover { border-color:var(--gold); }
+  .dm-header {
+    padding:18px 24px; background:var(--s2);
+    border-bottom:1px solid var(--gold-border);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .dm-type { font-size:8px; letter-spacing:5px; text-transform:uppercase; color:var(--gold); }
+  .dm-use { font-size:9px; letter-spacing:2px; color:var(--muted); }
+  .dm-body { padding:24px; }
+  .dm-text {
+    font-size:12px; letter-spacing:0.5px; color:var(--cream);
+    line-height:2.3; white-space:pre-line;
+    border-left:2px solid var(--gold-border); padding-left:18px;
+  }
+  .dm-text .highlight { color:var(--gold); }
+  .dm-footer {
+    padding:14px 24px; background:var(--s2);
+    border-top:1px solid var(--gold-border);
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:10px;
+  }
+  .dm-tip { font-size:9px; letter-spacing:1px; color:var(--muted); line-height:1.8; max-width:500px; }
+  .dm-copy-btn {
+    font-size:8px; letter-spacing:3px; text-transform:uppercase;
+    background:var(--gold); color:var(--black);
+    border:none; padding:9px 20px; cursor:pointer;
+    font-family:'Josefin Sans',sans-serif; transition:all 0.2s;
+    flex-shrink:0;
+  }
+  .dm-copy-btn:hover { background:var(--gold-light); }
+  .dm-copy-btn.copied { background:var(--green); color:white; }
+
+  /* ── TRACKER ── */
+  .tracker-head {
+    display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr;
+    gap:2px; margin-bottom:2px;
+  }
+  .th {
+    background:var(--s2); padding:10px 16px;
+    font-size:7px; letter-spacing:4px; text-transform:uppercase;
+    color:var(--gold);
+  }
+  .tracker-rows { display:flex; flex-direction:column; gap:2px; }
+  .tracker-row {
+    display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr;
+    gap:2px;
+  }
+  .td {
+    background:var(--s1); padding:14px 16px;
+    font-size:11px; letter-spacing:0.5px; color:var(--cream);
+    display:flex; align-items:center; gap:8px;
+  }
+  .td.muted { color:var(--muted); font-size:10px; }
+  .status-select {
+    background:var(--s3); border:1px solid var(--gold-border);
+    color:var(--cream); font-family:'Josefin Sans',sans-serif;
+    font-size:9px; letter-spacing:2px; padding:4px 8px;
+    cursor:pointer; width:100%;
+    appearance: none; -webkit-appearance: none;
+  }
+  .status-select:focus { outline:none; border-color:var(--gold); }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background:var(--gold-dim); border:1px solid var(--gold-border);
+    border-left:3px solid var(--gold);
+    padding:18px 22px; margin-bottom:32px;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .info-icon { font-size:20px; flex-shrink:0; margin-top:1px; }
+  .info-text { font-size:11px; letter-spacing:0.5px; color:var(--cream); line-height:2; }
+  .info-text strong { color:var(--gold); }
+
+  /* ── CHECKLIST ── */
+  .checklist { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+  .check-item {
+    display:flex; gap:14px; align-items:flex-start;
+    background:var(--s1); border:1px solid var(--gold-border);
+    padding:14px 18px;
+  }
+  .check-box {
+    width:18px; height:18px; border:1px solid var(--gold-border);
+    flex-shrink:0; margin-top:1px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; color:var(--gold); transition:all 0.2s;
+    background:var(--s2);
+  }
+  .check-box.checked { background:var(--gold); color:var(--black); }
+  .check-label { font-size:11px; letter-spacing:0.5px; line-height:1.9; }
+  .check-label.checked { color:var(--muted); text-decoration:line-through; }
+
+  @media(max-width:900px){
+    .body,.header,.tabs{ padding-left:20px; padding-right:20px; }
+    .inf-grid,.find-grid{ grid-template-columns:1fr; }
+    .tracker-head,.tracker-row{ grid-template-columns:1fr 1fr; }
+    .th:nth-child(n+4),.td:nth-child(n+4){ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="eyebrow">Orris & Oak · Influencer Outreach Kit · 2025</div>
+    <h1>Find, Contact &<br><em>Win Influencers</em></h1>
+    <p class="header-sub">Your complete toolkit: 12 hand-picked influencer targets, proven DM templates, step-by-step finding guide, and a live tracker — all for the Orrisoak gifting campaign.</p>
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-num">12</div>
+        <div class="hstat-label">Target Profiles</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">3</div>
+        <div class="hstat-label">DM Templates</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">$0</div>
+        <div class="hstat-label">Cost (gifting only)</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num">~72h</div>
+        <div class="hstat-label">Avg Reply Time</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('targets',this)">Target List</button>
+  <button class="tab" onclick="showTab('find',this)">How to Find More</button>
+  <button class="tab" onclick="showTab('templates',this)">DM Templates</button>
+  <button class="tab" onclick="showTab('tracker',this)">Outreach Tracker</button>
+  <button class="tab" onclick="showTab('checklist',this)">Launch Checklist</button>
+</div>
+
+<div class="body">
+
+  <!-- ═══════════════════════════════════════
+       TAB 1: TARGET LIST
+  ════════════════════════════════════════ -->
+  <div class="panel active" id="tab-targets">
+    <div class="sec-head">
+      <div class="sec-eye">Curated Targets · Start Here</div>
+      <h2 class="sec-title">12 Influencers<br><em>Perfect for Orrisoak</em></h2>
+      <p class="sec-desc">Hand-picked micro and nano influencers whose audience, content, and niche align perfectly with Orrisoak's luxury skincare and beauty positioning. Contact the "Top Pick" ones first.</p>
+    </div>
+
+    <div class="inf-grid">
+
+      <!-- 1 -->
+      <div class="inf-card top-pick">
+        <div class="inf-pick-badge">Top Pick</div>
+        <div class="inf-handle">@sincerelymissash</div>
+        <div class="inf-platform">Instagram · Toronto 🇨🇦</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">16.3K Followers</span>
+          <span class="inf-chip">Micro</span>
+          <span class="inf-chip blue">Skincare + Anti-Aging</span>
+        </div>
+        <p class="inf-desc">Posts skincare, makeup and anti-aging tips. Toronto-based, highly engaged community. Has "Collabs 💌" in bio — actively looking for brand partnerships.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          Her audience is exactly the 28–45 woman who buys luxury skincare. Anti-aging is her main niche — a direct match for the Gold Serum.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@sincerelymissash')">Copy Handle</button>
+          <button class="inf-btn" onclick="showTab('templates',document.querySelector('[onclick*=templates]'))">Use Template →</button>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="inf-card top-pick">
+        <div class="inf-pick-badge">Top Pick</div>
+        <div class="inf-handle">@erinnicoletv</div>
+        <div class="inf-platform">Instagram · Miami, FL 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">39.4K Followers</span>
+          <span class="inf-chip">Micro</span>
+          <span class="inf-chip blue">Curated Luxury Beauty</span>
+        </div>
+        <p class="inf-desc">Posts curated luxury beauty reviews — her bio literally says "Curated Luxury Beauty Reviews." Miami-based, highly aspirational content. Business email in bio.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          This is your dream match. Her whole brand is luxury beauty reviews. Orrisoak's gold + truffle positioning fits her aesthetic perfectly.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@erinnicoletv')">Copy Handle</button>
+          <button class="inf-btn" onclick="showTab('templates',document.querySelector('[onclick*=templates]'))">Use Template →</button>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="inf-card top-pick">
+        <div class="inf-pick-badge">Top Pick</div>
+        <div class="inf-handle">@itstheskinyourein</div>
+        <div class="inf-platform">Instagram · US 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">39.4K Followers</span>
+          <span class="inf-chip">Micro</span>
+          <span class="inf-chip blue">Skincare Made Fun</span>
+        </div>
+        <p class="inf-desc">"YOUR skin, YOUR rules" — makes skincare and makeup easy and fun. Very engaged, relatable community. Business email in bio for PR/collabs.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          Her fun, educational tone will demystify gold skincare for her audience and drive real curiosity. Great for the cleanser and serum.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@itstheskinyourein')">Copy Handle</button>
+          <button class="inf-btn" onclick="showTab('templates',document.querySelector('[onclick*=templates]'))">Use Template →</button>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="inf-card">
+        <div class="inf-handle">@beautypassionista</div>
+        <div class="inf-platform">Instagram · US 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">21.1K Followers</span>
+          <span class="inf-chip">Micro</span>
+          <span class="inf-chip blue">Midlife Beauty + Wellness</span>
+        </div>
+        <p class="inf-desc">Strength, style & longevity for modern midlife women. Focuses on menopause, confidence, and elegance. Business email in bio. Very niche, very loyal audience.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          Her audience of 40–55 women are the highest-value buyers of anti-aging skincare. Gold Serum would resonate deeply.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@beautypassionista')">Copy Handle</button>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="inf-card">
+        <div class="inf-handle">@my.skinology</div>
+        <div class="inf-platform">Instagram · US 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">19.1K Followers</span>
+          <span class="inf-chip">Micro</span>
+          <span class="inf-chip blue">Skin + Beauty + Lifestyle</span>
+        </div>
+        <p class="inf-desc">Skin, beauty, and lifestyle content. Email in bio for collabs. Warm, faith-inspired tone that builds high community trust. Consistent engagement.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          Authentic voice + loyal community = strong product trust transfer. Great for the complete ritual gifting package.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@my.skinology')">Copy Handle</button>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="inf-card">
+        <div class="inf-handle">@emmskincare</div>
+        <div class="inf-platform">Instagram · NYC 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">14.9K Followers</span>
+          <span class="inf-chip">Micro</span>
+          <span class="inf-chip blue">Dedicated Skincare</span>
+        </div>
+        <p class="inf-desc">NYC-based, 100% focused on skincare content. PR/Collab email in bio. Dedicated skincare audience who actively seek product recommendations.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          Pure skincare audience with high purchase intent. NYC luxury market — perfect fit for premium price point.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@emmskincare')">Copy Handle</button>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="inf-card">
+        <div class="inf-handle">@intheglamroom</div>
+        <div class="inf-platform">Instagram · Chicago, IL 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">12.1K Followers</span>
+          <span class="inf-chip">Micro</span>
+          <span class="inf-chip blue">Licensed Skincare Consultant</span>
+        </div>
+        <p class="inf-desc">Chicago-based licensed skincare consultant and product developer. UGC creator. Same market as Orrisoak (Westmont, IL). PR email in bio.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          LOCAL! Same Chicago/Illinois market. Her professional skincare background adds major credibility to any Orrisoak review. Priority contact.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@intheglamroom')">Copy Handle</button>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="inf-card">
+        <div class="inf-handle">@viancey_peraza</div>
+        <div class="inf-platform">Instagram · NYC 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">38.7K Followers</span>
+          <span class="inf-chip">Micro</span>
+          <span class="inf-chip blue">Skincare + Fashion + Lifestyle</span>
+        </div>
+        <p class="inf-desc">Latina lifestyle creator covering skincare, beauty, fashion, and family content. Strong engagement. Business email on her website for PR contacts.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          Diverse audience reach. Lifestyle angle lets her position Orrisoak as part of the aspirational daily ritual — not just a product.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@viancey_peraza')">Copy Handle</button>
+        </div>
+      </div>
+
+      <!-- 9 -->
+      <div class="inf-card">
+        <div class="inf-handle">@talkintoya247</div>
+        <div class="inf-platform">Instagram · New York, USA 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">15.3K Followers</span>
+          <span class="inf-chip">Micro</span>
+          <span class="inf-chip blue">Tutorials + Honest Reviews</span>
+        </div>
+        <p class="inf-desc">Beauty tutorials, honest product reviews, and GRWM content. Openly seeking PR/collabs via email. Known for direct, authentic opinions her audience trusts.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          Her "honest review" format is gold for social proof. A positive review from her carries high credibility — great for conversion.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@talkintoya247')">Copy Handle</button>
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="inf-card">
+        <div class="inf-handle">@mego</div>
+        <div class="inf-platform">Instagram · Houston, TX 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">71.2K Followers</span>
+          <span class="inf-chip">Micro/Mid</span>
+          <span class="inf-chip blue">Beauty + Wellness + Travel</span>
+        </div>
+        <p class="inf-desc">"Helping you look & feel good" — unfiltered, attainable beauty and wellness. Large engaged audience. Business contact via meg-o.com. Strong travel/lifestyle aesthetic.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          Bigger reach for brand awareness push. Wellness + beauty angle positions the Gold Serum as self-care, not just anti-aging.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@mego')">Copy Handle</button>
+        </div>
+      </div>
+
+      <!-- 11 -->
+      <div class="inf-card">
+        <div class="inf-handle">@sheena__cole</div>
+        <div class="inf-platform">Instagram · US 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">73.8K Followers</span>
+          <span class="inf-chip">Micro/Mid</span>
+          <span class="inf-chip blue">Ageless Style · 61+</span>
+        </div>
+        <p class="inf-desc">"Ageless style, effortless confidence." 61 years old and redefining age through fashion, beauty, and lifestyle. Business email in bio. Highly aspirational.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          She IS the Orrisoak customer. Her audience of 50–65 women has high disposable income and strong purchase intent for premium anti-aging.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@sheena__cole')">Copy Handle</button>
+        </div>
+      </div>
+
+      <!-- 12 -->
+      <div class="inf-card">
+        <div class="inf-handle">@sohinichanda_15</div>
+        <div class="inf-platform">Instagram · US 🇺🇸</div>
+        <div class="inf-meta">
+          <span class="inf-chip green">71.3K Followers</span>
+          <span class="inf-chip">Micro/Mid</span>
+          <span class="inf-chip blue">Makeup + Skincare + Fashion</span>
+        </div>
+        <p class="inf-desc">Covers makeup, skincare, fashion, hacks, tutorials, and hauls. Very high activity, DM or email for PR collabs. Large reach for an awareness campaign.</p>
+        <div class="inf-why">
+          <div class="inf-why-label">Why Orrisoak</div>
+          Great for the 4-in-1 Magnetic Brush — her tutorial-focused audience loves makeup tools. Wide reach amplifies brand name recognition fast.
+        </div>
+        <div class="inf-action">
+          <button class="inf-btn primary" onclick="copyHandle('@sohinichanda_15')">Copy Handle</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       TAB 2: HOW TO FIND MORE
+  ════════════════════════════════════════ -->
+  <div class="panel" id="tab-find">
+    <div class="sec-head">
+      <div class="sec-eye">Finding Influencers · The System</div>
+      <h2 class="sec-title">How to Find<br><em>100 More Yourself</em></h2>
+      <p class="sec-desc">Once you've contacted the 12 targets above, use these methods to continuously find new influencers. You should always have 5–10 new people in your pipeline every week.</p>
+    </div>
+
+    <div class="info-box">
+      <div class="info-icon">🎯</div>
+      <div class="info-text">
+        <strong>The golden rule:</strong> Only contact influencers who post content similar to what Orrisoak is about — luxury skincare, anti-aging, makeup tutorials, beauty routines, or glow/radiance focused content. A beauty influencer who posts about budget drugstore products is NOT a good match for Orrisoak's premium positioning.
+      </div>
+    </div>
+
+    <div class="find-grid">
+      <div class="find-card">
+        <div class="find-step">01</div>
+        <div class="find-title">Hashtag Hunting on Instagram</div>
+        <p class="find-desc">Search these hashtags on Instagram. Look at top posts and recent posts. Find accounts with 5K–80K followers posting beauty content. Check their engagement — comments and saves matter more than likes.</p>
+        <div class="find-tags">
+          <span class="find-tag">#LuxurySkincare</span>
+          <span class="find-tag">#AntiAgingSkincare</span>
+          <span class="find-tag">#SkincareRoutine</span>
+          <span class="find-tag">#GlowingSkin</span>
+          <span class="find-tag">#24KSkincare</span>
+          <span class="find-tag">#SkincareObsessed</span>
+          <span class="find-tag">#MakeupTutorial</span>
+          <span class="find-tag">#BeautyOver40</span>
+        </div>
+      </div>
+
+      <div class="find-card">
+        <div class="find-step">02</div>
+        <div class="find-title">Competitor Research</div>
+        <p class="find-desc">Go to Instagram and search luxury skincare brands similar to Orrisoak — brands like Tatcha, Perricone MD, or Sunday Riley. Look at who is tagging them or posting reviews. Those influencers are ALREADY interested in your category and will be easy to convert.</p>
+        <div class="find-tags">
+          <span class="find-tag">Search: @tatcha</span>
+          <span class="find-tag">Search: @sunday.riley</span>
+          <span class="find-tag">Search: @drperricone</span>
+          <span class="find-tag">Check Tagged Photos</span>
+        </div>
+      </div>
+
+      <div class="find-card">
+        <div class="find-step">03</div>
+        <div class="find-title">Free Tools to Speed It Up</div>
+        <p class="find-desc">Use free versions of these tools to find influencers by niche, follower count, and location. Filter for engagement rate above 3%. Export a list and start outreach.</p>
+        <div class="find-tags">
+          <span class="find-tag">modash.io (free trial)</span>
+          <span class="find-tag">heepsy.com (free)</span>
+          <span class="find-tag">Instagram Search</span>
+          <span class="find-tag">TikTok Search</span>
+          <span class="find-tag">thesocialcat.com</span>
+        </div>
+      </div>
+
+      <div class="find-card">
+        <div class="find-step">04</div>
+        <div class="find-title">What to Check Before Contacting</div>
+        <p class="find-desc">Before DMing anyone, spend 60 seconds checking these 4 things. If they pass all 4, add them to your outreach list immediately.</p>
+        <div class="find-tags">
+          <span class="find-tag">✓ Collab/PR email in bio</span>
+          <span class="find-tag">✓ Last post under 2 weeks ago</span>
+          <span class="find-tag">✓ Real comments (not bots)</span>
+          <span class="find-tag">✓ Beauty niche content</span>
+        </div>
+      </div>
+
+      <div class="find-card">
+        <div class="find-step">05</div>
+        <div class="find-title">TikTok Search Strategy</div>
+        <p class="find-desc">TikTok has massive organic beauty creators. Search these terms in TikTok's search bar. Filter by "Creators." Look for accounts under 100K with 10K–100K likes per video — those are the sweet spot for organic engagement.</p>
+        <div class="find-tags">
+          <span class="find-tag">"luxury skincare routine"</span>
+          <span class="find-tag">"anti aging serum review"</span>
+          <span class="find-tag">"24k gold skincare"</span>
+          <span class="find-tag">"skincare over 40"</span>
+          <span class="find-tag">"magnetic makeup brush"</span>
+        </div>
+      </div>
+
+      <div class="find-card">
+        <div class="find-step">06</div>
+        <div class="find-title">The Referral Play</div>
+        <p class="find-desc">After a successful gifting collab, ask your influencer: "Do you know any other beauty creators who might love Orrisoak?" A warm introduction from a fellow creator has a 3–4× higher acceptance rate than a cold DM.</p>
+        <div class="find-tags">
+          <span class="find-tag">Ask after first post</span>
+          <span class="find-tag">Offer referral gift</span>
+          <span class="find-tag">Build a network</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       TAB 3: DM TEMPLATES
+  ════════════════════════════════════════ -->
+  <div class="panel" id="tab-templates">
+    <div class="sec-head">
+      <div class="sec-eye">Outreach Messages · Copy & Send</div>
+      <h2 class="sec-title">3 Templates.<br><em>Proven to Get Replies.</em></h2>
+      <p class="sec-desc">These messages are short, personal, and non-pushy — exactly how luxury brands should reach out. Never copy-paste without personalizing the [BRACKET] parts. Always mention something specific about their content in the first line.</p>
+    </div>
+
+    <div class="info-box">
+      <div class="info-icon">💡</div>
+      <div class="info-text">
+        <strong>The #1 rule:</strong> Your first line must prove you actually looked at their profile. Mention their most recent post, a specific video, or something unique about their bio. Generic openers get ignored. Personalized openers get replies. Spend 30 seconds per influencer on this — it's worth it.
+      </div>
+    </div>
+
+    <div class="dm-grid">
+
+      <!-- Template 1 -->
+      <div class="dm-card">
+        <div class="dm-header">
+          <span class="dm-type">Template 1 · Instagram DM</span>
+          <span class="dm-use">Use for: Nano & Micro · Gifting only</span>
+        </div>
+        <div class="dm-body">
+          <div class="dm-text" id="template1">Hi <span class="highlight">[First Name]</span> 👋
+
+I just watched your <span class="highlight">[recent post/reel about X]</span> and your skincare content is exactly the kind of genuine, quality content we love.
+
+I'm reaching out from <span class="highlight">Orris & Oak</span> — we make a luxury 24K gold and black truffle skincare line (orrisoak.com). We'd love to send you our complete ritual: the Gold & Truffle Anti-Aging Serum, the Hydrating Glow Cleanser, and our 4-in-1 Magnetic Brush — completely complimentary, no strings attached.
+
+If you genuinely love the products, we'd be thrilled if you shared your honest experience. If it's not for you, no worries at all — they're yours to keep.
+
+Would you be open to receiving them? 🌟</div>
+        </div>
+        <div class="dm-footer">
+          <p class="dm-tip">💬 Why it works: Short, specific, no pressure, clear offer. "No strings attached" removes all friction. Works on Instagram DM or email. Expect 30–50% reply rate when personalized.</p>
+          <button class="dm-copy-btn" onclick="copyTemplate('template1',this)">Copy Message</button>
+        </div>
+      </div>
+
+      <!-- Template 2 -->
+      <div class="dm-card">
+        <div class="dm-header">
+          <span class="dm-type">Template 2 · Email Outreach</span>
+          <span class="dm-use">Use for: Micro with business email in bio</span>
+        </div>
+        <div class="dm-body">
+          <div class="dm-text" id="template2">Subject: Gifting collab? — Orris & Oak luxury skincare for <span class="highlight">[their handle]</span>
+
+Hi <span class="highlight">[Name]</span>,
+
+I came across your profile through your recent post on <span class="highlight">[specific content]</span> — beautiful work, and your audience's engagement really shows how much they trust your recommendations.
+
+I'm <span class="highlight">[your name]</span> from Orris & Oak (orrisoak.com), a luxury skincare brand built around 24K gold and rare black truffle extract. We're reaching out to a small group of creators whose aesthetic and audience feel like a genuine fit — and yours stood out.
+
+We'd love to gift you our complete 3-product ritual:
+✦ 24K Gold & Black Truffle Anti-Aging Serum
+✦ Hydrating Glow Cleanser
+✦ 4-in-1 Magnetic Makeup Brush
+
+No deliverables required — we genuinely believe you'll love the products. If you'd like to share your experience, we'd be grateful, but there's zero pressure.
+
+Would you be interested? Happy to send over more details.
+
+Warm regards,
+<span class="highlight">[Your Name]</span>
+Orris & Oak | orrisoak.com | 312-985-6684</div>
+        </div>
+        <div class="dm-footer">
+          <p class="dm-tip">📧 Subject line tip: Include their handle in the subject — it increases open rates by 40%. Always sign with your real name and phone number. It builds credibility and shows you're a real brand.</p>
+          <button class="dm-copy-btn" onclick="copyTemplate('template2',this)">Copy Message</button>
+        </div>
+      </div>
+
+      <!-- Template 3 -->
+      <div class="dm-card">
+        <div class="dm-header">
+          <span class="dm-type">Template 3 · Follow-Up DM</span>
+          <span class="dm-use">Use for: No reply after 5–7 days</span>
+        </div>
+        <div class="dm-body">
+          <div class="dm-text" id="template3">Hey <span class="highlight">[Name]</span>! Just following up on my DM from last week about the Orris & Oak gifting 🌿
+
+I know your inbox gets busy — totally understand! Still happy to send over the Gold Serum + full ritual if you're interested. Lots of creators have been loving the 24K gold texture 💛
+
+No rush at all — just wanted to make sure it didn't get buried!
+
+<span class="highlight">[Your name]</span> @ Orris & Oak</div>
+        </div>
+        <div class="dm-footer">
+          <p class="dm-tip">🔁 Send this once, 5–7 days after your first message. Never follow up more than twice — it damages the brand impression. This friendly nudge recovers about 15–20% of non-replies.</p>
+          <button class="dm-copy-btn" onclick="copyTemplate('template3',this)">Copy Message</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       TAB 4: TRACKER
+  ════════════════════════════════════════ -->
+  <div class="panel" id="tab-tracker">
+    <div class="sec-head">
+      <div class="sec-eye">Outreach Tracker · Stay Organized</div>
+      <h2 class="sec-title">Track Every<br><em>Conversation</em></h2>
+      <p class="sec-desc">Update the status for each influencer as you contact them. This keeps your outreach organized and ensures no one falls through the cracks.</p>
+    </div>
+
+    <div class="tracker-head">
+      <div class="th">Influencer</div>
+      <div class="th">Followers</div>
+      <div class="th">Platform</div>
+      <div class="th">Contacted</div>
+      <div class="th">Status</div>
+    </div>
+    <div class="tracker-rows" id="trackerRows"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       TAB 5: CHECKLIST
+  ════════════════════════════════════════ -->
+  <div class="panel" id="tab-checklist">
+    <div class="sec-head">
+      <div class="sec-eye">Launch Checklist · Before You Start</div>
+      <h2 class="sec-title">Do These Things<br><em>Before Sending a Single DM</em></h2>
+      <p class="sec-desc">Tick every box before reaching out to influencers. This preparation ensures a professional first impression and maximizes your reply rate.</p>
+    </div>
+
+    <div style="margin-bottom:32px;">
+      <p style="font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">Your Brand Profile Setup</p>
+      <div class="checklist" id="checklist1">
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">Your Orrisoak Instagram profile has a clear bio explaining what you sell, a link to orrisoak.com, and a professional profile photo or logo</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You have at least 6 posts live on your Instagram before reaching out (influencers will check your profile)</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">Your Orrisoak website (orrisoak.com) is live, polished, and has product pages that work and look professional</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You have a business email set up (e.g. hello@orrisoak.com) for professional outreach — not a Gmail</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:32px;">
+      <p style="font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">Product & Shipping Readiness</p>
+      <div class="checklist">
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You have at least 10–15 complete sets (Serum + Cleanser + Brush) ready to ship for gifting</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You have elegant packaging — influencers photograph and film the unboxing, so it needs to look luxury</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You have a handwritten or printed thank-you card to include in every gifting package with your Instagram handle</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You can ship within 3–5 days of an influencer saying "yes" — fast shipping impresses creators</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p style="font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">Outreach Process</p>
+      <div class="checklist">
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You've reviewed all 12 target influencers in the Target List tab and chosen your first 5 to contact this week</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You've chosen a DM template and personalized the [BRACKET] parts for each influencer before sending</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You've followed each influencer's account and engaged with 1–2 of their recent posts before DMing (like + genuine comment)</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You've opened the Outreach Tracker tab and added the influencers you're contacting so nothing gets lost</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-label">You know to follow up once after 5–7 days, and never more than twice per person</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── TAB SWITCHING ──
+  function showTab(name, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn && btn.classList) btn.classList.add('active');
+    else document.querySelectorAll('.tab').forEach(t => {
+      if (t.getAttribute('onclick') && t.getAttribute('onclick').includes(name)) t.classList.add('active');
+    });
+  }
+
+  // ── COPY HANDLE ──
+  function copyHandle(handle) {
+    navigator.clipboard.writeText(handle).then(() => {
+      const btns = document.querySelectorAll('.inf-btn.primary');
+      btns.forEach(b => { if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(handle)) {
+        const orig = b.textContent;
+        b.textContent = 'Copied!';
+        b.style.background = '#4CAF7D';
+        setTimeout(() => { b.textContent = orig; b.style.background = ''; }, 2000);
+      }});
+    }).catch(() => prompt('Copy this handle:', handle));
+  }
+
+  // ── COPY TEMPLATE ──
+  function copyTemplate(id, btn) {
+    const el = document.getElementById(id);
+    const text = el.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy Message'; btn.classList.remove('copied'); }, 2500);
+    }).catch(() => { alert('Please manually select and copy the message above.'); });
+  }
+
+  // ── CHECKLIST TOGGLE ──
+  function toggleCheck(item) {
+    const box = item.querySelector('.check-box');
+    const label = item.querySelector('.check-label');
+    box.classList.toggle('checked');
+    label.classList.toggle('checked');
+  }
+
+  // ── TRACKER ──
+  const influencers = [
+    { handle: '@sincerelymissash', followers: '16.3K', platform: 'Instagram' },
+    { handle: '@erinnicoletv', followers: '39.4K', platform: 'Instagram' },
+    { handle: '@itstheskinyourein', followers: '39.4K', platform: 'Instagram' },
+    { handle: '@beautypassionista', followers: '21.1K', platform: 'Instagram' },
+    { handle: '@my.skinology', followers: '19.1K', platform: 'Instagram' },
+    { handle: '@emmskincare', followers: '14.9K', platform: 'Instagram' },
+    { handle: '@intheglamroom', followers: '12.1K', platform: 'Instagram' },
+    { handle: '@viancey_peraza', followers: '38.7K', platform: 'Instagram' },
+    { handle: '@talkintoya247', followers: '15.3K', platform: 'Instagram' },
+    { handle: '@mego', followers: '71.2K', platform: 'Instagram' },
+    { handle: '@sheena__cole', followers: '73.8K', platform: 'Instagram' },
+    { handle: '@sohinichanda_15', followers: '71.3K', platform: 'Instagram' },
+  ];
+
+  const trackerRows = document.getElementById('trackerRows');
+  influencers.forEach((inf, i) => {
+    const row = document.createElement('div');
+    row.className = 'tracker-row';
+    row.innerHTML = `
+      <div class="td">
+        <div class="status-dot dot-todo" id="dot-${i}"></div>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:16px;">${inf.handle}</span>
+      </div>
+      <div class="td muted">${inf.followers}</div>
+      <div class="td muted">${inf.platform}</div>
+      <div class="td muted">
+        <input type="date" style="background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);padding:4px 8px;font-family:'Josefin Sans',sans-serif;font-size:9px;width:100%;" id="date-${i}">
+      </div>
+      <div class="td">
+        <select class="status-select" id="status-${i}" onchange="updateStatus(${i})">
+          <option value="todo">To Contact</option>
+          <option value="sent">DM Sent</option>
+          <option value="replied">Replied ✓</option>
+          <option value="yes">Agreed ✦</option>
+          <option value="posted">Posted 🌟</option>
+          <option value="no">Declined</option>
+        </select>
+      </div>
+    `;
+    trackerRows.appendChild(row);
+  });
+
+  function updateStatus(i) {
+    const sel = document.getElementById('status-' + i).value;
+    const dot = document.getElementById('dot-' + i);
+    const colors = { todo: 'dot-todo', sent: 'dot-sent', replied: 'dot-sent', yes: 'dot-yes', posted: 'dot-yes', no: 'dot-no' };
+    dot.className = 'status-dot ' + (colors[sel] || 'dot-todo');
+  }
+</script>
+
+</body>
+</html>
