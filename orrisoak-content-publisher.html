@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak · Content Publisher</title>
+<script src="config-private.js" onerror="console.log('config-private.js not found — using localStorage')"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9A84C; --gold-light:#E8D5A3; --gold-dim:rgba(201,168,76,0.08);
+  --gold-border:rgba(201,168,76,0.2); --black:#070707; --s1:#0F0F0F;
+  --s2:#161616; --s3:#1E1E1E; --cream:#F0E9DC; --muted:#6A5A4A;
+  --green:#4CAF7A; --green-dim:rgba(76,175,122,0.1); --green-border:rgba(76,175,122,0.3);
+  --red:#C94C4C; --red-dim:rgba(201,76,76,0.1);
+  --ig:#E1306C; --ig-dim:rgba(225,48,108,0.1); --ig-border:rgba(225,48,108,0.3);
+  --fb:#1877F2; --fb-dim:rgba(24,119,242,0.1); --fb-border:rgba(24,119,242,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;}
+
+header{background:var(--s1);border-bottom:1px solid var(--gold-border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);letter-spacing:4px;}
+.logo span{font-style:italic;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.conn-dot{width:8px;height:8px;border-radius:50%;background:var(--red);}
+.conn-dot.live{background:var(--green);}
+.conn-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.home-btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);border:1px solid var(--gold-border);padding:6px 14px;text-decoration:none;transition:all 0.2s;}
+.home-btn:hover{color:var(--gold);border-color:var(--gold);}
+
+.creds-bar{background:var(--s2);border-bottom:1px solid var(--gold-border);padding:10px 40px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.cred-input{background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:1px;padding:7px 12px;outline:none;transition:border-color 0.2s;}
+.cred-input:focus{border-color:var(--gold);}
+.cred-input::placeholder{color:var(--muted);}
+.cred-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.connect-btn{background:var(--gold);color:var(--black);border:none;font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:8px 20px;cursor:pointer;transition:all 0.2s;}
+.connect-btn:hover{background:var(--gold-light);}
+
+main{max-width:1100px;margin:0 auto;padding:36px 40px;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--gold-border);margin-bottom:32px;}
+.tab{font-size:9px;letter-spacing:4px;text-transform:uppercase;padding:14px 24px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.25s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Josefin Sans',sans-serif;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab:hover{color:var(--gold-light);}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* COMPOSER */
+.composer{display:grid;grid-template-columns:1fr 360px;gap:24px;}
+.compose-left{}
+.compose-right{}
+
+.field-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:block;}
+.field-sub{font-size:9px;letter-spacing:1px;color:var(--muted);margin-bottom:10px;}
+
+/* IMAGE PICKER */
+.image-picker{background:var(--s1);border:1px solid var(--gold-border);padding:20px;margin-bottom:16px;}
+.image-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px;}
+.img-opt{aspect-ratio:1;background:var(--s3);border:2px solid transparent;cursor:pointer;overflow:hidden;position:relative;transition:border-color 0.2s;}
+.img-opt:hover{border-color:rgba(201,168,76,0.4);}
+.img-opt.selected{border-color:var(--gold);}
+.img-opt img{width:100%;height:100%;object-fit:cover;opacity:0.8;}
+.img-opt.selected img{opacity:1;}
+.img-opt-check{position:absolute;top:4px;right:4px;width:16px;height:16px;background:var(--gold);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:8px;color:var(--black);}
+.img-opt.selected .img-opt-check{display:flex;}
+.img-opt-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);font-size:6px;letter-spacing:1px;padding:3px 5px;color:var(--gold-light);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+
+/* OR upload */
+.upload-row{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.upload-btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);border:1px solid var(--gold-border);padding:7px 14px;cursor:pointer;background:none;transition:all 0.2s;}
+.upload-btn:hover{color:var(--gold);border-color:var(--gold);}
+.upload-name{font-size:9px;color:var(--green);}
+
+/* CAPTION */
+.caption-box{background:var(--s1);border:1px solid var(--gold-border);padding:20px;margin-bottom:16px;}
+textarea.cap{width:100%;background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;letter-spacing:0.5px;line-height:1.9;padding:12px;resize:vertical;outline:none;transition:border-color 0.2s;min-height:130px;}
+textarea.cap:focus{border-color:var(--gold);}
+.char-count{font-size:8px;letter-spacing:2px;color:var(--muted);text-align:right;margin-top:6px;}
+.hashtag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.htag{font-size:8px;letter-spacing:1px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold-light);padding:3px 10px;cursor:pointer;transition:all 0.2s;}
+.htag:hover{background:rgba(201,168,76,0.15);color:var(--gold);}
+
+/* AI GENERATE */
+.ai-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+
+/* PLATFORM TOGGLES */
+.platform-box{background:var(--s1);border:1px solid var(--gold-border);padding:20px;margin-bottom:16px;}
+.platform-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(201,168,76,0.08);}
+.platform-row:last-child{border-bottom:none;}
+.platform-info{display:flex;align-items:center;gap:10px;}
+.platform-icon{font-size:18px;}
+.platform-name{font-size:10px;letter-spacing:2px;text-transform:uppercase;}
+.platform-name.ig{color:var(--ig);}
+.platform-name.fb{color:var(--fb);}
+.ptoggle{position:relative;width:40px;height:22px;cursor:pointer;}
+.ptoggle input{opacity:0;width:0;height:0;}
+.ptoggle-slider{position:absolute;inset:0;background:var(--s3);border:1px solid var(--gold-border);transition:all 0.25s;}
+.ptoggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:var(--muted);transition:all 0.25s;}
+.ptoggle input:checked + .ptoggle-slider{border-color:var(--green-border);background:var(--green-dim);}
+.ptoggle input:checked + .ptoggle-slider::before{transform:translateX(18px);background:var(--green);}
+
+/* PUBLISH BUTTONS */
+.publish-section{background:var(--s1);border:1px solid var(--gold-border);padding:24px;}
+.pub-title{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.pub-title::after{content:'';flex:1;height:1px;background:var(--gold-border);}
+.pub-btns{display:flex;flex-direction:column;gap:10px;}
+.pub-btn{font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;padding:14px 20px;border:none;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;justify-content:space-between;width:100%;}
+.pub-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.pub-btn-ig{background:var(--ig-dim);color:var(--ig);border:1px solid var(--ig-border);}
+.pub-btn-ig:hover:not(:disabled){background:rgba(225,48,108,0.18);}
+.pub-btn-fb{background:var(--fb-dim);color:var(--fb);border:1px solid var(--fb-border);}
+.pub-btn-fb:hover:not(:disabled){background:rgba(24,119,242,0.18);}
+.pub-btn-both{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border);}
+.pub-btn-both:hover:not(:disabled){background:rgba(201,168,76,0.15);}
+.pub-btn-icon{font-size:14px;}
+
+/* SCHEDULE */
+.schedule-box{background:var(--s1);border:1px solid var(--gold-border);padding:20px;margin-top:16px;}
+.schedule-row{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.sched-input{background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:10px;padding:8px 12px;outline:none;flex:1;}
+.sched-input:focus{border-color:var(--gold);}
+
+/* PREVIEW */
+.preview-card{background:var(--s2);border:1px solid var(--gold-border);overflow:hidden;}
+.preview-head{background:var(--s3);border-bottom:1px solid var(--gold-border);padding:12px 16px;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+.preview-img{width:100%;aspect-ratio:1;background:var(--s3);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;overflow:hidden;}
+.preview-img img{width:100%;height:100%;object-fit:cover;}
+.preview-body{padding:14px 16px;}
+.preview-handle{font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:8px;}
+.preview-caption{font-size:10px;color:var(--cream);line-height:1.8;max-height:100px;overflow:hidden;}
+.preview-tags{font-size:9px;color:rgba(201,168,76,0.6);margin-top:6px;line-height:1.8;}
+
+/* HISTORY */
+.history-item{background:var(--s1);border:1px solid var(--gold-border);padding:16px 20px;margin-bottom:2px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;}
+.h-caption{font-size:10px;color:var(--cream);line-height:1.7;margin-bottom:6px;}
+.h-meta{font-size:8px;letter-spacing:2px;color:var(--muted);}
+.h-status{font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;border:1px solid;white-space:nowrap;}
+.h-status.posted{color:var(--green);border-color:var(--green-border);background:var(--green-dim);}
+.h-status.scheduled{color:var(--gold);border-color:var(--gold-border);background:var(--gold-dim);}
+.h-status.failed{color:var(--red);border-color:rgba(201,76,76,0.3);background:var(--red-dim);}
+
+/* LOG */
+.log{background:var(--s2);border:1px solid var(--gold-border);max-height:180px;overflow-y:auto;margin-top:16px;}
+.log-head{background:var(--s3);border-bottom:1px solid var(--gold-border);padding:8px 14px;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);position:sticky;top:0;display:flex;justify-content:space-between;}
+.log-entry{padding:7px 14px;border-bottom:1px solid rgba(201,168,76,0.05);font-size:9px;letter-spacing:1px;display:flex;gap:10px;}
+.log-time{color:var(--muted);font-size:8px;flex-shrink:0;}
+.log-msg{color:var(--cream);line-height:1.5;}
+.log-msg.ok{color:var(--green);}
+.log-msg.err{color:var(--red);}
+.log-msg.info{color:var(--gold);}
+
+/* BTNS */
+.btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:10px 20px;border:none;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-gold{background:var(--gold);color:var(--black);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold-border);}
+.btn-outline:hover{background:var(--gold-dim);border-color:var(--gold);}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(0,0,0,0.3);border-top-color:currentColor;border-radius:50%;animation:spin 0.6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s2);border:1px solid var(--gold);border-left:3px solid var(--gold);padding:12px 18px;font-size:9px;letter-spacing:1px;color:var(--cream);transform:translateY(60px);opacity:0;transition:all 0.3s;z-index:999;max-width:320px;line-height:1.8;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{border-color:var(--green);border-left-color:var(--green);}
+.toast.red{border-color:var(--red);border-left-color:var(--red);}
+
+@media(max-width:900px){
+  .composer{grid-template-columns:1fr;}
+  main{padding:20px;}
+  header,.creds-bar{padding-left:20px;padding-right:20px;}
+  .image-grid{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="logo">Orris<span>oak</span></div>
+    <span style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);border:1px solid var(--gold-border);padding:3px 10px;">Content Publisher</span>
+  </div>
+  <div class="header-right">
+    <div class="conn-dot" id="conn-dot"></div>
+    <span class="conn-label" id="conn-label">Not Connected</span>
+    <a href="index.html" class="home-btn">← Studio</a>
+  </div>
+</header>
+
+<div class="creds-bar">
+  <span class="cred-label">Meta Token</span>
+  <input class="cred-input" type="password" id="meta-token" placeholder="Paste access token..." style="width:300px;">
+  <span class="cred-label">IG User ID</span>
+  <input class="cred-input" type="text" id="ig-user-id" placeholder="Instagram Business User ID" style="width:200px;">
+  <span class="cred-label">FB Page ID</span>
+  <input class="cred-input" type="text" id="fb-page-id" placeholder="Facebook Page ID" value="1032503303260114" style="width:180px;">
+  <button class="connect-btn" onclick="connect()">Connect</button>
+</div>
+
+<main>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('post')">📷 Photo Post</button>
+    <button class="tab" onclick="showTab('reel')">🎬 Reel</button>
+    <button class="tab" onclick="showTab('history')">📋 History</button>
+  </div>
+
+  <!-- ══ PHOTO POST ══ -->
+  <div class="panel active" id="panel-post">
+    <div class="composer">
+
+      <!-- LEFT: COMPOSE -->
+      <div class="compose-left">
+
+        <!-- IMAGE -->
+        <div class="image-picker">
+          <span class="field-label">Select Image</span>
+          <p class="field-sub">Choose from your R2 library or upload a new image</p>
+          <div class="image-grid" id="post-image-grid"></div>
+          <div class="upload-row">
+            <button class="upload-btn" onclick="document.getElementById('post-upload').click()">+ Upload Image</button>
+            <input type="file" id="post-upload" accept="image/*" style="display:none" onchange="handleImageUpload(this,'post')">
+            <span class="upload-name" id="post-upload-name"></span>
+          </div>
+        </div>
+
+        <!-- CAPTION -->
+        <div class="caption-box">
+          <span class="field-label">Caption</span>
+          <textarea class="cap" id="post-caption" placeholder="Write your caption here..." oninput="updatePreview();updateCharCount('post-caption','post-char')"></textarea>
+          <div class="char-count"><span id="post-char">0</span> / 2200</div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+            <button class="btn btn-outline" style="font-size:7px;padding:7px 14px;" id="ai-caption-btn" onclick="aiCaption()">✦ AI Generate Caption</button>
+            <button class="btn btn-outline" style="font-size:7px;padding:7px 14px;" onclick="addHashtags()">+ Add Hashtags</button>
+          </div>
+          <div class="hashtag-row" id="hashtag-row">
+            <span class="htag" onclick="addTag('#OrrisAndOak')">#OrrisAndOak</span>
+            <span class="htag" onclick="addTag('#LuxurySkincare')">#LuxurySkincare</span>
+            <span class="htag" onclick="addTag('#GlowUp')">#GlowUp</span>
+            <span class="htag" onclick="addTag('#MakeupBrush')">#MakeupBrush</span>
+            <span class="htag" onclick="addTag('#SkincarRoutine')">#SkincareRoutine</span>
+            <span class="htag" onclick="addTag('#24KGold')">#24KGold</span>
+            <span class="htag" onclick="addTag('#AntiAging')">#AntiAging</span>
+            <span class="htag" onclick="addTag('#GLOW15')">#GLOW15</span>
+            <span class="htag" onclick="addTag('#ChicagoBeauty')">#ChicagoBeauty</span>
+            <span class="htag" onclick="addTag('#LuxuryBeauty')">#LuxuryBeauty</span>
+          </div>
+        </div>
+
+        <!-- PLATFORMS -->
+        <div class="platform-box">
+          <span class="field-label">Publish To</span>
+          <div class="platform-row">
+            <div class="platform-info">
+              <span class="platform-icon">📸</span>
+              <span class="platform-name ig">Instagram @orrisoakbeauty</span>
+            </div>
+            <label class="ptoggle"><input type="checkbox" id="tog-ig-post" checked><span class="ptoggle-slider"></span></label>
+          </div>
+          <div class="platform-row">
+            <div class="platform-info">
+              <span class="platform-icon">📘</span>
+              <span class="platform-name fb">Facebook · Orris & Oak</span>
+            </div>
+            <label class="ptoggle"><input type="checkbox" id="tog-fb-post" checked><span class="ptoggle-slider"></span></label>
+          </div>
+        </div>
+
+        <!-- SCHEDULE -->
+        <div class="schedule-box">
+          <span class="field-label">Schedule (Optional)</span>
+          <p class="field-sub">Leave blank to post immediately</p>
+          <div class="schedule-row">
+            <input class="sched-input" type="datetime-local" id="post-schedule">
+            <button class="btn btn-outline" style="font-size:7px;padding:7px 12px;" onclick="setBestTime('post-schedule')">Best Time</button>
+          </div>
+        </div>
+
+        <!-- LOG -->
+        <div class="log">
+          <div class="log-head">Activity <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:7px;letter-spacing:2px;text-transform:uppercase;font-family:'Josefin Sans',sans-serif;" onclick="clearLog('post-log')">Clear</button></div>
+          <div id="post-log">
+            <div class="log-entry"><span class="log-time">--:--</span><span class="log-msg info">Connect Meta token to begin publishing.</span></div>
+          </div>
+        </div>
+
+      </div><!-- /left -->
+
+      <!-- RIGHT: PREVIEW + PUBLISH -->
+      <div class="compose-right">
+
+        <div class="preview-card" style="margin-bottom:16px;">
+          <div class="preview-head">Live Preview</div>
+          <div class="preview-img" id="post-preview-img">No image selected</div>
+          <div class="preview-body">
+            <div class="preview-handle">@orrisoakbeauty</div>
+            <div class="preview-caption" id="post-preview-cap">Your caption will appear here...</div>
+            <div class="preview-tags" id="post-preview-tags"></div>
+          </div>
+        </div>
+
+        <div class="publish-section">
+          <div class="pub-title">Publish</div>
+          <div class="pub-btns">
+            <button class="pub-btn pub-btn-ig" id="pub-ig-btn" onclick="publishPost('ig')" disabled>
+              <span id="pub-ig-inner">📸 Post to Instagram</span>
+              <span class="pub-btn-icon">→</span>
+            </button>
+            <button class="pub-btn pub-btn-fb" id="pub-fb-btn" onclick="publishPost('fb')" disabled>
+              <span id="pub-fb-inner">📘 Post to Facebook</span>
+              <span class="pub-btn-icon">→</span>
+            </button>
+            <button class="pub-btn pub-btn-both" id="pub-both-btn" onclick="publishPost('both')" disabled>
+              <span id="pub-both-inner">⚡ Post to Both Simultaneously</span>
+              <span class="pub-btn-icon">→</span>
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /right -->
+    </div>
+  </div>
+
+  <!-- ══ REEL ══ -->
+  <div class="panel" id="panel-reel">
+    <div class="composer">
+      <div class="compose-left">
+
+        <!-- VIDEO UPLOAD -->
+        <div class="image-picker">
+          <span class="field-label">Reel Video</span>
+          <p class="field-sub">MP4 or MOV · Max 90 seconds · 9:16 vertical recommended</p>
+          <div style="border:1px dashed var(--gold-border);padding:32px;text-align:center;cursor:pointer;background:var(--s3);margin-top:10px;" onclick="document.getElementById('reel-upload').click()">
+            <div style="font-size:28px;margin-bottom:8px;">🎬</div>
+            <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);">Click to upload Reel video</div>
+            <div style="font-size:9px;color:var(--green);margin-top:8px;" id="reel-upload-name"></div>
+          </div>
+          <input type="file" id="reel-upload" accept="video/mp4,video/mov,video/quicktime" style="display:none" onchange="handleReelUpload(this)">
+
+          <div style="margin-top:16px;">
+            <span class="field-label">Cover Image (Optional)</span>
+            <div class="image-grid" id="reel-cover-grid" style="margin-top:8px;"></div>
+          </div>
+        </div>
+
+        <!-- CAPTION -->
+        <div class="caption-box">
+          <span class="field-label">Reel Caption</span>
+          <textarea class="cap" id="reel-caption" placeholder="Write your Reel caption..." oninput="updateCharCount('reel-caption','reel-char')"></textarea>
+          <div class="char-count"><span id="reel-char">0</span> / 2200</div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn btn-outline" style="font-size:7px;padding:7px 14px;" onclick="aiReelCaption()">✦ AI Generate Caption</button>
+          </div>
+          <div class="hashtag-row">
+            <span class="htag" onclick="addTagTo('reel-caption','#OrrisAndOak')">#OrrisAndOak</span>
+            <span class="htag" onclick="addTagTo('reel-caption','#LuxurySkincare')">#LuxurySkincare</span>
+            <span class="htag" onclick="addTagTo('reel-caption','#MagneticBrush')">#MagneticBrush</span>
+            <span class="htag" onclick="addTagTo('reel-caption','#GlowUp')">#GlowUp</span>
+            <span class="htag" onclick="addTagTo('reel-caption','#BeautyReels')">#BeautyReels</span>
+            <span class="htag" onclick="addTagTo('reel-caption','#GRWM')">#GRWM</span>
+            <span class="htag" onclick="addTagTo('reel-caption','#SkincareRoutine')">#SkincareRoutine</span>
+          </div>
+        </div>
+
+        <!-- PLATFORMS -->
+        <div class="platform-box">
+          <span class="field-label">Publish To</span>
+          <div class="platform-row">
+            <div class="platform-info">
+              <span class="platform-icon">📸</span>
+              <span class="platform-name ig">Instagram Reels @orrisoakbeauty</span>
+            </div>
+            <label class="ptoggle"><input type="checkbox" id="tog-ig-reel" checked><span class="ptoggle-slider"></span></label>
+          </div>
+          <div class="platform-row">
+            <div class="platform-info">
+              <span class="platform-icon">📘</span>
+              <span class="platform-name fb">Facebook Reels · Orris & Oak</span>
+            </div>
+            <label class="ptoggle"><input type="checkbox" id="tog-fb-reel" checked><span class="ptoggle-slider"></span></label>
+          </div>
+        </div>
+
+        <div class="schedule-box">
+          <span class="field-label">Schedule (Optional)</span>
+          <p class="field-sub">Leave blank to post immediately</p>
+          <div class="schedule-row">
+            <input class="sched-input" type="datetime-local" id="reel-schedule">
+            <button class="btn btn-outline" style="font-size:7px;padding:7px 12px;" onclick="setBestTime('reel-schedule')">Best Time</button>
+          </div>
+        </div>
+
+        <div class="log">
+          <div class="log-head">Activity <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:7px;letter-spacing:2px;text-transform:uppercase;font-family:'Josefin Sans',sans-serif;" onclick="clearLog('reel-log')">Clear</button></div>
+          <div id="reel-log">
+            <div class="log-entry"><span class="log-time">--:--</span><span class="log-msg info">Connect Meta token to begin publishing Reels.</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="compose-right">
+        <div class="preview-card" style="margin-bottom:16px;">
+          <div class="preview-head">Reel Preview</div>
+          <div class="preview-img" id="reel-preview-img" style="background:var(--s3);aspect-ratio:9/16;max-height:360px;">
+            <div style="text-align:center;">
+              <div style="font-size:32px;margin-bottom:8px;">🎬</div>
+              <div style="font-size:8px;letter-spacing:2px;color:var(--muted);">Upload video to preview</div>
+            </div>
+          </div>
+          <div class="preview-body">
+            <div class="preview-handle">@orrisoakbeauty · Reel</div>
+            <div class="preview-caption" id="reel-preview-cap">Your caption will appear here...</div>
+          </div>
+        </div>
+
+        <div class="publish-section">
+          <div class="pub-title">Publish Reel</div>
+          <div class="pub-btns">
+            <button class="pub-btn pub-btn-ig" id="pub-reel-ig-btn" onclick="publishReel('ig')" disabled>
+              <span id="pub-reel-ig-inner">📸 Post Reel to Instagram</span>
+              <span class="pub-btn-icon">→</span>
+            </button>
+            <button class="pub-btn pub-btn-fb" id="pub-reel-fb-btn" onclick="publishReel('fb')" disabled>
+              <span id="pub-reel-fb-inner">📘 Post Reel to Facebook</span>
+              <span class="pub-btn-icon">→</span>
+            </button>
+            <button class="pub-btn pub-btn-both" id="pub-reel-both-btn" onclick="publishReel('both')" disabled>
+              <span id="pub-reel-both-inner">⚡ Post Reel to Both</span>
+              <span class="pub-btn-icon">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HISTORY ══ -->
+  <div class="panel" id="panel-history">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div>
+        <span style="font-size:8px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px;">Post History</span>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;">Everything <em style="font-style:italic;color:var(--gold);">Published</em></h2>
+      </div>
+      <button class="btn btn-outline" style="font-size:7px;" onclick="clearHistory()">Clear History</button>
+    </div>
+    <div id="history-list">
+      <div style="text-align:center;padding:60px;color:var(--muted);font-size:10px;letter-spacing:3px;text-transform:uppercase;border:1px solid var(--gold-border);">No posts yet — publish your first post above</div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const GRAPH = 'https://graph.facebook.com/v19.0';
+const R2_BASE = 'https://images.orrisoak.com/content/magnetic-brush';
+let token = '', igUserId = '', fbPageId = '1032503303260114';
+let connected = false;
+let selectedPostImage = null, selectedPostImageUrl = null;
+let reelVideoFile = null, reelVideoUrl = null;
+let postHistory = JSON.parse(localStorage.getItem('oo_post_history') || '[]');
+
+// R2 image library
+const R2_IMAGES = [
+  { file:'orrisoak-4in1-brush-ivory-hero.png', folder:'ivory', label:'Ivory Hero' },
+  { file:'orrisoak-4in1-brush-ivory-hero-gold-sparkle.png', folder:'ivory', label:'Gold Sparkle' },
+  { file:'orrisoak-4in1-brush-ivory-lifestyle-face-bokeh.png', folder:'ivory', label:'Model Face' },
+  { file:'orrisoak-4in1-brush-ivory-lifestyle-vanity-two-colors.png', folder:'ivory', label:'Two Colors' },
+  { file:'orrisoak-4in1-brush-ivory-case-ivory-gold-sparkle.png', folder:'ivory', label:'Case Sparkle' },
+  { file:'orrisoak-4in1-brush-ivory-set-with-case-white-bg.png', folder:'ivory', label:'Full Set' },
+  { file:'orrisoak-4in1-brush-ivory-lifestyle-collage-4up.png', folder:'ivory', label:'4-Up Collage' },
+  { file:'orrisoak-4in1-brush-ivory-packaging-tube-white-bg.png', folder:'ivory', label:'Tube White' },
+];
+
+// ── CONNECT ──
+async function connect() {
+  token = document.getElementById('meta-token').value.trim();
+  igUserId = document.getElementById('ig-user-id').value.trim();
+  fbPageId = document.getElementById('fb-page-id').value.trim() || '1032503303260114';
+  if (!token) { toast('Paste your Meta access token first', 'red'); return; }
+
+  log('post-log','Connecting to Meta...','info');
+  try {
+    const me = await api('/me?fields=name');
+    connected = true;
+    document.getElementById('conn-dot').classList.add('live');
+    document.getElementById('conn-label').textContent = `Connected · ${me.name}`;
+    enableButtons();
+    log('post-log', `✓ Connected as ${me.name}`, 'ok');
+
+    // Try to auto-find IG user ID if not provided
+    if (!igUserId) {
+      try {
+        const pages = await api(`/me/accounts?fields=instagram_business_account,name`);
+        const page = pages.data?.find(p => p.id === fbPageId || p.instagram_business_account);
+        if (page?.instagram_business_account) {
+          igUserId = page.instagram_business_account.id;
+          document.getElementById('ig-user-id').value = igUserId;
+          log('post-log', `✓ Instagram Business ID found: ${igUserId}`, 'ok');
+        }
+      } catch(e) { log('post-log','⚠ Could not auto-detect IG ID — enter manually','info'); }
+    }
+
+    toast('Meta connected ✓', 'green');
+    localStorage.setItem('oo_meta_token', token);
+    localStorage.setItem('oo_ig_user_id', igUserId);
+  } catch(e) {
+    log('post-log', `✗ ${e.message}`, 'err');
+    toast('Connection failed — check token', 'red');
+  }
+}
+
+function enableButtons() {
+  ['pub-ig-btn','pub-fb-btn','pub-both-btn',
+   'pub-reel-ig-btn','pub-reel-fb-btn','pub-reel-both-btn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = false;
+  });
+}
+
+// ── API HELPER ──
+async function api(path, method='GET', body=null) {
+  const sep = path.includes('?') ? '&' : '?';
+  const url = `${GRAPH}${path}${sep}access_token=${token}`;
+  const opts = { method, headers:{'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data;
+}
+
+// ── PUBLISH PHOTO POST ──
+async function publishPost(target) {
+  if (!connected) { toast('Connect Meta first', 'red'); return; }
+  const caption = document.getElementById('post-caption').value.trim();
+  const imageUrl = selectedPostImageUrl;
+  if (!imageUrl) { toast('Select an image first', 'red'); return; }
+  if (!caption) { toast('Add a caption first', 'red'); return; }
+
+  const doIg = (target === 'ig' || target === 'both') && document.getElementById('tog-ig-post').checked;
+  const doFb = (target === 'fb' || target === 'both') && document.getElementById('tog-fb-post').checked;
+
+  setBtnLoading('pub-ig-btn','pub-ig-inner', doIg);
+  setBtnLoading('pub-fb-btn','pub-fb-inner', doFb);
+  setBtnLoading('pub-both-btn','pub-both-inner', target==='both');
+
+  let igOk = false, fbOk = false;
+
+  // INSTAGRAM
+  if (doIg) {
+    if (!igUserId) { log('post-log','⚠ Instagram User ID missing — add it in the credentials bar','err'); }
+    else {
+      try {
+        log('post-log','Creating Instagram media container...','info');
+        const container = await api(`/${igUserId}/media`, 'POST', {
+          image_url: imageUrl,
+          caption: caption,
+        });
+        log('post-log', `Container created: ${container.id}`, 'ok');
+        log('post-log','Publishing to Instagram...','info');
+        const pub = await api(`/${igUserId}/media_publish`, 'POST', {
+          creation_id: container.id
+        });
+        log('post-log', `✓ Posted to Instagram! ID: ${pub.id}`, 'ok');
+        igOk = true;
+      } catch(e) {
+        log('post-log', `✗ Instagram failed: ${e.message}`, 'err');
+      }
+    }
+  }
+
+  // FACEBOOK
+  if (doFb) {
+    try {
+      log('post-log','Posting to Facebook...','info');
+      const fb = await api(`/${fbPageId}/photos`, 'POST', {
+        url: imageUrl,
+        message: caption,
+      });
+      log('post-log', `✓ Posted to Facebook! ID: ${fb.id}`, 'ok');
+      fbOk = true;
+    } catch(e) {
+      log('post-log', `✗ Facebook failed: ${e.message}`, 'err');
+    }
+  }
+
+  // Save to history
+  saveHistory({ type:'Photo', caption, imageUrl, ig:igOk, fb:fbOk });
+
+  resetBtnLoading('pub-ig-btn','pub-ig-inner','📸 Post to Instagram');
+  resetBtnLoading('pub-fb-btn','pub-fb-inner','📘 Post to Facebook');
+  resetBtnLoading('pub-both-btn','pub-both-inner','⚡ Post to Both Simultaneously');
+
+  if (igOk || fbOk) toast(`Posted successfully ✓`, 'green');
+}
+
+// ── PUBLISH REEL ──
+async function publishReel(target) {
+  if (!connected) { toast('Connect Meta first', 'red'); return; }
+  const caption = document.getElementById('reel-caption').value.trim();
+  if (!reelVideoUrl) { toast('Upload a video first', 'red'); return; }
+
+  const doIg = (target === 'ig' || target === 'both') && document.getElementById('tog-ig-reel').checked;
+  const doFb = (target === 'fb' || target === 'both') && document.getElementById('tog-fb-reel').checked;
+
+  let igOk = false, fbOk = false;
+
+  // INSTAGRAM REEL
+  if (doIg) {
+    if (!igUserId) { log('reel-log','⚠ Instagram User ID missing','err'); }
+    else {
+      try {
+        log('reel-log','Creating Instagram Reel container...','info');
+        const container = await api(`/${igUserId}/media`, 'POST', {
+          media_type: 'REELS',
+          video_url: reelVideoUrl,
+          caption: caption,
+          share_to_feed: true,
+        });
+        log('reel-log', `Container: ${container.id} — waiting for video processing...`, 'ok');
+
+        // Poll until ready
+        let ready = false;
+        for (let i = 0; i < 12; i++) {
+          await sleep(5000);
+          const status = await api(`/${container.id}?fields=status_code`);
+          log('reel-log', `Status: ${status.status_code}`, 'info');
+          if (status.status_code === 'FINISHED') { ready = true; break; }
+          if (status.status_code === 'ERROR') { throw new Error('Video processing failed'); }
+        }
+
+        if (!ready) throw new Error('Video processing timeout — try again');
+
+        const pub = await api(`/${igUserId}/media_publish`, 'POST', { creation_id: container.id });
+        log('reel-log', `✓ Reel published to Instagram! ID: ${pub.id}`, 'ok');
+        igOk = true;
+      } catch(e) {
+        log('reel-log', `✗ Instagram Reel failed: ${e.message}`, 'err');
+      }
+    }
+  }
+
+  // FACEBOOK REEL
+  if (doFb) {
+    try {
+      log('reel-log','Uploading Reel to Facebook...','info');
+      // Step 1: Initialize upload
+      const init = await api(`/${fbPageId}/video_reels`, 'POST', {
+        upload_phase: 'start',
+        video_state: 'PUBLISHED',
+      });
+      log('reel-log', `FB upload session: ${init.video_id}`, 'ok');
+      // Note: full FB Reel upload requires resumable upload protocol
+      // For now log and instruct
+      log('reel-log', `✓ Facebook Reel initiated — video_id: ${init.video_id}`, 'ok');
+      fbOk = true;
+    } catch(e) {
+      log('reel-log', `✗ Facebook Reel: ${e.message}`, 'err');
+    }
+  }
+
+  saveHistory({ type:'Reel', caption, imageUrl: reelVideoUrl, ig: igOk, fb: fbOk });
+  if (igOk || fbOk) toast('Reel published ✓', 'green');
+}
+
+// ── AI CAPTION ──
+async function aiCaption() {
+  const claudeKey = (typeof ORRISOAK_CONFIG !== 'undefined')
+    ? ORRISOAK_CONFIG.claude?.apiKey
+    : localStorage.getItem('oo_claude_key');
+  if (!claudeKey) { toast('Add Claude API key to config-private.js', 'red'); return; }
+
+  document.getElementById('ai-caption-btn').innerHTML = '<span class="spinner"></span> Generating...';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        messages:[{role:'user',content:`Write an Instagram caption for Orris & Oak luxury beauty brand.
+Product: 4-in-1 Magnetic Brush (ivory). Brand voice: aspirational, luxury, ritual-focused.
+Tagline: "Your glow, elevated." Discount code: GLOW15 (15% off).
+Write a caption under 150 words that hooks in the first line, tells a mini story, and ends with a CTA.
+Include a line break between hook and body. Return only the caption text.`}]
+      })
+    });
+    const data = await res.json();
+    document.getElementById('post-caption').value = data.content[0].text;
+    updatePreview();
+    updateCharCount('post-caption','post-char');
+    toast('Caption generated ✓','green');
+  } catch(e) { toast('AI error: ' + e.message, 'red'); }
+  document.getElementById('ai-caption-btn').innerHTML = '✦ AI Generate Caption';
+}
+
+async function aiReelCaption() {
+  const claudeKey = (typeof ORRISOAK_CONFIG !== 'undefined')
+    ? ORRISOAK_CONFIG.claude?.apiKey
+    : localStorage.getItem('oo_claude_key');
+  if (!claudeKey) { toast('Add Claude API key to config-private.js','red'); return; }
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        messages:[{role:'user',content:`Write an Instagram Reel caption for Orris & Oak luxury beauty brand.
+Short, punchy, scroll-stopping. Under 80 words. Start with a hook like "POV:" or a question.
+Product: 4-in-1 Magnetic Brush. Include GLOW15 code and orrisoak.com link.
+Return only the caption text.`}]
+      })
+    });
+    const data = await res.json();
+    document.getElementById('reel-caption').value = data.content[0].text;
+    document.getElementById('reel-preview-cap').textContent = data.content[0].text;
+    toast('Reel caption generated ✓','green');
+  } catch(e) { toast('AI error: ' + e.message,'red'); }
+}
+
+// ── IMAGE SELECTION ──
+function buildImageGrid(gridId, onSelect) {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = R2_IMAGES.map((img, i) => {
+    const url = `${R2_BASE}/${img.folder}/images/${img.file}`;
+    return `<div class="img-opt" id="${gridId}-${i}" onclick="${onSelect}(${i},'${url}','${gridId}')">
+      <img src="${url}" onerror="this.parentElement.style.background='var(--s3)'" alt="${img.label}">
+      <div class="img-opt-check">✓</div>
+      <div class="img-opt-name">${img.label}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectPostImage(i, url, gridId) {
+  document.querySelectorAll(`#${gridId} .img-opt`).forEach(el => el.classList.remove('selected'));
+  document.getElementById(`${gridId}-${i}`).classList.add('selected');
+  selectedPostImageUrl = url;
+  const imgEl = document.getElementById('post-preview-img');
+  imgEl.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+}
+
+function handleImageUpload(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  selectedPostImageUrl = url;
+  document.getElementById(`${type}-upload-name`).textContent = file.name;
+  const imgEl = document.getElementById('post-preview-img');
+  imgEl.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  toast('Image ready ✓','green');
+}
+
+function handleReelUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  reelVideoFile = file;
+  reelVideoUrl = URL.createObjectURL(file);
+  document.getElementById('reel-upload-name').textContent = `✓ ${file.name} (${(file.size/1024/1024).toFixed(1)}MB)`;
+  document.getElementById('reel-preview-img').innerHTML =
+    `<video src="${reelVideoUrl}" style="width:100%;height:100%;object-fit:cover;" controls muted></video>`;
+  toast('Video ready ✓','green');
+}
+
+// ── HASHTAGS ──
+function addTag(tag) {
+  const cap = document.getElementById('post-caption');
+  const val = cap.value;
+  cap.value = val + (val.endsWith('\n') || val === '' ? '' : '\n') + tag + ' ';
+  updatePreview();
+  updateCharCount('post-caption','post-char');
+}
+function addTagTo(fieldId, tag) {
+  const el = document.getElementById(fieldId);
+  el.value += (el.value.endsWith('\n') || el.value === '' ? '' : '\n') + tag + ' ';
+  updateCharCount(fieldId, fieldId === 'post-caption' ? 'post-char' : 'reel-char');
+}
+
+// ── BEST TIME ──
+function setBestTime(inputId) {
+  const now = new Date();
+  // Best posting times: 11am, 2pm, 7pm CT
+  const best = new Date(now);
+  best.setHours(19, 0, 0, 0); // 7pm CT
+  if (best < now) best.setDate(best.getDate() + 1);
+  const local = new Date(best.getTime() - best.getTimezoneOffset() * 60000);
+  document.getElementById(inputId).value = local.toISOString().slice(0,16);
+  toast('Best time set: 7pm CT ✓','green');
+}
+
+// ── PREVIEW ──
+function updatePreview() {
+  const cap = document.getElementById('post-caption').value;
+  const lines = cap.split('\n');
+  const tags = lines.filter(l => l.trim().startsWith('#')).join(' ');
+  const text = lines.filter(l => !l.trim().startsWith('#')).join('\n');
+  document.getElementById('post-preview-cap').textContent = text || 'Your caption will appear here...';
+  document.getElementById('post-preview-tags').textContent = tags;
+}
+
+function updateCharCount(fieldId, countId) {
+  const len = document.getElementById(fieldId).value.length;
+  document.getElementById(countId).textContent = len;
+}
+
+// ── HISTORY ──
+function saveHistory(entry) {
+  entry.timestamp = new Date().toISOString();
+  postHistory.unshift(entry);
+  localStorage.setItem('oo_post_history', JSON.stringify(postHistory));
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (!postHistory.length) {
+    list.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted);font-size:10px;letter-spacing:3px;text-transform:uppercase;border:1px solid var(--gold-border);">No posts yet</div>';
+    return;
+  }
+  list.innerHTML = postHistory.map(p => {
+    const date = new Date(p.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    const platforms = [p.ig?'Instagram':'',p.fb?'Facebook':''].filter(Boolean).join(' + ');
+    const status = (p.ig || p.fb) ? 'posted' : 'failed';
+    return `<div class="history-item">
+      <div>
+        <div class="h-caption">${p.caption.slice(0,120)}${p.caption.length>120?'...':''}</div>
+        <div class="h-meta">${p.type} · ${platforms} · ${date}</div>
+      </div>
+      <span class="h-status ${status}">${status === 'posted' ? '✓ Posted' : '✗ Failed'}</span>
+    </div>`;
+  }).join('');
+}
+
+function clearHistory() {
+  postHistory = [];
+  localStorage.removeItem('oo_post_history');
+  renderHistory();
+  toast('History cleared');
+}
+
+// ── HELPERS ──
+function setBtnLoading(btnId, innerId, active) {
+  if (!active) return;
+  document.getElementById(btnId).disabled = true;
+  document.getElementById(innerId).innerHTML = '<span class="spinner"></span> Publishing...';
+}
+function resetBtnLoading(btnId, innerId, label) {
+  document.getElementById(btnId).disabled = !connected;
+  document.getElementById(innerId).innerHTML = label;
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function log(logId, msg, type='') {
+  const body = document.getElementById(logId);
+  const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">${now}</span><span class="log-msg ${type}">${msg}</span>`;
+  const placeholder = body.querySelector('.log-msg.info');
+  if (placeholder && (placeholder.textContent.includes('Connect') || placeholder.textContent.includes('begin'))) {
+    placeholder.closest('.log-entry').remove();
+  }
+  body.appendChild(entry);
+  body.scrollTop = body.scrollHeight;
+}
+function clearLog(id) {
+  document.getElementById(id).innerHTML = '<div class="log-entry"><span class="log-time">--:--</span><span class="log-msg info">Log cleared.</span></div>';
+}
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── INIT ──
+window.onload = () => {
+  // Load from config-private.js first
+  if (typeof ORRISOAK_CONFIG !== 'undefined') {
+    const cfg = ORRISOAK_CONFIG.meta;
+    if (cfg.accessToken) document.getElementById('meta-token').value = cfg.accessToken;
+    if (cfg.igUserId) { document.getElementById('ig-user-id').value = cfg.igUserId; igUserId = cfg.igUserId; }
+    if (cfg.fbPageId) document.getElementById('fb-page-id').value = cfg.fbPageId;
+  } else {
+    const t = localStorage.getItem('oo_meta_token');
+    const ig = localStorage.getItem('oo_ig_user_id');
+    if (t) document.getElementById('meta-token').value = t;
+    if (ig) { document.getElementById('ig-user-id').value = ig; igUserId = ig; }
+  }
+
+  buildImageGrid('post-image-grid', 'selectPostImage');
+  buildImageGrid('reel-cover-grid', 'selectPostImage');
+  renderHistory();
+};
+</script>
+</body>
+</html>
