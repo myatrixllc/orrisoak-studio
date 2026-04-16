@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Orrisoak · Launch Control</title>
+<!-- Auto-loads credentials from config-private.js when running locally -->
+<script src="config-private.js" onerror="console.log('config-private.js not found — using localStorage')"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -642,11 +644,22 @@ function toast(msg, type='') {
 }
 
 // ─── AUTO-LOAD SAVED CREDS ───
+// Priority: config-private.js → localStorage → blank
 window.onload = () => {
-  const savedToken = localStorage.getItem('oo_meta_token');
-  const savedAcct  = localStorage.getItem('oo_ad_account');
-  if (savedToken) document.getElementById('meta-token').value = savedToken;
-  if (savedAcct)  document.getElementById('ad-account').value = savedAcct;
+  // 1. Try config-private.js (local dev)
+  if (typeof ORRISOAK_CONFIG !== 'undefined') {
+    const cfg = ORRISOAK_CONFIG.meta;
+    if (cfg.accessToken)  document.getElementById('meta-token').value = cfg.accessToken;
+    if (cfg.adAccountId)  document.getElementById('ad-account').value = cfg.adAccountId;
+    console.log('✦ Credentials loaded from config-private.js');
+  } else {
+    // 2. Fall back to localStorage (studio.orrisoak.com)
+    const savedToken = localStorage.getItem('oo_meta_token');
+    const savedAcct  = localStorage.getItem('oo_ad_account');
+    if (savedToken) document.getElementById('meta-token').value = savedToken;
+    if (savedAcct)  document.getElementById('ad-account').value = savedAcct;
+  }
+  // Load saved campaign IDs
   const saved = JSON.parse(localStorage.getItem('oo_campaign_ids') || '[null,null,null]');
   if (saved.some(id => id !== null)) campaignIds = saved;
 };
