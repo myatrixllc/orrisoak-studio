@@ -204,7 +204,7 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
   <p class="hero-sub">Your complete marketing infrastructure — all tools, all content, all in one place.</p>
   <div class="hero-stats">
     <div>
-      <div class="hero-stat-num" id="h-tools">9</div>
+      <div class="hero-stat-num" id="h-tools">10</div>
       <div class="hero-stat-label">Tools<br>Available</div>
     </div>
     <div>
@@ -293,6 +293,12 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
       <div class="tool-name">Content File Manager</div>
       <div class="tool-desc">Organised content library — content/&lt;product&gt;/images structure</div>
     </a>
+    <a class="tool-card" onclick="openTool('adcreatives')">
+      <div class="tool-tag new">New</div>
+      <span class="tool-icon">🎨</span>
+      <div class="tool-name">Meta Ad Creatives</div>
+      <div class="tool-desc">Select R2 hero images, copy ad copy &amp; audiences for all 3 campaigns. 15-day launch checklist included</div>
+    </a>
   </div>
 
   <!-- FILE MANAGER -->
@@ -311,7 +317,7 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
     <div class="fm-body">
       <div class="fm-sidebar">
         <div class="fm-folder active" onclick="fmOpen('magnetic-brush','images')" id="fm-brush-img">
-          <span class="fm-folder-icon">🖌️</span> Brush / Images
+          <span class="fm-folder-icon">🖌️</span> Brush / Images / Black
         </div>
         <div class="fm-folder" onclick="fmOpen('magnetic-brush','videos')">
           <span class="fm-folder-icon">🎬</span> Brush / Videos
@@ -638,6 +644,7 @@ const toolMap = {
   brand: 'orrisoak-brand-page.html',
   shopify: 'orrisoak-shopify-theme-preview.html',
   setup: 'orrisoak-setup-guide.html',
+  adcreatives: 'orrisoak-meta-ad-creatives.html',
   traffic: 'orrisoak-traffic-strategy.html',
 };
 function openTool(name){
