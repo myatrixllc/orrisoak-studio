@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orris & Oak — Meta Ad Creatives</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --black: #0A0A0A;
+    --charcoal: #161616;
+    --surface: #1E1E1E;
+    --border: rgba(201,168,76,0.2);
+    --cream: #FAF6EE;
+    --muted: #6A5A4A;
+    --green: #4CAF7A;
+    --red: #C94C4C;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--black); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-weight:300; min-height:100vh; }
+
+  /* HEADER */
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 40px; border-bottom:1px solid var(--border);
+    position:sticky; top:0; background:rgba(10,10,10,0.97); z-index:100;
+  }
+  .logo { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:300; letter-spacing:5px; color:var(--gold); }
+  .logo span { font-style:italic; }
+  .header-right { display:flex; align-items:center; gap:16px; }
+  .account-badge { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); border:1px solid var(--border); padding:6px 14px; }
+  .launch-badge { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); border:1px solid var(--gold); padding:6px 14px; }
+
+  /* TABS */
+  .tabs { display:flex; border-bottom:1px solid var(--border); padding:0 40px; background:var(--charcoal); }
+  .tab { font-size:9px; letter-spacing:4px; text-transform:uppercase; padding:16px 24px; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.25s; background:none; border-top:none; border-left:none; border-right:none; font-family:'Josefin Sans',sans-serif; }
+  .tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+  .tab:hover { color:var(--gold-light); }
+
+  /* MAIN */
+  main { padding:40px; max-width:1400px; margin:0 auto; }
+
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  /* SECTION HEADER */
+  .section-head { margin-bottom:36px; }
+  .section-eye { font-size:8px; letter-spacing:6px; text-transform:uppercase; color:var(--gold); margin-bottom:10px; display:block; }
+  .section-title { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:300; line-height:1.1; }
+  .section-title em { font-style:italic; color:var(--gold); }
+  .section-sub { font-size:11px; letter-spacing:1px; color:var(--muted); line-height:2; margin-top:10px; }
+
+  /* CAMPAIGN CARDS */
+  .campaigns { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-bottom:40px; }
+  .campaign-card { background:var(--surface); padding:28px; border-top:2px solid transparent; transition:border-color 0.3s; cursor:pointer; }
+  .campaign-card.active-card { border-top-color:var(--gold); background:#222; }
+  .campaign-card:hover { border-top-color:rgba(201,168,76,0.5); }
+  .c-num { font-family:'Cormorant Garamond',serif; font-size:40px; color:rgba(201,168,76,0.15); line-height:1; margin-bottom:12px; }
+  .c-product { font-size:8px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+  .c-name { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--cream); margin-bottom:10px; }
+  .c-objective { font-size:9px; letter-spacing:2px; color:var(--muted); margin-bottom:14px; }
+  .c-budget { display:inline-block; font-size:8px; letter-spacing:3px; text-transform:uppercase; background:rgba(201,168,76,0.1); color:var(--gold); padding:4px 10px; border:1px solid rgba(201,168,76,0.25); }
+
+  /* AD DETAIL */
+  .ad-detail { display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+  .detail-col { }
+
+  .detail-card { background:var(--surface); border:1px solid var(--border); padding:28px; margin-bottom:20px; }
+  .detail-label { font-size:8px; letter-spacing:5px; text-transform:uppercase; color:var(--gold); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .detail-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* IMAGE GRID */
+  .image-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .img-option { position:relative; aspect-ratio:1; background:var(--charcoal); border:2px solid transparent; cursor:pointer; overflow:hidden; transition:border-color 0.2s; }
+  .img-option:hover { border-color:rgba(201,168,76,0.5); }
+  .img-option.selected { border-color:var(--gold); }
+  .img-option img { width:100%; height:100%; object-fit:cover; opacity:0.85; transition:opacity 0.2s; }
+  .img-option:hover img, .img-option.selected img { opacity:1; }
+  .img-check { position:absolute; top:6px; right:6px; width:18px; height:18px; background:var(--gold); border-radius:50%; display:none; align-items:center; justify-content:center; font-size:9px; color:var(--black); }
+  .img-option.selected .img-check { display:flex; }
+  .img-name { position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.75); font-size:7px; letter-spacing:1px; padding:4px 6px; color:var(--gold-light); text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
+
+  /* COPY FIELDS */
+  .copy-field { margin-bottom:16px; }
+  .copy-label { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; display:flex; justify-content:space-between; }
+  .copy-label span { color:var(--gold); cursor:pointer; }
+  .copy-label span:hover { color:var(--gold-light); }
+  .copy-box { background:var(--charcoal); border:1px solid var(--border); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-size:11px; letter-spacing:0.5px; line-height:1.8; padding:12px 14px; width:100%; resize:vertical; outline:none; transition:border-color 0.2s; }
+  .copy-box:focus { border-color:var(--gold); }
+
+  /* AUDIENCE */
+  .audience-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+  .a-field { }
+  .a-label { font-size:8px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  .a-value { font-size:11px; letter-spacing:1px; color:var(--cream); background:var(--charcoal); border:1px solid var(--border); padding:10px 12px; }
+  .interest-tags { display:flex; flex-wrap:wrap; gap:6px; }
+  .i-tag { font-size:8px; letter-spacing:2px; text-transform:uppercase; background:rgba(201,168,76,0.08); color:var(--gold-light); border:1px solid rgba(201,168,76,0.2); padding:4px 10px; }
+
+  /* SPECS */
+  .spec-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(201,168,76,0.08); font-size:10px; }
+  .spec-key { color:var(--muted); letter-spacing:1px; }
+  .spec-val { color:var(--cream); text-align:right; }
+  .spec-val.gold { color:var(--gold); }
+
+  /* ACTIONS */
+  .action-bar { display:flex; gap:12px; margin-top:24px; flex-wrap:wrap; }
+  .btn { font-family:'Josefin Sans',sans-serif; font-size:9px; letter-spacing:4px; text-transform:uppercase; padding:13px 28px; border:none; cursor:pointer; transition:all 0.25s; }
+  .btn-gold { background:var(--gold); color:var(--black); }
+  .btn-gold:hover { background:var(--gold-light); }
+  .btn-outline { background:transparent; color:var(--gold); border:1px solid var(--gold); }
+  .btn-outline:hover { background:rgba(201,168,76,0.08); }
+  .btn-copy { background:var(--surface); color:var(--muted); border:1px solid var(--border); font-size:8px; padding:10px 18px; }
+  .btn-copy:hover { color:var(--gold); border-color:var(--gold); }
+
+  /* CHECKLIST */
+  .checklist { }
+  .check-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid rgba(201,168,76,0.08); }
+  .check-box { width:18px; height:18px; border:1px solid var(--border); flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:10px; transition:all 0.2s; margin-top:1px; }
+  .check-box.done { background:var(--gold); border-color:var(--gold); color:var(--black); }
+  .check-text { font-size:11px; letter-spacing:0.5px; color:var(--cream); line-height:1.8; }
+  .check-text.done { color:var(--muted); text-decoration:line-through; }
+  .check-sub { font-size:9px; letter-spacing:1px; color:var(--muted); margin-top:3px; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:30px; right:30px; background:var(--gold); color:var(--black); font-size:9px; letter-spacing:3px; text-transform:uppercase; padding:12px 24px; transform:translateY(80px); opacity:0; transition:all 0.3s; z-index:999; }
+  .toast.show { transform:translateY(0); opacity:1; }
+
+  /* PROGRESS */
+  .progress-bar { height:2px; background:var(--border); margin-bottom:30px; }
+  .progress-fill { height:100%; background:var(--gold); transition:width 0.5s; }
+
+  /* R2 URL */
+  .r2-url { font-size:9px; letter-spacing:1px; color:var(--muted); background:var(--charcoal); border:1px solid var(--border); padding:10px 14px; word-break:break-all; margin-top:6px; cursor:pointer; transition:border-color 0.2s; }
+  .r2-url:hover { border-color:var(--gold); color:var(--gold-light); }
+
+  /* LAUNCH PLAN */
+  .timeline { position:relative; padding-left:30px; }
+  .timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:1px; background:var(--border); }
+  .tl-item { position:relative; margin-bottom:28px; }
+  .tl-dot { position:absolute; left:-26px; top:4px; width:10px; height:10px; border:1px solid var(--gold); background:var(--black); }
+  .tl-dot.live { background:var(--gold); }
+  .tl-date { font-size:8px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+  .tl-title { font-family:'Cormorant Garamond',serif; font-size:18px; color:var(--cream); margin-bottom:6px; }
+  .tl-desc { font-size:10px; letter-spacing:1px; color:var(--muted); line-height:1.9; }
+
+  @media(max-width:900px) {
+    .campaigns { grid-template-columns:1fr; }
+    .ad-detail { grid-template-columns:1fr; }
+    .audience-row { grid-template-columns:1fr; }
+    main { padding:20px; }
+    header { padding:16px 20px; }
+    .tabs { padding:0 20px; overflow-x:auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Orris<span>oak</span></div>
+  <div class="header-right">
+    <div class="account-badge">act_1252129529887815</div>
+    <div class="launch-badge">🚀 May 1 Launch</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('creatives')">Ad Creatives</button>
+  <button class="tab" onclick="showTab('copy')">Ad Copy</button>
+  <button class="tab" onclick="showTab('audience')">Audiences</button>
+  <button class="tab" onclick="showTab('checklist')">Launch Checklist</button>
+  <button class="tab" onclick="showTab('timeline')">15-Day Plan</button>
+</div>
+
+<main>
+
+<!-- ══ CREATIVES TAB ══ -->
+<div class="panel active" id="panel-creatives">
+  <div class="section-head">
+    <span class="section-eye">Meta Ad Creatives</span>
+    <h2 class="section-title">Select Your <em>Hero Images</em></h2>
+    <p class="section-sub">Choose the primary and secondary creative for each campaign. Click an image to select it. R2 URLs auto-populate below.</p>
+  </div>
+
+  <!-- 3 CAMPAIGNS -->
+  <div class="campaigns">
+    <div class="campaign-card active-card" onclick="selectCampaign(0,this)">
+      <div class="c-num">01</div>
+      <div class="c-product">Beauty · Tools</div>
+      <div class="c-name">4-in-1 Magnetic Brush</div>
+      <div class="c-objective">Objective: Conversions · Purchase</div>
+      <div class="c-budget">$15/day · Both Colors</div>
+    </div>
+    <div class="campaign-card" onclick="selectCampaign(1,this)">
+      <div class="c-num">02</div>
+      <div class="c-product">Skincare · Anti-Aging</div>
+      <div class="c-name">24K Gold Serum</div>
+      <div class="c-objective">Objective: Awareness · Reach</div>
+      <div class="c-budget">$10/day · Phase 1</div>
+    </div>
+    <div class="campaign-card" onclick="selectCampaign(2,this)">
+      <div class="c-num">03</div>
+      <div class="c-product">Skincare · Cleanse</div>
+      <div class="c-name">Glow Cleanser</div>
+      <div class="c-objective">Objective: Traffic · Link Clicks</div>
+      <div class="c-budget">$8/day · Phase 1</div>
+    </div>
+  </div>
+
+  <!-- AD DETAIL FOR SELECTED CAMPAIGN -->
+  <div class="ad-detail">
+
+    <!-- LEFT: IMAGE PICKER -->
+    <div class="detail-col">
+      <div class="detail-card">
+        <div class="detail-label">Primary Creative — Hero Image</div>
+        <div class="image-grid" id="image-grid-primary"></div>
+        <div style="margin-top:14px;">
+          <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Selected R2 URL</div>
+          <div class="r2-url" id="r2-primary" onclick="copyR2(this)">Click an image to select</div>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-label">Secondary Creative — Lifestyle Image</div>
+        <div class="image-grid" id="image-grid-secondary"></div>
+        <div style="margin-top:14px;">
+          <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Selected R2 URL</div>
+          <div class="r2-url" id="r2-secondary" onclick="copyR2(this)">Click an image to select</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: SPECS -->
+    <div class="detail-col">
+      <div class="detail-card">
+        <div class="detail-label">Ad Format Specs</div>
+        <div id="specs-content"></div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-label">Meta Campaign Settings</div>
+        <div id="settings-content"></div>
+      </div>
+
+      <div class="action-bar">
+        <button class="btn btn-gold" onclick="copyAllSettings()">Copy All Settings</button>
+        <button class="btn btn-outline" onclick="showTab('copy')">Write Ad Copy →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COPY TAB ══ -->
+<div class="panel" id="panel-copy">
+  <div class="section-head">
+    <span class="section-eye">Ad Copy</span>
+    <h2 class="section-title">Ready-to-Paste <em>Ad Copy</em></h2>
+    <p class="section-sub">All copy written for Meta. Click any field to edit. Click the copy icon to copy to clipboard.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">
+
+    <!-- BRUSH COPY -->
+    <div class="detail-card">
+      <div class="detail-label" style="color:#C9A84C;">Campaign 01 · Magnetic Brush</div>
+
+      <div class="copy-field">
+        <div class="copy-label">Primary Text <span onclick="copyField('brush-primary')">Copy</span></div>
+        <textarea class="copy-box" id="brush-primary" rows="5">Your entire makeup routine. One magnetic tool.
+
+The Orris & Oak 4-in-1 Magnetic Brush snaps between foundation, contour, highlight, and blend in seconds. Professional finish. Zero clutter.
+
+✦ 4 brushes in 1 handle
+✦ Magnetic snap system
+✦ Luxury leather travel case included
+✦ Available in Ivory & Noir
+
+Use code GLOW15 for 15% off your first order.
+Shop orrisoak.com</textarea>
+      </div>
+
+      <div class="copy-field">
+        <div class="copy-label">Headline <span onclick="copyField('brush-headline')">Copy</span></div>
+        <textarea class="copy-box" id="brush-headline" rows="2">4 Brushes. 1 Magnetic System.</textarea>
+      </div>
+
+      <div class="copy-field">
+        <div class="copy-label">Description <span onclick="copyField('brush-desc')">Copy</span></div>
+        <textarea class="copy-box" id="brush-desc" rows="2">Professional makeup application, effortlessly elevated.</textarea>
+      </div>
+
+      <div class="copy-field">
+        <div class="copy-label">CTA Button</div>
+        <div class="a-value">Shop Now</div>
+      </div>
+    </div>
+
+    <!-- SERUM COPY -->
+    <div class="detail-card">
+      <div class="detail-label" style="color:#C9A84C;">Campaign 02 · Gold Serum</div>
+
+      <div class="copy-field">
+        <div class="copy-label">Primary Text <span onclick="copyField('serum-primary')">Copy</span></div>
+        <textarea class="copy-box" id="serum-primary" rows="5">Your skin deserves the world's most precious ingredient.
+
+Orris & Oak 24K Gold & Black Truffle Anti-Aging Serum. Real gold particles and rare truffle extract — formulated to visibly lift, firm, and illuminate in 14 days.
+
+✦ 24K pure gold complex
+✦ Black truffle extract
+✦ Visible results in 14 days
+✦ Luxury meets science
+
+Use code GLOW15 for 15% off.
+orrisoak.com</textarea>
+      </div>
+
+      <div class="copy-field">
+        <div class="copy-label">Headline <span onclick="copyField('serum-headline')">Copy</span></div>
+        <textarea class="copy-box" id="serum-headline" rows="2">24K Gold Anti-Aging Serum</textarea>
+      </div>
+
+      <div class="copy-field">
+        <div class="copy-label">Description <span onclick="copyField('serum-desc')">Copy</span></div>
+        <textarea class="copy-box" id="serum-desc" rows="2">Luxury skincare powered by gold and black truffle.</textarea>
+      </div>
+
+      <div class="copy-field">
+        <div class="copy-label">CTA Button</div>
+        <div class="a-value">Learn More</div>
+      </div>
+    </div>
+
+    <!-- CLEANSER COPY -->
+    <div class="detail-card">
+      <div class="detail-label" style="color:#C9A84C;">Campaign 03 · Glow Cleanser</div>
+
+      <div class="copy-field">
+        <div class="copy-label">Primary Text <span onclick="copyField('cleanser-primary')">Copy</span></div>
+        <textarea class="copy-box" id="cleanser-primary" rows="5">Every glow ritual starts with the perfect cleanse.
+
+Our 24K Gold Black Truffle Hydrating Glow Cleanser melts away impurities while flooding skin with gold-infused radiance. Wake up glowing. Every single morning.
+
+✦ Gold-infused formula
+✦ Truffle extract for deep hydration
+✦ Hyaluronic acid complex
+✦ Gentle enough for daily use
+
+Use code GLOW15 for 15% off.
+orrisoak.com</textarea>
+      </div>
+
+      <div class="copy-field">
+        <div class="copy-label">Headline <span onclick="copyField('cleanser-headline')">Copy</span></div>
+        <textarea class="copy-box" id="cleanser-headline" rows="2">Start Your Glow Ritual With Gold</textarea>
+      </div>
+
+      <div class="copy-field">
+        <div class="copy-label">Description <span onclick="copyField('cleanser-desc')">Copy</span></div>
+        <textarea class="copy-box" id="cleanser-desc" rows="2">Gold-infused cleanser for luminous, hydrated skin daily.</textarea>
+      </div>
+
+      <div class="copy-field">
+        <div class="copy-label">CTA Button</div>
+        <div class="a-value">Shop Now</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AUDIENCE TAB ══ -->
+<div class="panel" id="panel-audience">
+  <div class="section-head">
+    <span class="section-eye">Audience Targeting</span>
+    <h2 class="section-title">Who Sees <em>Your Ads</em></h2>
+    <p class="section-sub">Paste these settings directly into Meta Ads Manager → Audience section for each campaign.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">
+
+    <!-- BRUSH AUDIENCE -->
+    <div class="detail-card">
+      <div class="detail-label">Campaign 01 · Brush</div>
+      <div class="audience-row">
+        <div class="a-field"><div class="a-label">Age Range</div><div class="a-value">22 – 45</div></div>
+        <div class="a-field"><div class="a-label">Gender</div><div class="a-value">Women</div></div>
+      </div>
+      <div class="audience-row">
+        <div class="a-field"><div class="a-label">Location</div><div class="a-value">United States</div></div>
+        <div class="a-field"><div class="a-label">Language</div><div class="a-value">English</div></div>
+      </div>
+      <div class="a-label" style="margin-bottom:8px;">Detailed Targeting — Interests</div>
+      <div class="interest-tags">
+        <span class="i-tag">Makeup</span>
+        <span class="i-tag">Beauty Tutorials</span>
+        <span class="i-tag">Makeup Brushes</span>
+        <span class="i-tag">Sephora</span>
+        <span class="i-tag">ULTA Beauty</span>
+        <span class="i-tag">Luxury Cosmetics</span>
+        <span class="i-tag">Contour Makeup</span>
+        <span class="i-tag">Foundation Brush</span>
+        <span class="i-tag">Professional Makeup</span>
+      </div>
+      <div class="a-label" style="margin:14px 0 8px;">Placements</div>
+      <div class="interest-tags">
+        <span class="i-tag">Instagram Feed</span>
+        <span class="i-tag">Instagram Reels</span>
+        <span class="i-tag">Facebook Feed</span>
+        <span class="i-tag">Facebook Reels</span>
+      </div>
+    </div>
+
+    <!-- SERUM AUDIENCE -->
+    <div class="detail-card">
+      <div class="detail-label">Campaign 02 · Serum</div>
+      <div class="audience-row">
+        <div class="a-field"><div class="a-label">Age Range</div><div class="a-value">35 – 60</div></div>
+        <div class="a-field"><div class="a-label">Gender</div><div class="a-value">Women</div></div>
+      </div>
+      <div class="audience-row">
+        <div class="a-field"><div class="a-label">Location</div><div class="a-value">United States</div></div>
+        <div class="a-field"><div class="a-label">Language</div><div class="a-value">English</div></div>
+      </div>
+      <div class="a-label" style="margin-bottom:8px;">Detailed Targeting — Interests</div>
+      <div class="interest-tags">
+        <span class="i-tag">Anti-Aging</span>
+        <span class="i-tag">Luxury Skincare</span>
+        <span class="i-tag">Skincare Routine</span>
+        <span class="i-tag">La Mer</span>
+        <span class="i-tag">SK-II</span>
+        <span class="i-tag">Gold Skincare</span>
+        <span class="i-tag">Collagen</span>
+        <span class="i-tag">Serum</span>
+        <span class="i-tag">Beauty Over 40</span>
+        <span class="i-tag">Luxury Beauty</span>
+      </div>
+      <div class="a-label" style="margin:14px 0 8px;">Placements</div>
+      <div class="interest-tags">
+        <span class="i-tag">Instagram Feed</span>
+        <span class="i-tag">Facebook Feed</span>
+        <span class="i-tag">Facebook Right Column</span>
+      </div>
+    </div>
+
+    <!-- CLEANSER AUDIENCE -->
+    <div class="detail-card">
+      <div class="detail-label">Campaign 03 · Cleanser</div>
+      <div class="audience-row">
+        <div class="a-field"><div class="a-label">Age Range</div><div class="a-value">28 – 50</div></div>
+        <div class="a-field"><div class="a-label">Gender</div><div class="a-value">Women</div></div>
+      </div>
+      <div class="audience-row">
+        <div class="a-field"><div class="a-label">Location</div><div class="a-value">United States</div></div>
+        <div class="a-field"><div class="a-label">Language</div><div class="a-value">English</div></div>
+      </div>
+      <div class="a-label" style="margin-bottom:8px;">Detailed Targeting — Interests</div>
+      <div class="interest-tags">
+        <span class="i-tag">Skincare</span>
+        <span class="i-tag">Face Wash</span>
+        <span class="i-tag">Clean Beauty</span>
+        <span class="i-tag">Glow Skin</span>
+        <span class="i-tag">Hyaluronic Acid</span>
+        <span class="i-tag">Morning Skincare</span>
+        <span class="i-tag">Glass Skin</span>
+        <span class="i-tag">Hydration</span>
+        <span class="i-tag">Natural Beauty</span>
+      </div>
+      <div class="a-label" style="margin:14px 0 8px;">Placements</div>
+      <div class="interest-tags">
+        <span class="i-tag">Instagram Feed</span>
+        <span class="i-tag">Instagram Stories</span>
+        <span class="i-tag">Facebook Feed</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHECKLIST TAB ══ -->
+<div class="panel" id="panel-checklist">
+  <div class="section-head">
+    <span class="section-eye">Pre-Launch Checklist</span>
+    <h2 class="section-title">15 Days to <em>May 1</em></h2>
+    <p class="section-sub">Check off each item as you complete it. Must be 100% before activating campaigns.</p>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div style="font-size:9px;letter-spacing:3px;color:var(--muted);margin-bottom:24px;" id="progress-text">0 of 12 complete</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;">
+    <div>
+      <div class="detail-card">
+        <div class="detail-label">Meta Setup</div>
+        <div class="checklist">
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">Orrisoak Pixel installed on orrisoak.com</div><div class="check-sub">Events Manager → verify pixel is firing</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">Payment method added to Ad Account</div><div class="check-sub">Ads Manager → Billing → Add credit card</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">Instagram @orrisoakbeauty connected to Business Manager</div><div class="check-sub">Business Settings → Instagram Accounts</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">3 campaigns created as DRAFTS in Ads Manager</div><div class="check-sub">Brush · Serum · Cleanser — do not activate yet</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">Ad creatives uploaded (images selected from this tool)</div><div class="check-sub">Use R2 URLs or upload PNGs directly to Meta</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">All ad copy pasted into each campaign</div><div class="check-sub">Primary text + headline + description per ad</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="detail-card">
+        <div class="detail-label">Store & Content</div>
+        <div class="checklist">
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">Shopify store live at orrisoak.com</div><div class="check-sub">All 3 products published with prices</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">GLOW15 discount code active in Shopify</div><div class="check-sub">15% off — verify it works at checkout</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">R2 product images live at images.orrisoak.com</div><div class="check-sub">Black brush ✓ · Ivory brush ✓ · Serum & cleanser TBD</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">First 3 Instagram posts published before launch</div><div class="check-sub">Build organic presence before ads go live</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">Klaviyo welcome email sequence active</div><div class="check-sub">Triggered when someone signs up → delivers GLOW15</div></div></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><div><div class="check-text">Activate all 3 campaigns on May 1 at 9am CT</div><div class="check-sub">Open Ads Manager → change status from Draft → Active</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TIMELINE TAB ══ -->
+<div class="panel" id="panel-timeline">
+  <div class="section-head">
+    <span class="section-eye">Execution Timeline</span>
+    <h2 class="section-title">Apr 15 → <em>May 1</em></h2>
+    <p class="section-sub">Your day-by-day execution plan to launch date. Work through this in order.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+    <div>
+      <div class="detail-card">
+        <div class="detail-label">Week 1 · Apr 15–20</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot live"></div>
+            <div class="tl-date">Today · Apr 15</div>
+            <div class="tl-title">Set up Meta Ad Creatives</div>
+            <div class="tl-desc">Use this tool to select hero images for all 3 campaigns. Copy all ad copy and audience settings. Create 3 draft campaigns in Ads Manager.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Apr 16</div>
+            <div class="tl-title">Post First Instagram Content</div>
+            <div class="tl-desc">Post the ivory brush hero image with GLOW15 teaser copy to @orrisoakbeauty. Simultaneously post to Facebook page.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Apr 17–18</div>
+            <div class="tl-title">Upload Serum & Cleanser Images to R2</div>
+            <div class="tl-desc">Same process as brush images — rename, run upload script, verify at images.orrisoak.com.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Apr 19</div>
+            <div class="tl-title">Post Brush Comparison — Ivory vs Noir</div>
+            <div class="tl-desc">Use lifestyle-vanity-two-colors.png — perfect side-by-side shot. Caption: "Two shades. One ritual."</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Apr 20</div>
+            <div class="tl-title">Verify Pixel Is Firing</div>
+            <div class="tl-desc">Install Meta Pixel Helper Chrome extension. Visit orrisoak.com. Confirm green checkmark on all pages including product and checkout.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="detail-card">
+        <div class="detail-label">Week 2–3 · Apr 21–May 1</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Apr 21</div>
+            <div class="tl-title">Full Product Reveal Post</div>
+            <div class="tl-desc">First post showing all 3 products together. Caption: "The complete ritual. Launching May 1."</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Apr 23–25</div>
+            <div class="tl-title">Influencer Follow-Ups</div>
+            <div class="tl-desc">Follow up on all 5 DMs sent. Aim to confirm 3+ influencers who will post on or around May 1.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Apr 27</div>
+            <div class="tl-title">Final Review of All 3 Draft Campaigns</div>
+            <div class="tl-desc">Open Ads Manager. Check images, copy, audience, budget, and pixel for each campaign. Fix anything flagged.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Apr 28</div>
+            <div class="tl-title">Send Mother's Day Launch Email</div>
+            <div class="tl-desc">Klaviyo → send to full list. Subject: "Launching May 1 — your gift (15% off)" with GLOW15 code.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">May 1 · 9am CT 🎉</div>
+            <div class="tl-title">Activate All 3 Campaigns</div>
+            <div class="tl-desc">Ads Manager → select all 3 campaigns → change status to Active. Post launch day content. Monitor for first 4 hours.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const R2_BASE = "https://images.orrisoak.com/content/magnetic-brush";
+
+const campaigns = [
+  {
+    name: "4-in-1 Magnetic Brush",
+    primaryImages: [
+      { file: "orrisoak-4in1-brush-ivory-hero.png", folder: "ivory", label: "Ivory Hero" },
+      { file: "orrisoak-4in1-brush-ivory-hero-gold-sparkle.png", folder: "ivory", label: "Gold Sparkle" },
+      { file: "orrisoak-4in1-brush-ivory-set-with-case-white-bg.png", folder: "ivory", label: "Set + Case" },
+      { file: "orrisoak-4in1-brush-ivory-packaging-tube-white-bg.png", folder: "ivory", label: "Tube White" },
+      { file: "orrisoak-4in1-brush-ivory-case-ivory-gold-sparkle.png", folder: "ivory", label: "Case Sparkle" },
+      { file: "orrisoak-4in1-brush-ivory-set-black-bg.png", folder: "ivory", label: "Set Black BG" },
+    ],
+    secondaryImages: [
+      { file: "orrisoak-4in1-brush-ivory-lifestyle-face-bokeh.png", folder: "ivory", label: "Model Face" },
+      { file: "orrisoak-4in1-brush-ivory-lifestyle-model-white-bg.png", folder: "ivory", label: "Model White" },
+      { file: "orrisoak-4in1-brush-ivory-lifestyle-vanity-two-colors.png", folder: "ivory", label: "Two Colors" },
+      { file: "orrisoak-4in1-brush-ivory-lifestyle-hand-case-bokeh.png", folder: "ivory", label: "Hand+Case" },
+      { file: "orrisoak-4in1-brush-ivory-lifestyle-collage-4up.png", folder: "ivory", label: "4-Up Collage" },
+      { file: "orrisoak-4in1-brush-ivory-lifestyle-model-case-white-bg.png", folder: "ivory", label: "Model Case" },
+    ],
+    specs: [
+      { k: "Format", v: "Single Image + Carousel" },
+      { k: "Image Size", v: "1080 × 1080px (1:1)" },
+      { k: "Story Size", v: "1080 × 1920px (9:16)" },
+      { k: "File Type", v: "PNG / JPG" },
+      { k: "Max File Size", v: "30MB" },
+      { k: "Min Resolution", v: "600 × 600px" },
+      { k: "Text Overlay", v: "Keep under 20% of image" },
+    ],
+    settings: [
+      { k: "Campaign Objective", v: "Conversions", g: true },
+      { k: "Conversion Event", v: "Purchase" },
+      { k: "Budget", v: "$15/day" },
+      { k: "Bid Strategy", v: "Lowest Cost" },
+      { k: "Schedule", v: "Start May 1, 9am CT" },
+      { k: "Ad Account", v: "act_1252129529887815" },
+      { k: "Pixel", v: "Orrisoak Pixel" },
+    ]
+  },
+  {
+    name: "24K Gold Serum",
+    primaryImages: [
+      { file: "serum-hero-white-bg.png", folder: "serum", label: "Hero White" },
+      { file: "serum-bottle-gold-detail.png", folder: "serum", label: "Gold Detail" },
+      { file: "serum-texture-closeup.png", folder: "serum", label: "Texture" },
+      { file: "serum-lifestyle-model.png", folder: "serum", label: "Model" },
+      { file: "serum-before-after.png", folder: "serum", label: "Before/After" },
+      { file: "serum-ingredients-flatlay.png", folder: "serum", label: "Ingredients" },
+    ],
+    secondaryImages: [
+      { file: "serum-model-applying.png", folder: "serum", label: "Applying" },
+      { file: "serum-morning-ritual.png", folder: "serum", label: "Morning Ritual" },
+      { file: "serum-packaging.png", folder: "serum", label: "Packaging" },
+      { file: "serum-gold-pour.png", folder: "serum", label: "Gold Pour" },
+      { file: "serum-lifestyle-vanity.png", folder: "serum", label: "Vanity" },
+      { file: "serum-collage.png", folder: "serum", label: "Collage" },
+    ],
+    specs: [
+      { k: "Format", v: "Single Image + Video" },
+      { k: "Image Size", v: "1080 × 1080px (1:1)" },
+      { k: "File Type", v: "PNG / JPG" },
+      { k: "Max File Size", v: "30MB" },
+      { k: "Text Overlay", v: "Keep under 20% of image" },
+      { k: "Video Length", v: "6–15 seconds optimal" },
+    ],
+    settings: [
+      { k: "Campaign Objective", v: "Awareness / Reach", g: true },
+      { k: "Conversion Event", v: "ViewContent (Phase 1)" },
+      { k: "Budget", v: "$10/day" },
+      { k: "Bid Strategy", v: "Lowest Cost" },
+      { k: "Schedule", v: "Start May 1, 9am CT" },
+      { k: "Ad Account", v: "act_1252129529887815" },
+      { k: "Pixel", v: "Orrisoak Pixel" },
+    ]
+  },
+  {
+    name: "Glow Cleanser",
+    primaryImages: [
+      { file: "cleanser-hero-white-bg.png", folder: "cleanser", label: "Hero White" },
+      { file: "cleanser-bottle-detail.png", folder: "cleanser", label: "Bottle" },
+      { file: "cleanser-texture-lather.png", folder: "cleanser", label: "Texture" },
+      { file: "cleanser-lifestyle-model.png", folder: "cleanser", label: "Model" },
+      { file: "cleanser-ingredients.png", folder: "cleanser", label: "Ingredients" },
+      { file: "cleanser-ritual-set.png", folder: "cleanser", label: "Ritual Set" },
+    ],
+    secondaryImages: [
+      { file: "cleanser-model-applying.png", folder: "cleanser", label: "Applying" },
+      { file: "cleanser-morning-ritual.png", folder: "cleanser", label: "Morning" },
+      { file: "cleanser-packaging.png", folder: "cleanser", label: "Packaging" },
+      { file: "cleanser-glow-result.png", folder: "cleanser", label: "Glow Result" },
+      { file: "cleanser-lifestyle-bokeh.png", folder: "cleanser", label: "Bokeh" },
+      { file: "cleanser-collage.png", folder: "cleanser", label: "Collage" },
+    ],
+    specs: [
+      { k: "Format", v: "Single Image + Stories" },
+      { k: "Image Size", v: "1080 × 1080px (1:1)" },
+      { k: "Story Size", v: "1080 × 1920px (9:16)" },
+      { k: "File Type", v: "PNG / JPG" },
+      { k: "Max File Size", v: "30MB" },
+      { k: "Text Overlay", v: "Keep under 20% of image" },
+    ],
+    settings: [
+      { k: "Campaign Objective", v: "Traffic", g: true },
+      { k: "Conversion Event", v: "Link Clicks" },
+      { k: "Budget", v: "$8/day" },
+      { k: "Bid Strategy", v: "Lowest Cost" },
+      { k: "Schedule", v: "Start May 1, 9am CT" },
+      { k: "Ad Account", v: "act_1252129529887815" },
+      { k: "Pixel", v: "Orrisoak Pixel" },
+    ]
+  }
+];
+
+let activeCampaign = 0;
+
+function selectCampaign(idx, el) {
+  activeCampaign = idx;
+  document.querySelectorAll('.campaign-card').forEach(c => c.classList.remove('active-card'));
+  el.classList.add('active-card');
+  renderCreatives();
+}
+
+function renderCreatives() {
+  const c = campaigns[activeCampaign];
+
+  // Primary grid
+  const pg = document.getElementById('image-grid-primary');
+  pg.innerHTML = c.primaryImages.map((img, i) => {
+    const url = `${R2_BASE}/${img.folder}/images/${img.file}`;
+    return `<div class="img-option" onclick="selectImage('primary',${i},'${url}',this)">
+      <img src="${url}" onerror="this.style.display='none'" alt="${img.label}">
+      <div class="img-check">✓</div>
+      <div class="img-name">${img.label}</div>
+    </div>`;
+  }).join('');
+
+  // Secondary grid
+  const sg = document.getElementById('image-grid-secondary');
+  sg.innerHTML = c.secondaryImages.map((img, i) => {
+    const url = `${R2_BASE}/${img.folder}/images/${img.file}`;
+    return `<div class="img-option" onclick="selectImage('secondary',${i},'${url}',this)">
+      <img src="${url}" onerror="this.style.display='none'" alt="${img.label}">
+      <div class="img-check">✓</div>
+      <div class="img-name">${img.label}</div>
+    </div>`;
+  }).join('');
+
+  // Specs
+  document.getElementById('specs-content').innerHTML = c.specs.map(s =>
+    `<div class="spec-row"><span class="spec-key">${s.k}</span><span class="spec-val">${s.v}</span></div>`
+  ).join('');
+
+  // Settings
+  document.getElementById('settings-content').innerHTML = c.settings.map(s =>
+    `<div class="spec-row"><span class="spec-key">${s.k}</span><span class="spec-val ${s.g?'gold':''}">${s.v}</span></div>`
+  ).join('');
+
+  // Reset R2 URLs
+  document.getElementById('r2-primary').textContent = 'Click an image to select';
+  document.getElementById('r2-secondary').textContent = 'Click an image to select';
+}
+
+function selectImage(type, idx, url, el) {
+  const grid = type === 'primary' ? 'image-grid-primary' : 'image-grid-secondary';
+  document.querySelectorAll(`#${grid} .img-option`).forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById(`r2-${type}`).textContent = url;
+}
+
+function copyR2(el) {
+  const txt = el.textContent;
+  if(txt === 'Click an image to select') return;
+  navigator.clipboard.writeText(txt).then(() => toast('URL Copied ✓'));
+}
+
+function copyField(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.value).then(() => toast('Copied ✓'));
+}
+
+function copyAllSettings() {
+  const c = campaigns[activeCampaign];
+  const txt = c.settings.map(s => `${s.k}: ${s.v}`).join('\n');
+  navigator.clipboard.writeText(txt).then(() => toast('All Settings Copied ✓'));
+}
+
+// CHECKLIST
+function toggleCheck(box) {
+  box.classList.toggle('done');
+  const text = box.nextElementSibling.querySelector('.check-text');
+  text.classList.toggle('done');
+  updateProgress();
+}
+
+function updateProgress() {
+  const all = document.querySelectorAll('.check-box').length;
+  const done = document.querySelectorAll('.check-box.done').length;
+  const pct = Math.round((done/all)*100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} of ${all} complete`;
+}
+
+// TABS
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// INIT
+renderCreatives();
+</script>
+</body>
+</html>
