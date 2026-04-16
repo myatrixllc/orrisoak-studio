@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orrisoak · Launch Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9A84C; --gold-light:#E8D5A3; --gold-dim:rgba(201,168,76,0.08);
+  --gold-border:rgba(201,168,76,0.2); --black:#070707; --s1:#0F0F0F;
+  --s2:#161616; --s3:#1E1E1E; --cream:#F0E9DC; --muted:#6A5A4A;
+  --green:#4CAF7A; --green-dim:rgba(76,175,122,0.1); --green-border:rgba(76,175,122,0.35);
+  --red:#C94C4C; --red-dim:rgba(201,76,76,0.1); --red-border:rgba(201,76,76,0.35);
+  --orange:#D4894A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;}
+
+/* HEADER */
+header{background:var(--s1);border-bottom:1px solid var(--gold-border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);letter-spacing:4px;}
+.logo span{font-style:italic;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.conn-dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;}
+.conn-dot.live{background:var(--green);}
+.conn-status{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.home-btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);border:1px solid var(--gold-border);padding:6px 14px;text-decoration:none;transition:all 0.2s;}
+.home-btn:hover{color:var(--gold);border-color:var(--gold);}
+
+/* CREDS BAR */
+.creds-bar{background:var(--s2);border-bottom:1px solid var(--gold-border);padding:12px 40px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.cred-input{background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:1px;padding:8px 12px;width:220px;outline:none;transition:border-color 0.2s;}
+.cred-input:focus{border-color:var(--gold);}
+.cred-input::placeholder{color:var(--muted);}
+.connect-btn{background:var(--gold);color:var(--black);border:none;font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:8px 20px;cursor:pointer;transition:all 0.2s;}
+.connect-btn:hover{background:var(--gold-light);}
+.cred-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+
+/* MAIN */
+main{max-width:1200px;margin:0 auto;padding:36px 40px;}
+
+/* ALERT */
+.alert{background:rgba(212,137,74,0.08);border:1px solid rgba(212,137,74,0.3);padding:14px 20px;margin-bottom:28px;display:flex;align-items:flex-start;gap:12px;}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:10px;letter-spacing:1px;color:var(--cream);line-height:1.9;}
+.alert-text strong{color:var(--orange);}
+
+/* SECTION */
+.section-eye{font-size:8px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:block;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:24px;}
+.section-title em{font-style:italic;color:var(--gold);}
+
+/* CAMPAIGN CARDS */
+.campaigns{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:36px;}
+.campaign{background:var(--s1);border:1px solid var(--gold-border);padding:28px;position:relative;transition:border-color 0.2s;}
+.campaign.published{border-color:rgba(76,175,122,0.4);}
+.c-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+.c-num{font-family:'Cormorant Garamond',serif;font-size:36px;color:rgba(201,168,76,0.15);line-height:1;}
+.c-status-badge{font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--gold-border);color:var(--muted);}
+.c-status-badge.active{background:var(--green-dim);border-color:var(--green-border);color:var(--green);}
+.c-status-badge.paused{background:var(--red-dim);border-color:var(--red-border);color:var(--red);}
+.c-status-badge.draft{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold);}
+.c-product{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.c-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;}
+.c-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.c-meta-item{background:var(--s2);padding:8px 10px;}
+.c-meta-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.c-meta-val{font-size:11px;color:var(--cream);}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--gold-border);}
+.toggle-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--s3);border:1px solid var(--gold-border);transition:all 0.3s;border-radius:0;}
+.toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:var(--muted);transition:all 0.3s;}
+.toggle input:checked + .toggle-slider{background:var(--green-dim);border-color:var(--green-border);}
+.toggle input:checked + .toggle-slider::before{transform:translateX(20px);background:var(--green);}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:12px;}
+.stat-box{background:var(--s2);padding:12px 14px;text-align:center;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);line-height:1;}
+.stat-lbl{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.stat-box.loading .stat-num{color:var(--muted);}
+
+/* LOG */
+.log{background:var(--s2);border:1px solid var(--gold-border);padding:0;max-height:200px;overflow-y:auto;margin-bottom:28px;}
+.log-head{background:var(--s3);border-bottom:1px solid var(--gold-border);padding:10px 16px;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;}
+.log-clear{font-size:7px;cursor:pointer;color:var(--muted);background:none;border:none;font-family:'Josefin Sans',sans-serif;letter-spacing:2px;text-transform:uppercase;}
+.log-clear:hover{color:var(--gold);}
+.log-entry{padding:8px 16px;border-bottom:1px solid rgba(201,168,76,0.06);font-size:9px;letter-spacing:1px;display:flex;gap:12px;align-items:flex-start;}
+.log-entry:last-child{border-bottom:none;}
+.log-time{color:var(--muted);flex-shrink:0;font-size:8px;}
+.log-msg{color:var(--cream);line-height:1.6;}
+.log-msg.success{color:var(--green);}
+.log-msg.error{color:var(--red);}
+.log-msg.info{color:var(--gold);}
+
+/* MASTER CONTROLS */
+.master{background:var(--s1);border:1px solid var(--gold-border);padding:28px;margin-bottom:28px;}
+.master-title{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.master-title::after{content:'';flex:1;height:1px;background:var(--gold-border);}
+.master-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:13px 28px;border:none;cursor:pointer;transition:all 0.25s;display:inline-flex;align-items:center;gap:8px;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-gold{background:var(--gold);color:var(--black);}
+.btn-gold:hover:not(:disabled){background:var(--gold-light);}
+.btn-green{background:var(--green);color:var(--black);}
+.btn-green:hover:not(:disabled){background:#5fd68a;}
+.btn-red{background:transparent;color:var(--red);border:1px solid var(--red-border);}
+.btn-red:hover:not(:disabled){background:var(--red-dim);}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold-border);}
+.btn-outline:hover:not(:disabled){border-color:var(--gold);background:var(--gold-dim);}
+
+.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(0,0,0,0.3);border-top-color:var(--black);border-radius:50%;animation:spin 0.6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s2);border:1px solid var(--gold);border-left:3px solid var(--gold);padding:12px 18px;font-size:9px;letter-spacing:1px;color:var(--cream);transform:translateY(60px);opacity:0;transition:all 0.3s;z-index:999;max-width:300px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{border-color:var(--green);border-left-color:var(--green);}
+.toast.red{border-color:var(--red);border-left-color:var(--red);}
+
+@media(max-width:900px){
+  .campaigns{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  main{padding:20px;}
+  header{padding:0 20px;}
+  .creds-bar{padding:12px 20px;}
+  .cred-input{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="logo">Orris<span>oak</span></div>
+    <span style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);border:1px solid var(--gold-border);padding:3px 10px;">Launch Control</span>
+  </div>
+  <div class="header-right">
+    <div class="conn-dot" id="conn-dot"></div>
+    <span class="conn-status" id="conn-status">Not Connected</span>
+    <a href="index.html" class="home-btn">← Studio</a>
+  </div>
+</header>
+
+<!-- CREDENTIALS -->
+<div class="creds-bar">
+  <span class="cred-label">Meta Token</span>
+  <input class="cred-input" type="password" id="meta-token" placeholder="Paste access token..." style="width:320px;">
+  <span class="cred-label">Ad Account</span>
+  <input class="cred-input" type="text" id="ad-account" placeholder="act_1252129529887815" value="act_1252129529887815" style="width:200px;">
+  <button class="connect-btn" onclick="connect()">Connect Meta</button>
+</div>
+
+<main>
+
+  <!-- ALERT -->
+  <div class="alert">
+    <div class="alert-icon">⚡</div>
+    <div class="alert-text">
+      <strong>How this works:</strong> Step 1 — Connect Meta with your token above. Step 2 — Click <strong>"Publish All 3 Campaigns"</strong> to create them as PAUSED drafts in Meta. Step 3 — On May 1 at 9am CT, flip the toggles to <strong>ACTIVE</strong>. That's it. No manual Ads Manager needed.
+    </div>
+  </div>
+
+  <!-- MASTER CONTROLS -->
+  <div class="master">
+    <div class="master-title">Master Controls</div>
+    <div class="master-btns">
+      <button class="btn btn-gold" id="publish-all-btn" onclick="publishAllCampaigns()" disabled>
+        <span id="publish-all-inner">🚀 Publish All 3 Campaigns</span>
+      </button>
+      <button class="btn btn-green" id="activate-all-btn" onclick="setAllCampaigns('ACTIVE')" disabled>
+        <span id="activate-all-inner">▶ Activate All — Go Live</span>
+      </button>
+      <button class="btn btn-red" id="pause-all-btn" onclick="setAllCampaigns('PAUSED')" disabled>
+        <span id="pause-all-inner">⏸ Pause All Campaigns</span>
+      </button>
+      <button class="btn btn-outline" onclick="refreshStats()" id="refresh-btn" disabled>
+        <span id="refresh-inner">↻ Refresh Stats</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- PERFORMANCE STATS -->
+  <span class="section-eye">Live Performance</span>
+  <div class="stats-row" id="global-stats">
+    <div class="stat-box loading"><div class="stat-num" id="s-spend">—</div><div class="stat-lbl">Total Spend</div></div>
+    <div class="stat-box loading"><div class="stat-num" id="s-reach">—</div><div class="stat-lbl">Total Reach</div></div>
+    <div class="stat-box loading"><div class="stat-num" id="s-clicks">—</div><div class="stat-lbl">Link Clicks</div></div>
+    <div class="stat-box loading"><div class="stat-num" id="s-roas">—</div><div class="stat-lbl">ROAS</div></div>
+  </div>
+
+  <!-- 3 CAMPAIGN CARDS -->
+  <span class="section-eye" style="margin-top:28px;">Campaign Controls</span>
+  <div class="campaigns">
+
+    <!-- CAMPAIGN 1: BRUSH -->
+    <div class="campaign" id="camp-card-0">
+      <div class="c-header">
+        <div class="c-num">01</div>
+        <span class="c-status-badge draft" id="camp-badge-0">Draft</span>
+      </div>
+      <div class="c-product">Beauty · Tools</div>
+      <div class="c-name">4-in-1 Magnetic Brush</div>
+      <div class="c-meta">
+        <div class="c-meta-item"><div class="c-meta-label">Objective</div><div class="c-meta-val">Conversions</div></div>
+        <div class="c-meta-item"><div class="c-meta-label">Budget</div><div class="c-meta-val">$15/day</div></div>
+        <div class="c-meta-item"><div class="c-meta-label">Audience</div><div class="c-meta-val">Women 22–45</div></div>
+        <div class="c-meta-item"><div class="c-meta-label">Spend</div><div class="c-meta-val" id="spend-0">—</div></div>
+      </div>
+      <div class="stats-row" style="margin-bottom:14px;">
+        <div class="stat-box"><div class="stat-num" id="reach-0">—</div><div class="stat-lbl">Reach</div></div>
+        <div class="stat-box"><div class="stat-num" id="clicks-0">—</div><div class="stat-lbl">Clicks</div></div>
+        <div class="stat-box"><div class="stat-num" id="ctr-0">—</div><div class="stat-lbl">CTR</div></div>
+        <div class="stat-box"><div class="stat-num" id="cpc-0">—</div><div class="stat-lbl">CPC</div></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label" id="toggle-label-0">Off — Paused</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-0" onchange="toggleCampaign(0,this)" disabled>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- CAMPAIGN 2: SERUM -->
+    <div class="campaign" id="camp-card-1">
+      <div class="c-header">
+        <div class="c-num">02</div>
+        <span class="c-status-badge draft" id="camp-badge-1">Draft</span>
+      </div>
+      <div class="c-product">Skincare · Anti-Aging</div>
+      <div class="c-name">24K Gold & Black Truffle Serum</div>
+      <div class="c-meta">
+        <div class="c-meta-item"><div class="c-meta-label">Objective</div><div class="c-meta-val">Awareness</div></div>
+        <div class="c-meta-item"><div class="c-meta-label">Budget</div><div class="c-meta-val">$10/day</div></div>
+        <div class="c-meta-item"><div class="c-meta-label">Audience</div><div class="c-meta-val">Women 35–60</div></div>
+        <div class="c-meta-item"><div class="c-meta-label">Spend</div><div class="c-meta-val" id="spend-1">—</div></div>
+      </div>
+      <div class="stats-row" style="margin-bottom:14px;">
+        <div class="stat-box"><div class="stat-num" id="reach-1">—</div><div class="stat-lbl">Reach</div></div>
+        <div class="stat-box"><div class="stat-num" id="clicks-1">—</div><div class="stat-lbl">Clicks</div></div>
+        <div class="stat-box"><div class="stat-num" id="ctr-1">—</div><div class="stat-lbl">CTR</div></div>
+        <div class="stat-box"><div class="stat-num" id="cpc-1">—</div><div class="stat-lbl">CPC</div></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label" id="toggle-label-1">Off — Paused</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-1" onchange="toggleCampaign(1,this)" disabled>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- CAMPAIGN 3: CLEANSER -->
+    <div class="campaign" id="camp-card-2">
+      <div class="c-header">
+        <div class="c-num">03</div>
+        <span class="c-status-badge draft" id="camp-badge-2">Draft</span>
+      </div>
+      <div class="c-product">Skincare · Cleanse</div>
+      <div class="c-name">24K Gold Hydrating Glow Cleanser</div>
+      <div class="c-meta">
+        <div class="c-meta-item"><div class="c-meta-label">Objective</div><div class="c-meta-val">Traffic</div></div>
+        <div class="c-meta-item"><div class="c-meta-label">Budget</div><div class="c-meta-val">$8/day</div></div>
+        <div class="c-meta-item"><div class="c-meta-label">Audience</div><div class="c-meta-val">Women 28–50</div></div>
+        <div class="c-meta-item"><div class="c-meta-label">Spend</div><div class="c-meta-val" id="spend-2">—</div></div>
+      </div>
+      <div class="stats-row" style="margin-bottom:14px;">
+        <div class="stat-box"><div class="stat-num" id="reach-2">—</div><div class="stat-lbl">Reach</div></div>
+        <div class="stat-box"><div class="stat-num" id="clicks-2">—</div><div class="stat-lbl">Clicks</div></div>
+        <div class="stat-box"><div class="stat-num" id="ctr-2">—</div><div class="stat-lbl">CTR</div></div>
+        <div class="stat-box"><div class="stat-num" id="cpc-2">—</div><div class="stat-lbl">CPC</div></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label" id="toggle-label-2">Off — Paused</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-2" onchange="toggleCampaign(2,this)" disabled>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ACTIVITY LOG -->
+  <div class="log">
+    <div class="log-head">
+      Activity Log
+      <button class="log-clear" onclick="clearLog()">Clear</button>
+    </div>
+    <div id="log-body">
+      <div class="log-entry"><span class="log-time">--:--</span><span class="log-msg info">Connect your Meta token to begin.</span></div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ───
+const GRAPH = 'https://graph.facebook.com/v19.0';
+let token = '';
+let acct  = 'act_1252129529887815';
+let connected = false;
+let campaignIds = JSON.parse(localStorage.getItem('oo_campaign_ids') || '[null,null,null]');
+
+// Campaign definitions
+const CAMPAIGNS = [
+  {
+    name: 'Orrisoak — 4-in-1 Brush · Conversions',
+    objective: 'OUTCOME_SALES',
+    budget: 1500,           // cents = $15/day
+    ageMin: 22, ageMax: 45,
+    interests: ['Makeup','Beauty Tutorials','Makeup Brushes','Sephora','ULTA Beauty'],
+    adName: '4-in-1 Magnetic Brush Ad',
+    primary: 'Your entire makeup routine. One magnetic tool.\n\nThe Orris & Oak 4-in-1 Magnetic Brush snaps between foundation, contour, highlight, and blend in seconds. ✦ 4 brushes in 1 handle ✦ Magnetic snap system ✦ Luxury leather travel case\n\nUse code GLOW15 for 15% off → orrisoak.com',
+    headline: '4 Brushes. 1 Magnetic System.',
+    description: 'Professional makeup. Effortlessly elevated.',
+    url: 'https://orrisoak.com/products/4-in-1-magnetic-brush',
+  },
+  {
+    name: 'Orrisoak — 24K Gold Serum · Awareness',
+    objective: 'OUTCOME_AWARENESS',
+    budget: 1000,
+    ageMin: 35, ageMax: 60,
+    interests: ['Anti-Aging','Luxury Skincare','Skincare Routine','Gold Skincare','Collagen'],
+    adName: '24K Gold Serum Ad',
+    primary: 'Your skin deserves the world\'s most precious ingredient.\n\nOrris & Oak 24K Gold & Black Truffle Anti-Aging Serum. Real gold particles and rare truffle extract — visibly lift, firm, and illuminate in 14 days.\n\nUse code GLOW15 for 15% off → orrisoak.com',
+    headline: '24K Gold Anti-Aging Serum',
+    description: 'Luxury skincare powered by gold & black truffle.',
+    url: 'https://orrisoak.com/products/24k-gold-serum',
+  },
+  {
+    name: 'Orrisoak — Glow Cleanser · Traffic',
+    objective: 'OUTCOME_TRAFFIC',
+    budget: 800,
+    ageMin: 28, ageMax: 50,
+    interests: ['Skincare','Face Wash','Clean Beauty','Hyaluronic Acid','Glass Skin'],
+    adName: 'Glow Cleanser Ad',
+    primary: 'Every glow ritual starts with the perfect cleanse.\n\nOrris & Oak 24K Gold Black Truffle Hydrating Glow Cleanser melts away impurities while flooding skin with gold-infused radiance.\n\nUse code GLOW15 for 15% off → orrisoak.com',
+    headline: 'Start Your Glow Ritual With Gold',
+    description: 'Gold-infused cleanser for luminous skin daily.',
+    url: 'https://orrisoak.com/products/glow-cleanser',
+  }
+];
+
+// ─── CONNECT ───
+async function connect() {
+  token = document.getElementById('meta-token').value.trim();
+  acct  = document.getElementById('ad-account').value.trim() || 'act_1252129529887815';
+  if (!token) { toast('Paste your Meta access token first', 'red'); return; }
+
+  log('Connecting to Meta API...', 'info');
+  try {
+    const res = await api(`/me?fields=name,id`);
+    connected = true;
+    document.getElementById('conn-dot').classList.add('live');
+    document.getElementById('conn-status').textContent = `Connected · ${res.name}`;
+    enableButtons();
+    log(`✓ Connected as ${res.name} (${res.id})`, 'success');
+    toast('Meta connected ✓', 'green');
+    // Save token
+    localStorage.setItem('oo_meta_token', token);
+    localStorage.setItem('oo_ad_account', acct);
+    // Load existing campaign states
+    await syncCampaignStates();
+  } catch(e) {
+    log(`✗ Connection failed: ${e.message}`, 'error');
+    toast('Connection failed — check token', 'red');
+  }
+}
+
+function enableButtons() {
+  ['publish-all-btn','activate-all-btn','pause-all-btn','refresh-btn'].forEach(id => {
+    document.getElementById(id).disabled = false;
+  });
+  [0,1,2].forEach(i => {
+    document.getElementById(`toggle-${i}`).disabled = false;
+  });
+}
+
+// ─── API HELPER ───
+async function api(path, method='GET', body=null) {
+  const sep = path.includes('?') ? '&' : '?';
+  const url = `${GRAPH}${path}${sep}access_token=${token}`;
+  const opts = { method, headers: {'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data;
+}
+
+// ─── PUBLISH ALL 3 CAMPAIGNS ───
+async function publishAllCampaigns() {
+  if (!connected) { toast('Connect Meta first', 'red'); return; }
+  const btn = document.getElementById('publish-all-inner');
+  btn.innerHTML = '<span class="spinner"></span> Publishing...';
+  document.getElementById('publish-all-btn').disabled = true;
+
+  let successCount = 0;
+  for (let i = 0; i < CAMPAIGNS.length; i++) {
+    try {
+      await publishCampaign(i);
+      successCount++;
+    } catch(e) {
+      log(`✗ Campaign ${i+1} failed: ${e.message}`, 'error');
+    }
+  }
+
+  btn.innerHTML = successCount === 3
+    ? '✓ All 3 Published — Toggle to Activate'
+    : `⚠ ${successCount}/3 Published`;
+  document.getElementById('publish-all-btn').disabled = false;
+
+  if (successCount === 3) {
+    toast('All 3 campaigns published to Meta ✓', 'green');
+    localStorage.setItem('oo_campaign_ids', JSON.stringify(campaignIds));
+  }
+}
+
+async function publishCampaign(i) {
+  const c = CAMPAIGNS[i];
+  log(`Creating campaign: ${c.name}...`, 'info');
+
+  // 1. Create Campaign
+  const camp = await api(`/${acct}/campaigns`, 'POST', {
+    name: c.name,
+    objective: c.objective,
+    status: 'PAUSED',
+    special_ad_categories: [],
+  });
+  campaignIds[i] = camp.id;
+  log(`✓ Campaign created: ID ${camp.id}`, 'success');
+
+  // 2. Create Ad Set
+  const adSet = await api(`/${acct}/adsets`, 'POST', {
+    name: `${c.name} · Ad Set`,
+    campaign_id: camp.id,
+    daily_budget: c.budget,
+    billing_event: 'IMPRESSIONS',
+    optimization_goal: c.objective === 'OUTCOME_SALES' ? 'OFFSITE_CONVERSIONS' :
+                       c.objective === 'OUTCOME_TRAFFIC' ? 'LINK_CLICKS' : 'REACH',
+    bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
+    status: 'PAUSED',
+    targeting: {
+      geo_locations: { countries: ['US'] },
+      age_min: c.ageMin,
+      age_max: c.ageMax,
+      genders: [2],
+      flexible_spec: [{ interests: c.interests.map(n => ({ name: n })) }]
+    },
+    start_time: '2026-05-01T09:00:00-0500',
+  });
+  log(`✓ Ad Set created: ID ${adSet.id}`, 'success');
+
+  // 3. Create Ad Creative
+  const creative = await api(`/${acct}/adcreatives`, 'POST', {
+    name: `${c.adName} Creative`,
+    object_story_spec: {
+      page_id: '1032503303260114',
+      link_data: {
+        message: c.primary,
+        link: c.url,
+        name: c.headline,
+        description: c.description,
+        call_to_action: {
+          type: c.objective === 'OUTCOME_AWARENESS' ? 'LEARN_MORE' : 'SHOP_NOW',
+          value: { link: c.url }
+        }
+      }
+    }
+  });
+  log(`✓ Ad Creative created: ID ${creative.id}`, 'success');
+
+  // 4. Create Ad
+  const ad = await api(`/${acct}/ads`, 'POST', {
+    name: c.adName,
+    adset_id: adSet.id,
+    creative: { creative_id: creative.id },
+    status: 'PAUSED',
+  });
+  log(`✓ Ad created: ID ${ad.id}`, 'success');
+
+  // Update UI
+  updateCampaignBadge(i, 'PAUSED');
+  toast(`Campaign ${i+1} published ✓`, 'green');
+}
+
+// ─── TOGGLE SINGLE CAMPAIGN ───
+async function toggleCampaign(i, checkbox) {
+  if (!connected) { checkbox.checked = !checkbox.checked; toast('Connect Meta first', 'red'); return; }
+  if (!campaignIds[i]) { checkbox.checked = false; toast('Publish campaigns first', 'red'); return; }
+
+  const status = checkbox.checked ? 'ACTIVE' : 'PAUSED';
+  const label = checkbox.checked ? '🟢 Live — Active' : 'Off — Paused';
+  document.getElementById(`toggle-label-${i}`).textContent = 'Updating...';
+
+  try {
+    await api(`/${campaignIds[i]}`, 'POST', { status });
+    document.getElementById(`toggle-label-${i}`).textContent = label;
+    updateCampaignBadge(i, status);
+    log(`✓ Campaign ${i+1} set to ${status}`, 'success');
+    toast(`Campaign ${i+1} ${status === 'ACTIVE' ? 'is now LIVE ✓' : 'paused'}`, status === 'ACTIVE' ? 'green' : '');
+  } catch(e) {
+    checkbox.checked = !checkbox.checked;
+    document.getElementById(`toggle-label-${i}`).textContent = 'Error — try again';
+    log(`✗ Failed to update campaign ${i+1}: ${e.message}`, 'error');
+    toast(`Failed: ${e.message}`, 'red');
+  }
+}
+
+// ─── ACTIVATE / PAUSE ALL ───
+async function setAllCampaigns(status) {
+  if (!connected) { toast('Connect Meta first', 'red'); return; }
+  const btnId = status === 'ACTIVE' ? 'activate-all-inner' : 'pause-all-inner';
+  document.getElementById(btnId).innerHTML = '<span class="spinner"></span> Updating...';
+
+  for (let i = 0; i < 3; i++) {
+    if (!campaignIds[i]) { log(`⚠ Campaign ${i+1} not published yet — skipping`, 'info'); continue; }
+    try {
+      await api(`/${campaignIds[i]}`, 'POST', { status });
+      const toggle = document.getElementById(`toggle-${i}`);
+      toggle.checked = status === 'ACTIVE';
+      document.getElementById(`toggle-label-${i}`).textContent =
+        status === 'ACTIVE' ? '🟢 Live — Active' : 'Off — Paused';
+      updateCampaignBadge(i, status);
+      log(`✓ Campaign ${i+1} → ${status}`, 'success');
+    } catch(e) {
+      log(`✗ Campaign ${i+1} failed: ${e.message}`, 'error');
+    }
+  }
+
+  document.getElementById(btnId).innerHTML =
+    status === 'ACTIVE' ? '▶ Activate All — Go Live' : '⏸ Pause All Campaigns';
+
+  toast(status === 'ACTIVE' ? '🎉 All campaigns are LIVE!' : 'All campaigns paused',
+        status === 'ACTIVE' ? 'green' : '');
+}
+
+// ─── REFRESH STATS ───
+async function refreshStats() {
+  if (!connected) return;
+  document.getElementById('refresh-inner').innerHTML = '<span class="spinner"></span> Loading...';
+
+  let totalSpend = 0, totalReach = 0, totalClicks = 0, totalPurchaseValue = 0;
+
+  for (let i = 0; i < 3; i++) {
+    if (!campaignIds[i]) continue;
+    try {
+      const ins = await api(`/${campaignIds[i]}/insights?fields=spend,reach,clicks,ctr,cpc,actions,action_values&date_preset=lifetime`);
+      if (ins.data && ins.data[0]) {
+        const d = ins.data[0];
+        const spend = parseFloat(d.spend || 0);
+        const reach = parseInt(d.reach || 0);
+        const clicks = parseInt(d.clicks || 0);
+        const ctr = parseFloat(d.ctr || 0).toFixed(2);
+        const cpc = parseFloat(d.cpc || 0).toFixed(2);
+
+        document.getElementById(`spend-${i}`).textContent = `$${spend.toFixed(2)}`;
+        document.getElementById(`reach-${i}`).textContent = reach > 1000 ? (reach/1000).toFixed(1)+'K' : reach;
+        document.getElementById(`clicks-${i}`).textContent = clicks;
+        document.getElementById(`ctr-${i}`).textContent = ctr + '%';
+        document.getElementById(`cpc-${i}`).textContent = `$${cpc}`;
+
+        totalSpend += spend;
+        totalReach += reach;
+        totalClicks += clicks;
+
+        // Purchase value for ROAS
+        const purchaseAction = (d.action_values || []).find(a => a.action_type === 'purchase');
+        if (purchaseAction) totalPurchaseValue += parseFloat(purchaseAction.value || 0);
+      }
+    } catch(e) {
+      log(`⚠ Could not load stats for campaign ${i+1}`, 'info');
+    }
+  }
+
+  document.getElementById('s-spend').textContent = `$${totalSpend.toFixed(2)}`;
+  document.getElementById('s-reach').textContent = totalReach > 1000 ? (totalReach/1000).toFixed(1)+'K' : totalReach;
+  document.getElementById('s-clicks').textContent = totalClicks;
+  const roas = totalSpend > 0 ? (totalPurchaseValue / totalSpend).toFixed(2) : '—';
+  document.getElementById('s-roas').textContent = roas !== '—' ? roas + 'x' : '—';
+
+  document.getElementById('refresh-inner').innerHTML = '↻ Refresh Stats';
+  log('Stats refreshed', 'success');
+}
+
+// ─── SYNC EXISTING CAMPAIGN STATES ───
+async function syncCampaignStates() {
+  for (let i = 0; i < 3; i++) {
+    if (!campaignIds[i]) continue;
+    try {
+      const data = await api(`/${campaignIds[i]}?fields=status,name`);
+      updateCampaignBadge(i, data.status);
+      const toggle = document.getElementById(`toggle-${i}`);
+      toggle.checked = data.status === 'ACTIVE';
+      document.getElementById(`toggle-label-${i}`).textContent =
+        data.status === 'ACTIVE' ? '🟢 Live — Active' : 'Off — Paused';
+      log(`Campaign ${i+1} status: ${data.status}`, 'info');
+    } catch(e) {}
+  }
+  await refreshStats();
+}
+
+// ─── UI HELPERS ───
+function updateCampaignBadge(i, status) {
+  const badge = document.getElementById(`camp-badge-${i}`);
+  badge.textContent = status === 'ACTIVE' ? 'Live' : status === 'PAUSED' ? 'Paused' : 'Draft';
+  badge.className = 'c-status-badge ' + (status === 'ACTIVE' ? 'active' : status === 'PAUSED' ? 'paused' : 'draft');
+}
+
+function log(msg, type='') {
+  const body = document.getElementById('log-body');
+  const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">${now}</span><span class="log-msg ${type}">${msg}</span>`;
+  // Remove placeholder
+  const placeholder = body.querySelector('.log-msg.info');
+  if (placeholder && placeholder.textContent.includes('Connect your Meta')) placeholder.closest('.log-entry').remove();
+  body.appendChild(entry);
+  body.scrollTop = body.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('log-body').innerHTML =
+    '<div class="log-entry"><span class="log-time">--:--</span><span class="log-msg info">Log cleared.</span></div>';
+}
+
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── AUTO-LOAD SAVED CREDS ───
+window.onload = () => {
+  const savedToken = localStorage.getItem('oo_meta_token');
+  const savedAcct  = localStorage.getItem('oo_ad_account');
+  if (savedToken) document.getElementById('meta-token').value = savedToken;
+  if (savedAcct)  document.getElementById('ad-account').value = savedAcct;
+  const saved = JSON.parse(localStorage.getItem('oo_campaign_ids') || '[null,null,null]');
+  if (saved.some(id => id !== null)) campaignIds = saved;
+};
+</script>
+</body>
+</html>
