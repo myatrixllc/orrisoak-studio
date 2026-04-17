@@ -493,18 +493,22 @@ async function connect() {
     enableButtons();
     log('post-log', `✓ Connected as ${me.name}`, 'ok');
 
-    // Try to auto-find IG user ID if not provided
-    if (!igUserId) {
-      try {
-        const pages = await api(`/me/accounts?fields=instagram_business_account,name`);
-        const page = pages.data?.find(p => p.id === fbPageId || p.instagram_business_account);
-        if (page?.instagram_business_account) {
+    // Fetch page access token and IG business account
+    try {
+      const pages = await api(`/me/accounts?fields=id,name,access_token,instagram_business_account`);
+      log('post-log', `Found ${pages.data?.length || 0} pages`, 'info');
+      const page = pages.data?.find(p => p.id === fbPageId) || pages.data?.[0];
+      if (page) {
+        window._pageToken = page.access_token;
+        log('post-log', `✓ Page token: ${page.name}`, 'ok');
+        if (page.instagram_business_account) {
           igUserId = page.instagram_business_account.id;
           document.getElementById('ig-user-id').value = igUserId;
-          log('post-log', `✓ Instagram Business ID found: ${igUserId}`, 'ok');
+          log('post-log', `✓ IG Business ID: ${igUserId}`, 'ok');
+          localStorage.setItem('oo_ig_user_id', igUserId);
         }
-      } catch(e) { log('post-log','⚠ Could not auto-detect IG ID — enter manually','info'); }
-    }
+      }
+    } catch(e) { log('post-log', `⚠ Page token error: ${e.message}`, 'info'); }
 
     toast('Meta connected ✓', 'green');
     localStorage.setItem('oo_meta_token', token);
@@ -558,15 +562,22 @@ async function publishPost(target) {
     else {
       try {
         log('post-log','Creating Instagram media container...','info');
-        const container = await api(`/${igUserId}/media`, 'POST', {
-          image_url: imageUrl,
-          caption: caption,
+        const igToken = window._pageToken || token;
+        const igRes = await fetch(`https://graph.facebook.com/v19.0/${igUserId}/media?access_token=${igToken}`, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ image_url: imageUrl, caption: caption })
         });
+        const container = await igRes.json();
+        if (container.error) throw new Error(container.error.message);
         log('post-log', `Container created: ${container.id}`, 'ok');
         log('post-log','Publishing to Instagram...','info');
-        const pub = await api(`/${igUserId}/media_publish`, 'POST', {
-          creation_id: container.id
+        const igToken2 = window._pageToken || token;
+        const pubRes = await fetch(`https://graph.facebook.com/v19.0/${igUserId}/media_publish?access_token=${igToken2}`, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ creation_id: container.id })
         });
+        const pub = await pubRes.json();
+        if (pub.error) throw new Error(pub.error.message);
         log('post-log', `✓ Posted to Instagram! ID: ${pub.id}`, 'ok');
         igOk = true;
       } catch(e) {
@@ -579,10 +590,20 @@ async function publishPost(target) {
   if (doFb) {
     try {
       log('post-log','Posting to Facebook...','info');
-      const fb = await api(`/${fbPageId}/photos`, 'POST', {
-        url: imageUrl,
-        message: caption,
-      });
+      // Get page access token first
+      const pagesData = await api(`/me/accounts?fields=id,name,access_token`);
+      const page = pagesData.data?.find(p => p.id === fbPageId);
+      const pageToken = page?.access_token || token;
+
+      const fb = await fetch(`https://graph.facebook.com/v19.0/${fbPageId}/photos?access_token=${pageToken}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          url: imageUrl,
+          message: caption,
+        })
+      }).then(r => r.json());
+      if (fb.error) throw new Error(fb.error.message);
       log('post-log', `✓ Posted to Facebook! ID: ${fb.id}`, 'ok');
       fbOk = true;
     } catch(e) {
@@ -678,7 +699,7 @@ async function aiCaption() {
 
   document.getElementById('ai-caption-btn').innerHTML = '<span class="spinner"></span> Generating...';
   try {
-    const res = await fetch('https://api.orrisoak.com', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -707,7 +728,7 @@ async function aiReelCaption() {
   if (!claudeKey) { toast('Add Claude API key to config-private.js','red'); return; }
 
   try {
-    const res = await fetch('https://api.orrisoak.com', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
