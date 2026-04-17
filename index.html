@@ -9,11 +9,11 @@
 :root{
   --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dim:rgba(201,168,76,0.1);
   --gold-border:rgba(201,168,76,0.2);--black:#070707;--s1:#141414;
-  --s2:#1C1C1C;--s3:#242424;--s4:#252525;--cream:#F5F0E8;--muted:#A89880;
+  --s2:#1C1C1C;--s3:#242424;--s4:#252525;--cream:#F5F0E8;--muted:#C8B89A;
   --green:#4CAF7D;--blue:#7B9FE8;--orange:#D4894A;--red:#D45A5A;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;}
+body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;}
 
 /* ── PASSWORD GATE ── */
 #gate{
@@ -23,7 +23,7 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
 }
 .gate-logo{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--gold);letter-spacing:6px;margin-bottom:8px;}
 .gate-logo span{font-style:italic;}
-.gate-sub{font-size:8px;letter-spacing:8px;text-transform:uppercase;color:var(--muted);margin-bottom:40px;}
+.gate-sub{font-size:8px;letter-spacing:8px;text-transform:uppercase;color:#C8B89A;margin-bottom:40px;}
 .gate-box{background:var(--s1);border:1px solid var(--gold-border);padding:40px;width:340px;text-align:center;}
 .gate-label{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:block;}
 .gate-input{width:100%;background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:14px;letter-spacing:4px;padding:14px;text-align:center;margin-bottom:14px;}
@@ -41,9 +41,9 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
 .logo{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);letter-spacing:4px;}
 .logo span{font-style:italic;}
 .header-right{display:flex;align-items:center;gap:16px;}
-.header-date{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);}
+.header-date{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:#C8B89A;}
 .header-badge{font-size:7px;letter-spacing:4px;text-transform:uppercase;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:4px 12px;}
-.logout-btn{background:none;border:1px solid rgba(201,168,76,0.2);color:var(--muted);font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:5px 12px;cursor:pointer;transition:all 0.2s;}
+.logout-btn{background:none;border:1px solid rgba(201,168,76,0.35);color:#C8B89A;font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:5px 12px;cursor:pointer;transition:all 0.2s;}
 .logout-btn:hover{border-color:var(--gold);color:var(--gold);}
 
 /* HERO */
@@ -52,10 +52,10 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
 .hero-eye{font-size:8px;letter-spacing:8px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;position:relative;}
 .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,60px);font-weight:300;line-height:1.05;position:relative;}
 .hero-title em{font-style:italic;color:var(--gold);}
-.hero-sub{font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:14px;line-height:2;position:relative;}
+.hero-sub{font-size:10px;letter-spacing:3px;color:#C8B89A;margin-top:14px;line-height:2;position:relative;}
 .hero-stats{display:flex;justify-content:center;gap:48px;margin-top:32px;position:relative;}
 .hero-stat-num{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--gold);line-height:1;}
-.hero-stat-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.hero-stat-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:#C8B89A;margin-top:4px;}
 
 /* CONTENT */
 .content{max-width:1200px;margin:0 auto;padding:40px;}
@@ -67,7 +67,7 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
 
 /* TOOLS GRID */
 .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:40px;}
-.tool-card{background:var(--s1);border:1px solid var(--gold-border);padding:24px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;text-decoration:none;display:block;}
+.tool-card{background:#151515;border:1px solid rgba(201,168,76,0.35);padding:24px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;text-decoration:none;display:block;}
 .tool-card:hover{border-color:var(--gold);transform:translateY(-3px);}
 .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transition:transform 0.3s;}
 .tool-card:hover::before{transform:scaleX(1);}
@@ -79,7 +79,7 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
 .tool-tag.live{background:rgba(201,168,76,0.1);color:var(--gold);}
 
 /* GITHUB GUIDE */
-.github-section{background:var(--s1);border:1px solid var(--gold-border);margin-bottom:40px;overflow:hidden;}
+.github-section{background:#151515;border:1px solid rgba(201,168,76,0.35);margin-bottom:40px;overflow:hidden;}
 .github-head{background:var(--s2);border-bottom:1px solid var(--gold-border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
 .github-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cream);}
 .github-body{padding:24px;}
@@ -90,12 +90,12 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
 .step-body{padding:14px 18px;}
 .step-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
 .step-text{font-size:10px;color:#B8A898;line-height:2;}
-.code-block{background:var(--black);border:1px solid rgba(201,168,76,0.15);padding:12px 14px;margin-top:10px;font-family:monospace;font-size:11px;color:#98C98A;line-height:1.8;overflow-x:auto;white-space:pre;}
+.code-block{background:#0D0D0D;border:1px solid rgba(201,168,76,0.25);padding:12px 14px;margin-top:10px;font-family:monospace;font-size:11px;color:#A8E090;line-height:1.8;overflow-x:auto;white-space:pre;}
 .copy-code{background:none;border:1px solid rgba(201,168,76,0.2);color:var(--gold);font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;cursor:pointer;margin-top:8px;transition:all 0.2s;}
 .copy-code:hover{background:var(--gold-dim);}
 
 /* FILE STRUCTURE */
-.file-tree{background:var(--black);border:1px solid rgba(201,168,76,0.15);padding:16px 20px;font-family:monospace;font-size:11px;color:var(--muted);line-height:2;}
+.file-tree{background:var(--black);border:1px solid rgba(201,168,76,0.15);padding:16px 20px;font-family:monospace;font-size:11px;color:#C8B89A;line-height:2;}
 .file-tree .folder{color:var(--gold);}
 .file-tree .file{color:#98C98A;}
 .file-tree .comment{color:rgba(201,168,76,0.4);}
@@ -107,26 +107,26 @@ body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-
 .sub-desc{font-size:10px;color:#B8A898;line-height:2;}
 
 /* FILE MANAGER */
-.file-manager{background:var(--s1);border:1px solid var(--gold-border);margin-bottom:40px;}
-.fm-head{background:var(--s2);border-bottom:1px solid var(--gold-border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+.file-manager{background:#151515;border:1px solid rgba(201,168,76,0.35);margin-bottom:40px;}
+.fm-head{background:#1A1A1A;border-bottom:1px solid rgba(201,168,76,0.35);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
 .fm-title{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
 .fm-body{display:grid;grid-template-columns:200px 1fr;min-height:300px;}
-.fm-sidebar{border-right:1px solid var(--gold-border);padding:16px 0;}
-.fm-folder{padding:10px 16px;cursor:pointer;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.fm-sidebar{border-right:1px solid rgba(201,168,76,0.35);padding:16px 0;}
+.fm-folder{padding:10px 16px;cursor:pointer;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#C8B89A;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
 .fm-folder:hover,.fm-folder.active{background:var(--gold-dim);color:var(--gold);}
 .fm-folder-icon{font-size:12px;}
 .fm-main{padding:20px;}
 .fm-breadcrumb{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
 .fm-breadcrumb span{color:var(--gold);}
 .fm-files{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.fm-file{background:var(--s2);border:1px solid var(--gold-border);padding:12px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.fm-file{background:#1A1A1A;border:1px solid rgba(201,168,76,0.35);padding:12px;text-align:center;cursor:pointer;transition:all 0.2s;}
 .fm-file:hover{border-color:var(--gold);}
 .fm-file-icon{font-size:22px;margin-bottom:6px;}
 .fm-file-name{font-size:8px;letter-spacing:1px;color:var(--cream);word-break:break-all;line-height:1.5;}
-.fm-empty{color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:40px;text-align:center;grid-column:1/-1;}
+.fm-empty{color:#C8B89A;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:40px;text-align:center;grid-column:1/-1;}
 
 /* COUNTDOWN */
-.countdown-bar{background:var(--s1);border:1px solid var(--gold-border);padding:20px 24px;margin-bottom:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.countdown-bar{background:#151515;border:1px solid rgba(201,168,76,0.35);padding:20px 24px;margin-bottom:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
 .countdown-label{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
 .countdown-nums{display:flex;gap:20px;}
 .countdown-unit{text-align:center;}
@@ -527,7 +527,7 @@ TTL:   Auto</div>
     <div class="section-eye">✦ Studio Password</div>
     <div class="section-line"></div>
   </div>
-  <div style="background:var(--s1);border:1px solid var(--gold-border);padding:24px;margin-bottom:40px;">
+  <div style="background:#151515;border:1px solid rgba(201,168,76,0.35);padding:24px;margin-bottom:40px;">
     <div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Change Studio Password</div>
     <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
       <div>
