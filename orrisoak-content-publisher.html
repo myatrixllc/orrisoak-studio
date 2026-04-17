@@ -79,8 +79,9 @@ textarea.cap{width:100%;background:#242424;border:1px solid var(--gold-border);c
 textarea.cap:focus{border-color:var(--gold);}
 .char-count{font-size:8px;letter-spacing:2px;color:var(--muted);text-align:right;margin-top:6px;}
 .hashtag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
-.htag{font-size:8px;letter-spacing:1px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);color:var(--gold-light);padding:3px 10px;cursor:pointer;transition:all 0.2s;}
-.htag:hover{background:rgba(201,168,76,0.15);color:var(--gold);}
+.htag{font-size:8px;letter-spacing:1px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.35);color:#FFFFFF;padding:5px 12px;cursor:pointer;transition:all 0.2s;border-radius:2px;}
+.htag:hover{background:rgba(201,168,76,0.25);color:#FFFFFF;border-color:var(--gold);}
+.htag.added{background:rgba(201,168,76,0.3);border-color:var(--gold);color:var(--gold);}
 
 /* AI GENERATE */
 .ai-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
@@ -677,7 +678,7 @@ async function aiCaption() {
 
   document.getElementById('ai-caption-btn').innerHTML = '<span class="spinner"></span> Generating...';
   try {
-    const res = await fetch('https://api.orrisoak.com', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -706,7 +707,7 @@ async function aiReelCaption() {
   if (!claudeKey) { toast('Add Claude API key to config-private.js','red'); return; }
 
   try {
-    const res = await fetch('https://api.orrisoak.com', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -769,12 +770,34 @@ function handleReelUpload(input) {
 }
 
 // ── HASHTAGS ──
+function addHashtags() {
+  const allTags = [
+    '#OrrisAndOak','#LuxurySkincare','#GlowUp','#MakeupBrush',
+    '#SkincareRoutine','#24KGold','#AntiAging','#GLOW15',
+    '#ChicagoBeauty','#LuxuryBeauty'
+  ];
+  const cap = document.getElementById('post-caption');
+  const existing = cap.value;
+  const existingTags = allTags.filter(t => existing.includes(t));
+  const newTags = allTags.filter(t => !existing.includes(t));
+  if (newTags.length === 0) { toast('All hashtags already added ✓'); return; }
+  cap.value = existing + (existing.endsWith('\n') || existing === '' ? '' : '\n') + newTags.join(' ');
+  updatePreview();
+  updateCharCount('post-caption','post-char');
+  // Mark all as added
+  document.querySelectorAll('#hashtag-row .htag').forEach(el => el.classList.add('added'));
+  toast(`${newTags.length} hashtags added ✓`, 'green');
+}
+
 function addTag(tag) {
   const cap = document.getElementById('post-caption');
+  if (cap.value.includes(tag)) { toast(`${tag} already in caption`); return; }
   const val = cap.value;
   cap.value = val + (val.endsWith('\n') || val === '' ? '' : '\n') + tag + ' ';
   updatePreview();
   updateCharCount('post-caption','post-char');
+  // Mark this tag as added
+  event.target.classList.add('added');
 }
 function addTagTo(fieldId, tag) {
   const el = document.getElementById(fieldId);
