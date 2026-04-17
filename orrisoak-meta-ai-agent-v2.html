@@ -737,7 +737,7 @@ function updateKey(){
 async function claude(prompt,max=900){
   const k=getKey();
   if(!k){showToast('Paste your API key in the top bar');throw new Error('No key');}
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
+  const r=await fetch('https://api.orrisoak.com',{
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:max,system:BRAND,messages:[{role:'user',content:prompt}]})

