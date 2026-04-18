@@ -1051,20 +1051,16 @@ async function generateRunwayReel() {
   };
 
   try {
-    updateProgress(10, 'Sending image to Runway...');
+    updateProgress(15, 'Creating Runway task...');
 
-    // Create generation task
-    const res = await fetch(`${RUNWAY_API}/image_to_video`, {
+    // 1. Create task via worker
+    const res = await fetch('https://api.orrisoak.com/runway/image_to_video', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'X-Runway-Version': '2024-11-06',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'gen4_turbo',
         promptImage: runwayImageUrl,
-        promptText: motionPrompt + '. Luxury beauty brand Orris & Oak aesthetic.',
+        promptText: motionPrompt + '. Luxury beauty brand Orris & Oak. Cinematic, elegant.',
         duration: duration,
         ratio: ratio,
       })
@@ -1072,38 +1068,38 @@ async function generateRunwayReel() {
 
     const task = await res.json();
     if (task.error || !task.id) throw new Error(task.error || 'Failed to start generation');
+    log('reel-log', `✓ Task: ${task.id}`, 'ok');
+    updateProgress(20, 'Generating video... (~30-60 seconds)');
 
-    updateProgress(20, `Task started: ${task.id} — processing...`);
-
-    // Poll for completion
+    // 2. Poll via worker status endpoint — auto-saves to R2 on success
     let attempts = 0;
     const maxAttempts = 60;
     while (attempts < maxAttempts) {
       await sleep(3000);
       attempts++;
       const pct = 20 + (attempts / maxAttempts) * 75;
-      updateProgress(pct, `Processing... (${attempts * 3}s)`);
+      updateProgress(pct, `Generating... (${attempts * 3}s elapsed)`);
 
-      const pollRes = await fetch(`${RUNWAY_API}/tasks/${task.id}`, {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'X-Runway-Version': '2024-11-06',
-        }
+      const pollRes = await fetch(`https://api.orrisoak.com/runway/status/${task.id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
       });
       const pollData = await pollRes.json();
 
       if (pollData.status === 'SUCCEEDED') {
-        const videoUrl = pollData.output?.[0];
-        if (!videoUrl) throw new Error('No video URL in response');
-
-        updateProgress(100, '✓ Complete!');
+        updateProgress(100, '✓ Saved to R2!');
+        const videoUrl = pollData.permanentUrl || pollData.output?.[0];
+        if (!videoUrl) throw new Error('No video URL returned');
         runwayVideoUrl = videoUrl;
-
-        // Show result
         document.getElementById('runway-result').style.display = 'block';
         document.getElementById('runway-video').src = videoUrl;
         document.getElementById('runway-download').href = videoUrl;
-        toast('Reel generated! ✓', 'green');
+        if (pollData.permanentUrl) {
+          log('reel-log', `✓ Saved to R2: ${pollData.r2Key}`, 'ok');
+          toast('Reel generated and saved to R2! ✓', 'green');
+        } else {
+          toast('Reel generated! ✓', 'green');
+        }
         break;
       }
 
