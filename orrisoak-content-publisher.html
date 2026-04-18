@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Orrisoak · Content Publisher</title>
 <script src="config-private.js" onerror="console.log('config-private.js not found — using localStorage')"></script>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+<script src="https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1306,31 +1308,40 @@ async function mergeVideoAudio() {
   };
 
   try {
-    updateMerge(10, 'Loading FFmpeg WASM...');
+    updateMerge(10, 'Loading FFmpeg...');
 
-    // Load FFmpeg WASM
-    const { createFFmpeg, fetchFile } = await import('https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
-    const ffmpeg = createFFmpeg({ log: false });
+    // Use globally loaded FFmpeg
+    if (typeof FFmpeg === 'undefined' || !FFmpeg.createFFmpeg) {
+      throw new Error('FFmpeg not loaded — please refresh the page and try again');
+    }
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({
+      corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+      log: false,
+    });
+
     await ffmpeg.load();
+    updateMerge(25, 'FFmpeg ready');
 
-    updateMerge(30, 'Downloading video...');
-    ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(runwayVideoUrl));
+    updateMerge(35, 'Downloading video...');
+    const videoData = await fetchFile(runwayVideoUrl);
+    ffmpeg.FS('writeFile', 'video.mp4', videoData);
 
-    updateMerge(50, 'Downloading audio...');
-    ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(voiceAudioUrl));
+    updateMerge(55, 'Downloading voiceover...');
+    const audioData = await fetchFile(voiceAudioUrl);
+    ffmpeg.FS('writeFile', 'audio.mp3', audioData);
 
-    updateMerge(70, 'Merging video + voiceover...');
+    updateMerge(70, 'Merging...');
     await ffmpeg.run(
       '-i', 'video.mp4',
       '-i', 'audio.mp3',
       '-c:v', 'copy',
       '-c:a', 'aac',
       '-shortest',
-      '-y',
-      'output.mp4'
+      '-y', 'output.mp4'
     );
 
-    updateMerge(90, 'Saving final Reel...');
+    updateMerge(90, 'Finalizing...');
     const outputData = ffmpeg.FS('readFile', 'output.mp4');
     const outputBlob = new Blob([outputData.buffer], { type: 'video/mp4' });
     const outputUrl = URL.createObjectURL(outputBlob);
