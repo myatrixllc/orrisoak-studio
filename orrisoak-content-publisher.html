@@ -344,9 +344,84 @@ textarea.cap:focus{border-color:var(--gold);}
     <div class="composer">
       <div class="compose-left">
 
+        <!-- AI VIDEO GENERATOR -->
+        <div class="image-picker" style="margin-bottom:16px;">
+          <span class="field-label">✦ AI Generate Reel with Runway</span>
+          <p class="field-sub">Select a product image → write a motion prompt → Runway generates your Reel automatically</p>
+
+          <!-- IMAGE SELECTOR FOR RUNWAY -->
+          <div style="margin-bottom:12px;">
+            <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">1. Select Source Image</div>
+            <div class="image-grid" id="runway-image-grid"></div>
+            <div style="font-size:8px;letter-spacing:2px;color:var(--green);margin-top:6px;" id="runway-selected-img"></div>
+          </div>
+
+          <!-- MOTION PROMPT -->
+          <div style="margin-bottom:12px;">
+            <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">2. Motion Prompt</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Slow cinematic zoom in, golden particles floating, luxury beauty atmosphere')">✦ Cinematic Zoom</button>
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Gentle rotation, soft bokeh background, warm golden light, elegant product reveal')">✦ Elegant Reveal</button>
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Camera slowly pulls back revealing full product, sparkle effect, black background with gold shimmer')">✦ Pull Back</button>
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Brushes snapping together magnetically, satisfying click motion, ivory and gold tones')">✦ Magnetic Snap</button>
+            </div>
+            <textarea id="runway-prompt" style="width:100%;background:#242424;border:1px solid var(--gold-border);color:#F0EDE8;font-family:Josefin Sans,sans-serif;font-size:11px;padding:10px;resize:vertical;outline:none;min-height:70px;" placeholder="Describe the motion and mood of your Reel..."></textarea>
+          </div>
+
+          <!-- RUNWAY SETTINGS -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+            <div>
+              <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Duration</div>
+              <select id="runway-duration" style="width:100%;background:#242424;border:1px solid var(--gold-border);color:#F0EDE8;font-family:Josefin Sans,sans-serif;font-size:10px;padding:8px;">
+                <option value="5">5 seconds</option>
+                <option value="10" selected>10 seconds</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Ratio</div>
+              <select id="runway-ratio" style="width:100%;background:#242424;border:1px solid var(--gold-border);color:#F0EDE8;font-family:Josefin Sans,sans-serif;font-size:10px;padding:8px;">
+                <option value="720:1280" selected>9:16 Vertical (Reels)</option>
+                <option value="1280:720">16:9 Horizontal</option>
+                <option value="1:1">1:1 Square</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- GENERATE BUTTON -->
+          <button class="btn btn-gold" style="width:100%;justify-content:center;" id="runway-gen-btn" onclick="generateRunwayReel()">
+            <span id="runway-gen-inner">🎬 Generate Reel with Runway AI</span>
+          </button>
+
+          <!-- PROGRESS -->
+          <div id="runway-progress" style="display:none;margin-top:14px;">
+            <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Generating your Reel...</div>
+            <div style="height:4px;background:#242424;border-radius:2px;">
+              <div id="runway-progress-bar" style="height:100%;background:var(--gold);width:0%;transition:width 0.5s;border-radius:2px;"></div>
+            </div>
+            <div style="font-size:9px;color:var(--muted);margin-top:6px;" id="runway-status">Initializing...</div>
+          </div>
+
+          <!-- GENERATED VIDEO PREVIEW -->
+          <div id="runway-result" style="display:none;margin-top:14px;">
+            <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:8px;">✓ Reel Generated!</div>
+            <video id="runway-video" controls style="width:100%;max-height:300px;background:#0D0D0D;"></video>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="btn btn-outline" style="font-size:7px;" onclick="useRunwayVideo()">Use This Reel →</button>
+              <a id="runway-download" class="btn btn-ghost" style="font-size:7px;" download="orrisoak-reel.mp4">↓ Download</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIVIDER -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <div style="flex:1;height:1px;background:var(--gold-border);"></div>
+          <span style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);">OR UPLOAD YOUR OWN</span>
+          <div style="flex:1;height:1px;background:var(--gold-border);"></div>
+        </div>
+
         <!-- VIDEO UPLOAD -->
         <div class="image-picker">
-          <span class="field-label">Reel Video</span>
+          <span class="field-label">Upload Reel Video</span>
           <p class="field-sub">MP4 or MOV · Max 90 seconds · 9:16 vertical recommended</p>
           <div style="border:1px dashed var(--gold-border);padding:32px;text-align:center;cursor:pointer;background:#242424;margin-top:10px;" onclick="document.getElementById('reel-upload').click()">
             <div style="font-size:28px;margin-bottom:8px;">🎬</div>
@@ -715,12 +790,6 @@ function r2SelectImage(i, url) {
   selectedPostImageUrl = url;
   const imgEl = document.getElementById('post-preview-img');
   imgEl.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
-  // Clear caption and hashtags for fresh start
-  document.getElementById('post-caption').value = '';
-  document.getElementById('post-char').textContent = '0';
-  document.getElementById('post-preview-cap').textContent = 'Your caption will appear here...';
-  document.getElementById('post-preview-tags').textContent = '';
-  document.querySelectorAll('#hashtag-row .htag').forEach(el => el.classList.remove('added'));
   updatePreview();
 }
 
@@ -913,6 +982,156 @@ async function publishPost(target) {
   if (igOk || fbOk) toast(`Posted successfully ✓`, 'green');
 }
 
+// ── RUNWAY AI VIDEO GENERATION ──
+const RUNWAY_API = 'https://api.dev.runwayml.com/v1';
+let runwayImageUrl = null;
+let runwayVideoUrl = null;
+
+function buildRunwayImageGrid() {
+  const grid = document.getElementById('runway-image-grid');
+  if (!grid) return;
+  // Use ivory hero images as quick picks
+  const quickImages = [
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-hero.png', label: 'Ivory Hero' },
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-hero-gold-sparkle.png', label: 'Gold Sparkle' },
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-face-bokeh.png', label: 'Model Face' },
+    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-hero-01.png', label: 'Noir Hero' },
+    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-dramatic-gold-01.png', label: 'Noir Gold' },
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-case-ivory-gold-sparkle.png', label: 'Case Sparkle' },
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-set-with-case-white-bg.png', label: 'Full Set' },
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-vanity-two-colors.png', label: 'Two Colors' },
+  ];
+  grid.innerHTML = quickImages.map((img, i) => `
+    <div class="img-opt" id="rw-img-${i}" onclick="selectRunwayImage(${i},'${img.url}','${img.label}')">
+      <img src="${img.url}" onerror="this.parentElement.style.opacity='0.3'" alt="${img.label}">
+      <div class="img-opt-check">✓</div>
+      <div class="img-opt-name">${img.label}</div>
+    </div>
+  `).join('');
+}
+
+function selectRunwayImage(i, url, label) {
+  document.querySelectorAll('#runway-image-grid .img-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById('rw-img-' + i)?.classList.add('selected');
+  runwayImageUrl = url;
+  document.getElementById('runway-selected-img').textContent = '✓ ' + label + ' selected';
+}
+
+function setRunwayPrompt(prompt) {
+  document.getElementById('runway-prompt').value = prompt;
+}
+
+async function generateRunwayReel() {
+  const runwayKey = (typeof ORRISOAK_CONFIG !== 'undefined' && ORRISOAK_CONFIG.runway?.apiKey)
+    ? ORRISOAK_CONFIG.runway.apiKey
+    : localStorage.getItem('oo_runway_key');
+
+  if (!runwayKey) {
+    const key = prompt('Enter your Runway API key (from runwayml.com → Account → API Keys):');
+    if (!key) return;
+    localStorage.setItem('oo_runway_key', key);
+  }
+
+  const apiKey = runwayKey || localStorage.getItem('oo_runway_key');
+  if (!runwayImageUrl) { toast('Select a source image first', 'red'); return; }
+  const prompt = document.getElementById('runway-prompt').value.trim();
+  if (!prompt) { toast('Enter a motion prompt first', 'red'); return; }
+  const duration = parseInt(document.getElementById('runway-duration').value);
+  const ratio = document.getElementById('runway-ratio').value;
+
+  // Show progress
+  document.getElementById('runway-progress').style.display = 'block';
+  document.getElementById('runway-result').style.display = 'none';
+  document.getElementById('runway-gen-btn').disabled = true;
+  document.getElementById('runway-gen-inner').innerHTML = '<span class="spinner"></span> Generating...';
+
+  const updateProgress = (pct, status) => {
+    document.getElementById('runway-progress-bar').style.width = pct + '%';
+    document.getElementById('runway-status').textContent = status;
+  };
+
+  try {
+    updateProgress(10, 'Sending image to Runway...');
+
+    // Create generation task
+    const res = await fetch(`${RUNWAY_API}/image_to_video`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'X-Runway-Version': '2024-11-06',
+      },
+      body: JSON.stringify({
+        model: 'gen4_turbo',
+        promptImage: runwayImageUrl,
+        promptText: prompt + '. Luxury beauty brand Orris & Oak aesthetic.',
+        duration: duration,
+        ratio: ratio,
+      })
+    });
+
+    const task = await res.json();
+    if (task.error || !task.id) throw new Error(task.error || 'Failed to start generation');
+
+    updateProgress(20, `Task started: ${task.id} — processing...`);
+
+    // Poll for completion
+    let attempts = 0;
+    const maxAttempts = 60;
+    while (attempts < maxAttempts) {
+      await sleep(3000);
+      attempts++;
+      const pct = 20 + (attempts / maxAttempts) * 75;
+      updateProgress(pct, `Processing... (${attempts * 3}s)`);
+
+      const pollRes = await fetch(`${RUNWAY_API}/tasks/${task.id}`, {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'X-Runway-Version': '2024-11-06',
+        }
+      });
+      const pollData = await pollRes.json();
+
+      if (pollData.status === 'SUCCEEDED') {
+        const videoUrl = pollData.output?.[0];
+        if (!videoUrl) throw new Error('No video URL in response');
+
+        updateProgress(100, '✓ Complete!');
+        runwayVideoUrl = videoUrl;
+
+        // Show result
+        document.getElementById('runway-result').style.display = 'block';
+        document.getElementById('runway-video').src = videoUrl;
+        document.getElementById('runway-download').href = videoUrl;
+        toast('Reel generated! ✓', 'green');
+        break;
+      }
+
+      if (pollData.status === 'FAILED') {
+        throw new Error(pollData.failure || 'Generation failed');
+      }
+    }
+
+    if (attempts >= maxAttempts) throw new Error('Timeout — try again');
+
+  } catch(e) {
+    document.getElementById('runway-status').textContent = '✗ Error: ' + e.message;
+    toast('Runway error: ' + e.message, 'red');
+  }
+
+  document.getElementById('runway-gen-btn').disabled = false;
+  document.getElementById('runway-gen-inner').innerHTML = '🎬 Generate Reel with Runway AI';
+}
+
+function useRunwayVideo() {
+  if (!runwayVideoUrl) return;
+  reelVideoUrl = runwayVideoUrl;
+  document.getElementById('reel-preview-img').innerHTML =
+    `<video src="${runwayVideoUrl}" style="width:100%;height:100%;object-fit:cover;" controls muted></video>`;
+  document.getElementById('reel-upload-name').textContent = '✓ AI Generated Reel ready to publish';
+  toast('Reel ready — add caption and publish!', 'green');
+}
+
 // ── PUBLISH REEL ──
 async function publishReel(target) {
   if (!connected) { toast('Connect Meta first', 'red'); return; }
@@ -991,7 +1210,7 @@ async function aiCaption() {
 
   document.getElementById('ai-caption-btn').innerHTML = '<span class="spinner"></span> Generating...';
   try {
-    const res = await fetch('https://api.orrisoak.com', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -1020,7 +1239,7 @@ async function aiReelCaption() {
   if (!claudeKey) { toast('Add Claude API key to config-private.js','red'); return; }
 
   try {
-    const res = await fetch('https://api.orrisoak.com', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -1227,6 +1446,7 @@ window.onload = () => {
     const cfg = ORRISOAK_CONFIG.meta;
     if (cfg.accessToken) document.getElementById('meta-token').value = cfg.accessToken;
     if (cfg.igUserId) { document.getElementById('ig-user-id').value = cfg.igUserId; igUserId = cfg.igUserId; }
+  if (ORRISOAK_CONFIG.runway?.apiKey) localStorage.setItem('oo_runway_key', ORRISOAK_CONFIG.runway.apiKey);
     if (cfg.fbPageId) document.getElementById('fb-page-id').value = cfg.fbPageId;
   } else {
     const t = localStorage.getItem('oo_meta_token');
@@ -1236,6 +1456,7 @@ window.onload = () => {
   }
 
   r2RenderProducts(); // Show R2 product browser on load
+  buildRunwayImageGrid(); // Runway source image picker
   buildImageGrid('reel-cover-grid', 'selectPostImage'); // Reel cover still uses quick grid
   renderHistory();
 };
