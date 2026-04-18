@@ -1056,11 +1056,7 @@ async function generateRunwayReel() {
     // Create generation task
     const res = await fetch(`${RUNWAY_API}/image_to_video`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'X-Runway-Version': '2024-11-06',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'gen4_turbo',
         promptImage: runwayImageUrl,
@@ -1085,10 +1081,8 @@ async function generateRunwayReel() {
       updateProgress(pct, `Processing... (${attempts * 3}s)`);
 
       const pollRes = await fetch(`${RUNWAY_API}/tasks/${task.id}`, {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'X-Runway-Version': '2024-11-06',
-        }
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
       });
       const pollData = await pollRes.json();
 
