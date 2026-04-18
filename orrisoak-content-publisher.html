@@ -1027,15 +1027,15 @@ async function generateRunwayReel() {
     : localStorage.getItem('oo_runway_key');
 
   if (!runwayKey) {
-    const key = prompt('Enter your Runway API key (from runwayml.com → Account → API Keys):');
+    const key = window.prompt('Enter your Runway API key (from dev.runwayml.com → API Keys):');
     if (!key) return;
     localStorage.setItem('oo_runway_key', key);
   }
 
   const apiKey = runwayKey || localStorage.getItem('oo_runway_key');
   if (!runwayImageUrl) { toast('Select a source image first', 'red'); return; }
-  const prompt = document.getElementById('runway-prompt').value.trim();
-  if (!prompt) { toast('Enter a motion prompt first', 'red'); return; }
+  const motionPrompt = document.getElementById('runway-prompt').value.trim();
+  if (!motionPrompt) { toast('Enter a motion prompt first', 'red'); return; }
   const duration = parseInt(document.getElementById('runway-duration').value);
   const ratio = document.getElementById('runway-ratio').value;
 
@@ -1064,7 +1064,7 @@ async function generateRunwayReel() {
       body: JSON.stringify({
         model: 'gen4_turbo',
         promptImage: runwayImageUrl,
-        promptText: prompt + '. Luxury beauty brand Orris & Oak aesthetic.',
+        promptText: motionPrompt + '. Luxury beauty brand Orris & Oak aesthetic.',
         duration: duration,
         ratio: ratio,
       })
