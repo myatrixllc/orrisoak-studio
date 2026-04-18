@@ -715,6 +715,12 @@ function r2SelectImage(i, url) {
   selectedPostImageUrl = url;
   const imgEl = document.getElementById('post-preview-img');
   imgEl.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  // Clear caption and hashtags for fresh start
+  document.getElementById('post-caption').value = '';
+  document.getElementById('post-char').textContent = '0';
+  document.getElementById('post-preview-cap').textContent = 'Your caption will appear here...';
+  document.getElementById('post-preview-tags').textContent = '';
+  document.querySelectorAll('#hashtag-row .htag').forEach(el => el.classList.remove('added'));
   updatePreview();
 }
 
