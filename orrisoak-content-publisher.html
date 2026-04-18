@@ -496,6 +496,10 @@ const R2_CATALOG = {
           { file:'orrisoak-4in1-brush-noir-case-noir-gold-sparkle.png', label:'Case Sparkle' },
         ]
       },
+      'videos': { label: 'Videos', icon: '🎬', images: [] },
+      'reels':  { label: 'Reels', icon: '📱', images: [] },
+      'stories':{ label: 'Stories', icon: '⭕', images: [] },
+      'ads':    { label: 'Ad Creatives', icon: '📢', images: [] },
       'ivory': {
         label: 'Ivory — White',
         icon: '🤍',
@@ -516,29 +520,31 @@ const R2_CATALOG = {
           { file:'orrisoak-4in1-brush-ivory-packaging-tube-black-bg.png', label:'Tube Black' },
           { file:'orrisoak-4in1-brush-ivory-lifestyle-model-case-white-bg.png', label:'Model+Case' },
         ]
-      }
+      },
+      'videos': { label: 'Videos', icon: '🎬', images: [] },
+      'reels':  { label: 'Reels', icon: '📱', images: [] },
+      'stories':{ label: 'Stories', icon: '⭕', images: [] },
+      'ads':    { label: 'Ad Creatives', icon: '📢', images: [] },
     }
   },
   'gold-serum': {
     label: '24K Gold Serum',
     icon: '✨',
     variants: {
-      'images': {
-        label: 'Product Images',
-        icon: '📸',
-        images: []  // Add when serum images uploaded to R2
-      }
+      'images': { label: 'Product Images', icon: '📸', images: [] },
+      'videos': { label: 'Videos', icon: '🎬', images: [] },
+      'reels':  { label: 'Reels', icon: '📱', images: [] },
+      'stories':{ label: 'Stories', icon: '⭕', images: [] },
     }
   },
   'glow-cleanser': {
     label: 'Glow Cleanser',
     icon: '💧',
     variants: {
-      'images': {
-        label: 'Product Images',
-        icon: '📸',
-        images: []  // Add when cleanser images uploaded to R2
-      }
+      'images': { label: 'Product Images', icon: '📸', images: [] },
+      'videos': { label: 'Videos', icon: '🎬', images: [] },
+      'reels':  { label: 'Reels', icon: '📱', images: [] },
+      'stories':{ label: 'Stories', icon: '⭕', images: [] },
     }
   }
 };
@@ -593,10 +599,65 @@ function r2RenderVariants(productKey) {
 }
 
 function r2SelectVariant(productKey, variantKey) {
-  r2State.variant = variantKey;
+  // For magnetic-brush: if selecting a color, show content type next
+  if (productKey === 'magnetic-brush' && ['black','ivory'].includes(variantKey)) {
+    r2State.color = variantKey;
+    r2State.variant = variantKey;
+    r2State.level = 'contenttype';
+    r2UpdateBreadcrumb();
+    // Show content type options
+    const tiles = document.getElementById('r2-tiles');
+    document.getElementById('post-image-grid').innerHTML = '';
+    const contentTypes = [
+      { key:'images',  icon:'📸', label:'Photos' },
+      { key:'videos',  icon:'🎬', label:'Videos' },
+      { key:'reels',   icon:'📱', label:'Reels' },
+      { key:'stories', icon:'⭕', label:'Stories' },
+      { key:'ads',     icon:'📢', label:'Ad Creatives' },
+    ];
+    tiles.innerHTML = contentTypes.map(ct => `
+      <div onclick="r2SelectContentType('${productKey}','${variantKey}','${ct.key}')" style="background:#1A1A1A;border:1px solid rgba(201,168,76,0.25);padding:16px;cursor:pointer;text-align:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.25)'">
+        <div style="font-size:24px;margin-bottom:8px;">${ct.icon}</div>
+        <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;">${ct.label}</div>
+      </div>
+    `).join('');
+  } else {
+    r2State.variant = variantKey;
+    r2State.level = 'images';
+    r2UpdateBreadcrumb();
+    r2RenderImages(productKey, variantKey);
+  }
+}
+
+function r2SelectContentType(productKey, colorKey, contentType) {
+  r2State.contentType = contentType;
   r2State.level = 'images';
-  r2UpdateBreadcrumb();
-  r2RenderImages(productKey, variantKey);
+  // Update breadcrumb
+  const bc = document.getElementById('bc-folder');
+  const contentLabels = {images:'Photos',videos:'Videos',reels:'Reels',stories:'Stories',ads:'Ad Creatives'};
+  bc.textContent = contentLabels[contentType] || contentType;
+  bc.style.display = 'block';
+  document.getElementById('bc-sep2').style.display = 'block';
+  document.getElementById('r2-tiles').innerHTML = '';
+  // Build path: content/magnetic-brush/black/images
+  const imgPath = `${R2_BASE}/${productKey}/${colorKey}/${contentType}`;
+  const variant = R2_CATALOG[productKey].variants[colorKey];
+  const images = variant?.images || [];
+  const grid = document.getElementById('post-image-grid');
+  if (!images.length || contentType !== 'images') {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">
+      ${contentType === 'images' ? 'No images in catalog yet' : 'Upload ' + contentType + ' to R2 at:<br><code style=color:var(--gold)>content/magnetic-brush/${colorKey}/${contentType}/</code>'}</div>`;
+    if (contentType === 'images') return;
+    return;
+  }
+  grid.innerHTML = images.map((img, i) => {
+    const url = `${imgPath}/${img.file}`;
+    return `<div class="img-opt" id="r2-img-${i}" onclick="r2SelectImage(${i},'${url}')">
+      <img src="${url}" onerror="this.parentElement.style.opacity='0.3'" alt="${img.label}">
+      <div class="img-opt-check">✓</div>
+      <div class="img-opt-name">${img.label}</div>
+    </div>`;
+  }).join('');
 }
 
 function r2RenderImages(productKey, variantKey) {
@@ -611,11 +672,22 @@ function r2RenderImages(productKey, variantKey) {
   }
 
   // Build correct R2 path
+  // For magnetic-brush: content/magnetic-brush/black/images OR content/magnetic-brush/black/videos
+  // For others: content/gold-serum/images OR content/gold-serum/videos
+  const contentFolders = ['videos','reels','stories','ads','images'];
   let imgPath;
   if (productKey === 'magnetic-brush') {
-    imgPath = `${R2_BASE}/${productKey}/${variantKey}/images`;
+    // variant is color (black/ivory), folder is content type
+    // But we merged color+type into variants — detect if variantKey is a color
+    const isColor = ['black','ivory'].includes(variantKey);
+    if (isColor) {
+      imgPath = `${R2_BASE}/${productKey}/${variantKey}/images`;
+    } else {
+      // variantKey is a content type — need color context
+      imgPath = `${R2_BASE}/${productKey}/${r2State.color || 'ivory'}/${variantKey}`;
+    }
   } else {
-    imgPath = `${R2_BASE}/${productKey}/images`;
+    imgPath = `${R2_BASE}/${productKey}/${variantKey}`;
   }
 
   grid.innerHTML = variant.images.map((img, i) => {
