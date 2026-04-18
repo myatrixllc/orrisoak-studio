@@ -405,8 +405,32 @@ textarea.cap:focus{border-color:var(--gold);}
           <div id="runway-result" style="display:none;margin-top:14px;">
             <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:8px;">✓ Reel Generated!</div>
             <video id="runway-video" controls style="width:100%;max-height:300px;background:#0D0D0D;"></video>
+
+            <!-- VOICEOVER SECTION -->
+            <div style="margin-top:14px;background:#1A1A1A;border:1px solid var(--gold-border);padding:16px;">
+              <div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">✦ Add AI Voiceover</div>
+              <textarea id="voice-script" style="width:100%;background:#242424;border:1px solid var(--gold-border);color:#F0EDE8;font-family:Josefin Sans,sans-serif;font-size:10px;padding:10px;resize:vertical;outline:none;min-height:60px;margin-bottom:10px;" placeholder="Write voiceover script or AI-generate from caption...">Orris and Oak. Your glow, elevated. Four precision brushes. One magnetic system. Luxury redefined.</textarea>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-outline" style="font-size:7px;padding:7px 14px;" onclick="aiVoiceScript()">✦ AI Write Script</button>
+                <button class="btn btn-gold" style="font-size:7px;padding:7px 14px;" id="voice-gen-btn" onclick="generateVoiceover()">
+                  <span id="voice-gen-inner">🎙 Generate Voiceover</span>
+                </button>
+              </div>
+              <div id="voice-result" style="display:none;margin-top:10px;">
+                <div style="font-size:8px;letter-spacing:2px;color:var(--green);margin-bottom:6px;">✓ Voiceover ready</div>
+                <audio id="voice-audio" controls style="width:100%;margin-bottom:10px;"></audio>
+                <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:8px;" id="merge-btn" onclick="mergeVideoAudio()">
+                  <span id="merge-inner">⚡ Merge Video + Voiceover</span>
+                </button>
+              </div>
+              <div id="merge-progress" style="display:none;margin-top:10px;">
+                <div style="font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px;" id="merge-status">Merging...</div>
+                <div style="height:3px;background:#242424;"><div id="merge-bar" style="height:100%;background:var(--gold);width:0%;transition:width 0.3s;"></div></div>
+              </div>
+            </div>
+
             <div style="display:flex;gap:8px;margin-top:10px;">
-              <button class="btn btn-outline" style="font-size:7px;" onclick="useRunwayVideo()">Use This Reel →</button>
+              <button class="btn btn-outline" style="font-size:7px;" onclick="useRunwayVideo()">Use Silent Reel →</button>
               <a id="runway-download" class="btn btn-ghost" style="font-size:7px;" download="orrisoak-reel.mp4">↓ Download</a>
             </div>
           </div>
@@ -1126,6 +1150,210 @@ function useRunwayVideo() {
     `<video src="${runwayVideoUrl}" style="width:100%;height:100%;object-fit:cover;" controls muted></video>`;
   document.getElementById('reel-upload-name').textContent = '✓ AI Generated Reel ready to publish';
   toast('Reel ready — add caption and publish!', 'green');
+}
+
+// ── VOICEOVER FUNCTIONS ──
+let voiceAudioUrl = null;
+
+// Product voiceover templates
+const VOICE_TEMPLATES = {
+  'magnetic-brush': {
+    'black': {
+      product: '4-in-1 Magnetic Brush in Noir',
+      hook: 'No more carrying multiple brushes.',
+      detail: 'Orris and Oak created something extraordinary — one magnetic system, four brushes that snap on and off in seconds. Foundation. Contour. Highlight. Blend. All in one.',
+      cta: 'Your ritual, elevated.',
+    },
+    'ivory': {
+      product: '4-in-1 Magnetic Brush in Ivory',
+      hook: 'Imagine never needing another brush set again.',
+      detail: 'Orris and Oak reinvented the beauty routine. One handle. Four magnetic heads that attach and detach effortlessly. The innovation your vanity has been waiting for.',
+      cta: 'Your glow, elevated.',
+    },
+    'default': {
+      product: '4-in-1 Magnetic Brush',
+      hook: 'Why carry four brushes when one does it all?',
+      detail: 'Orris and Oak engineered a breakthrough — a single magnetic system with four precision brush heads. Snap. Switch. Perfect. Every single time.',
+      cta: 'Your glow, elevated.',
+    }
+  },
+  'gold-serum': {
+    'default': {
+      product: '24K Gold and Black Truffle Serum',
+      hook: 'What if the rarest ingredients on Earth could transform your skin?',
+      detail: 'Orris and Oak formulated the impossible — real 24 karat gold particles and rare black truffle extract, working together to lift, firm, and illuminate in just fourteen days.',
+      cta: 'Luxury, redefined.',
+    }
+  },
+  'glow-cleanser': {
+    'default': {
+      product: 'Gold Black Truffle Hydrating Glow Cleanser',
+      hook: 'Your glow ritual deserves a luxury beginning.',
+      detail: 'Orris and Oak starts where most brands stop — a gold-infused cleanser with black truffle extract that melts away impurities while flooding your skin with radiance.',
+      cta: 'Wake up glowing. Every single day.',
+    }
+  }
+};
+
+function detectProductFromImage() {
+  // Detect from selected R2 image URL or state
+  const imgUrl = runwayImageUrl || '';
+  const state = r2State;
+
+  let productKey = state.product || 'magnetic-brush';
+  let variantKey = state.color || state.variant || 'default';
+
+  // Also detect from URL
+  if (imgUrl.includes('gold-serum')) productKey = 'gold-serum';
+  else if (imgUrl.includes('glow-cleanser')) productKey = 'glow-cleanser';
+  else if (imgUrl.includes('magnetic-brush') || imgUrl.includes('brush')) productKey = 'magnetic-brush';
+
+  if (imgUrl.includes('/black/') || imgUrl.includes('noir')) variantKey = 'black';
+  else if (imgUrl.includes('/ivory/') || imgUrl.includes('ivory')) variantKey = 'ivory';
+
+  const templates = VOICE_TEMPLATES[productKey] || VOICE_TEMPLATES['magnetic-brush'];
+  return templates[variantKey] || templates['default'];
+}
+
+async function aiVoiceScript() {
+  const caption = document.getElementById('reel-caption').value.trim();
+  const tmpl = detectProductFromImage();
+
+  const prompt = caption
+    ? `Write a luxury voiceover script for an Instagram Reel. Max 30 words. 
+Product: ${tmpl.product}. 
+Tone: warm, aspirational, elegant. 
+Use this caption for inspiration: "${caption.slice(0,200)}"
+End with "Orris and Oak."
+Return ONLY the voiceover script, no quotes.`
+    : `Write a luxury voiceover script for an Instagram Reel. Max 30 words.
+Product: ${tmpl.product}.
+Hook: "${tmpl.hook}"
+Detail: "${tmpl.detail}"
+End with: "${tmpl.cta} Orris and Oak."
+Return ONLY the voiceover script, no quotes.`;
+
+  const btn = document.getElementById('voice-gen-btn');
+  btn.disabled = true;
+  document.getElementById('voice-gen-inner').innerHTML = '<span class="spinner"></span> Writing script...';
+
+  try {
+    const res = await fetch('https://api.orrisoak.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 120,
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text?.trim() || tmpl.hook + ' ' + tmpl.cta + ' Orris and Oak.';
+    document.getElementById('voice-script').value = text;
+    toast('Script generated ✓', 'green');
+  } catch(e) {
+    // Fallback to template
+    document.getElementById('voice-script').value = `${tmpl.hook} ${tmpl.detail} ${tmpl.cta} Orris and Oak.`;
+    toast('Using template script', '');
+  }
+
+  btn.disabled = false;
+  document.getElementById('voice-gen-inner').innerHTML = '🎙 Generate Voiceover';
+}
+
+async function generateVoiceover() {
+  const text = document.getElementById('voice-script').value.trim();
+  if (!text) { toast('Write a voiceover script first', 'red'); return; }
+
+  document.getElementById('voice-gen-btn').disabled = true;
+  document.getElementById('voice-gen-inner').innerHTML = '<span class="spinner"></span> Generating...';
+
+  try {
+    const res = await fetch('https://api.orrisoak.com/voiceover', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voice: 'nova' })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    voiceAudioUrl = data.audioUrl;
+    document.getElementById('voice-result').style.display = 'block';
+    document.getElementById('voice-audio').src = data.audioUrl;
+    toast('Voiceover generated ✓', 'green');
+    log('reel-log', `✓ Voiceover saved: ${data.r2Key}`, 'ok');
+  } catch(e) {
+    toast('Voiceover error: ' + e.message, 'red');
+    log('reel-log', '✗ Voiceover failed: ' + e.message, 'err');
+  }
+
+  document.getElementById('voice-gen-btn').disabled = false;
+  document.getElementById('voice-gen-inner').innerHTML = '🎙 Generate Voiceover';
+}
+
+async function mergeVideoAudio() {
+  if (!runwayVideoUrl || !voiceAudioUrl) {
+    toast('Need both video and voiceover first', 'red');
+    return;
+  }
+
+  document.getElementById('merge-btn').disabled = true;
+  document.getElementById('merge-inner').innerHTML = '<span class="spinner"></span> Loading FFmpeg...';
+  document.getElementById('merge-progress').style.display = 'block';
+
+  const updateMerge = (pct, status) => {
+    document.getElementById('merge-bar').style.width = pct + '%';
+    document.getElementById('merge-status').textContent = status;
+  };
+
+  try {
+    updateMerge(10, 'Loading FFmpeg WASM...');
+
+    // Load FFmpeg WASM
+    const { createFFmpeg, fetchFile } = await import('https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
+    const ffmpeg = createFFmpeg({ log: false });
+    await ffmpeg.load();
+
+    updateMerge(30, 'Downloading video...');
+    ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(runwayVideoUrl));
+
+    updateMerge(50, 'Downloading audio...');
+    ffmpeg.FS('writeFile', 'audio.mp3', await fetchFile(voiceAudioUrl));
+
+    updateMerge(70, 'Merging video + voiceover...');
+    await ffmpeg.run(
+      '-i', 'video.mp4',
+      '-i', 'audio.mp3',
+      '-c:v', 'copy',
+      '-c:a', 'aac',
+      '-shortest',
+      '-y',
+      'output.mp4'
+    );
+
+    updateMerge(90, 'Saving final Reel...');
+    const outputData = ffmpeg.FS('readFile', 'output.mp4');
+    const outputBlob = new Blob([outputData.buffer], { type: 'video/mp4' });
+    const outputUrl = URL.createObjectURL(outputBlob);
+
+    // Use merged video
+    reelVideoUrl = outputUrl;
+    document.getElementById('runway-video').src = outputUrl;
+    document.getElementById('reel-preview-img').innerHTML =
+      `<video src="${outputUrl}" style="width:100%;height:100%;object-fit:cover;" controls></video>`;
+    document.getElementById('reel-upload-name').textContent = '✓ Reel with voiceover ready to publish';
+
+    updateMerge(100, '✓ Merged! Ready to publish.');
+    toast('Video + voiceover merged! ✓', 'green');
+    log('reel-log', '✓ Final Reel with voiceover ready', 'ok');
+
+  } catch(e) {
+    updateMerge(0, '✗ Error: ' + e.message);
+    toast('Merge error: ' + e.message, 'red');
+    log('reel-log', '✗ Merge failed: ' + e.message, 'err');
+  }
+
+  document.getElementById('merge-btn').disabled = false;
+  document.getElementById('merge-inner').innerHTML = '⚡ Merge Video + Voiceover';
 }
 
 // ── PUBLISH REEL ──
