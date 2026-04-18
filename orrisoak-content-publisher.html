@@ -214,12 +214,28 @@ textarea.cap:focus{border-color:var(--gold);}
       <!-- LEFT: COMPOSE -->
       <div class="compose-left">
 
-        <!-- IMAGE -->
+        <!-- IMAGE BROWSER -->
         <div class="image-picker">
-          <span class="field-label">Select Image</span>
-          <p class="field-sub">Choose from your R2 library or upload a new image</p>
-          <div class="image-grid" id="post-image-grid"></div>
-          <div class="upload-row">
+          <span class="field-label">Image Library</span>
+
+          <!-- BREADCRUMB NAV -->
+          <div id="r2-breadcrumb" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;background:#0D0D0D;border:1px solid rgba(201,168,76,0.25);padding:10px 14px;">
+            <span style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,76,0.5);">images.orrisoak.com</span>
+            <span style="color:rgba(201,168,76,0.3);">/</span>
+            <span id="bc-product" style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);cursor:pointer;" onclick="r2Nav('product')">— select product —</span>
+            <span id="bc-sep1" style="color:rgba(201,168,76,0.3);display:none;">/</span>
+            <span id="bc-variant" style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);cursor:pointer;display:none;" onclick="r2Nav('variant')"></span>
+            <span id="bc-sep2" style="color:rgba(201,168,76,0.3);display:none;">/</span>
+            <span id="bc-folder" style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;display:none;">images</span>
+          </div>
+
+          <!-- PRODUCT / FOLDER TILES -->
+          <div id="r2-tiles" class="image-grid" style="grid-template-columns:repeat(4,1fr);"></div>
+
+          <!-- IMAGE GRID -->
+          <div class="image-grid" id="post-image-grid" style="margin-top:8px;"></div>
+
+          <div class="upload-row" style="margin-top:10px;">
             <button class="upload-btn" onclick="document.getElementById('post-upload').click()">+ Upload Image</button>
             <input type="file" id="post-upload" accept="image/*" style="display:none" onchange="handleImageUpload(this,'post')">
             <span class="upload-name" id="post-upload-name"></span>
@@ -458,7 +474,196 @@ textarea.cap:focus{border-color:var(--gold);}
 <script>
 // ── CONFIG ──
 const GRAPH = 'https://graph.facebook.com/v19.0';
-const R2_BASE = 'https://images.orrisoak.com/content/magnetic-brush';
+const R2_BASE = 'https://images.orrisoak.com/content';
+
+// ── R2 CATALOG ──
+const R2_CATALOG = {
+  'magnetic-brush': {
+    label: 'Magnetic Brush',
+    icon: '🖌️',
+    variants: {
+      'black': {
+        label: 'Noir — Black',
+        icon: '🖤',
+        images: [
+          { file:'orrisoak-4in1-brush-noir-hero.png', label:'Hero' },
+          { file:'orrisoak-4in1-brush-noir-hero-gold-sparkle.png', label:'Gold Sparkle' },
+          { file:'orrisoak-4in1-brush-noir-lifestyle-face-bokeh.png', label:'Model Face' },
+          { file:'orrisoak-4in1-brush-noir-hand-black-bg.png', label:'Hand Black' },
+          { file:'orrisoak-4in1-brush-noir-packaging-tube-white-bg.png', label:'Tube White' },
+          { file:'orrisoak-4in1-brush-noir-set-black-bg.png', label:'Full Set' },
+          { file:'orrisoak-4in1-brush-noir-lifestyle-vanity-two-colors.png', label:'Two Colors' },
+          { file:'orrisoak-4in1-brush-noir-case-noir-gold-sparkle.png', label:'Case Sparkle' },
+        ]
+      },
+      'ivory': {
+        label: 'Ivory — White',
+        icon: '🤍',
+        images: [
+          { file:'orrisoak-4in1-brush-ivory-hero.png', label:'Hero' },
+          { file:'orrisoak-4in1-brush-ivory-hero-gold-sparkle.png', label:'Gold Sparkle' },
+          { file:'orrisoak-4in1-brush-ivory-lifestyle-face-bokeh.png', label:'Model Face' },
+          { file:'orrisoak-4in1-brush-ivory-lifestyle-vanity-two-colors.png', label:'Two Colors' },
+          { file:'orrisoak-4in1-brush-ivory-case-ivory-gold-sparkle.png', label:'Case Sparkle' },
+          { file:'orrisoak-4in1-brush-ivory-set-with-case-white-bg.png', label:'Full Set' },
+          { file:'orrisoak-4in1-brush-ivory-lifestyle-collage-4up.png', label:'4-Up Collage' },
+          { file:'orrisoak-4in1-brush-ivory-packaging-tube-white-bg.png', label:'Tube White' },
+          { file:'orrisoak-4in1-brush-ivory-hand-fan-white-bg.png', label:'Fan View' },
+          { file:'orrisoak-4in1-brush-ivory-lifestyle-model-white-bg.png', label:'Model White' },
+          { file:'orrisoak-4in1-brush-ivory-lifestyle-hand-case-bokeh.png', label:'Hand+Case' },
+          { file:'orrisoak-4in1-brush-ivory-flatlay-marble-dark.png', label:'Flatlay Marble' },
+          { file:'orrisoak-4in1-brush-ivory-hand-marble-dark.png', label:'Hand Marble' },
+          { file:'orrisoak-4in1-brush-ivory-packaging-tube-black-bg.png', label:'Tube Black' },
+          { file:'orrisoak-4in1-brush-ivory-lifestyle-model-case-white-bg.png', label:'Model+Case' },
+        ]
+      }
+    }
+  },
+  'gold-serum': {
+    label: '24K Gold Serum',
+    icon: '✨',
+    variants: {
+      'images': {
+        label: 'Product Images',
+        icon: '📸',
+        images: []  // Add when serum images uploaded to R2
+      }
+    }
+  },
+  'glow-cleanser': {
+    label: 'Glow Cleanser',
+    icon: '💧',
+    variants: {
+      'images': {
+        label: 'Product Images',
+        icon: '📸',
+        images: []  // Add when cleanser images uploaded to R2
+      }
+    }
+  }
+};
+
+// ── R2 BROWSER STATE ──
+let r2State = { level: 'product', product: null, variant: null };
+
+function r2Nav(level) {
+  if (level === 'product') {
+    r2State = { level: 'product', product: null, variant: null };
+    r2RenderProducts();
+  } else if (level === 'variant') {
+    r2State.level = 'variant';
+    r2State.variant = null;
+    r2RenderVariants(r2State.product);
+  }
+  r2UpdateBreadcrumb();
+}
+
+function r2RenderProducts() {
+  const tiles = document.getElementById('r2-tiles');
+  const grid = document.getElementById('post-image-grid');
+  grid.innerHTML = '';
+  
+  tiles.innerHTML = Object.entries(R2_CATALOG).map(([key, product]) => `
+    <div onclick="r2SelectProduct('${key}')" style="background:#1A1A1A;border:1px solid rgba(201,168,76,0.25);padding:16px;cursor:pointer;text-align:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.25)'">
+      <div style="font-size:24px;margin-bottom:8px;">${product.icon}</div>
+      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;">${product.label}</div>
+    </div>
+  `).join('');
+}
+
+function r2SelectProduct(productKey) {
+  r2State.product = productKey;
+  r2State.level = 'variant';
+  r2UpdateBreadcrumb();
+  r2RenderVariants(productKey);
+}
+
+function r2RenderVariants(productKey) {
+  const product = R2_CATALOG[productKey];
+  const tiles = document.getElementById('r2-tiles');
+  const grid = document.getElementById('post-image-grid');
+  grid.innerHTML = '';
+
+  tiles.innerHTML = Object.entries(product.variants).map(([key, variant]) => `
+    <div onclick="r2SelectVariant('${productKey}','${key}')" style="background:#1A1A1A;border:1px solid rgba(201,168,76,0.25);padding:16px;cursor:pointer;text-align:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.25)'">
+      <div style="font-size:24px;margin-bottom:8px;">${variant.icon}</div>
+      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;">${variant.label}</div>
+    </div>
+  `).join('');
+}
+
+function r2SelectVariant(productKey, variantKey) {
+  r2State.variant = variantKey;
+  r2State.level = 'images';
+  r2UpdateBreadcrumb();
+  r2RenderImages(productKey, variantKey);
+}
+
+function r2RenderImages(productKey, variantKey) {
+  const variant = R2_CATALOG[productKey].variants[variantKey];
+  const tiles = document.getElementById('r2-tiles');
+  const grid = document.getElementById('post-image-grid');
+  tiles.innerHTML = '';
+
+  if (!variant.images.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">No images uploaded yet for this product</div>';
+    return;
+  }
+
+  // Build correct R2 path
+  let imgPath;
+  if (productKey === 'magnetic-brush') {
+    imgPath = `${R2_BASE}/${productKey}/${variantKey}/images`;
+  } else {
+    imgPath = `${R2_BASE}/${productKey}/images`;
+  }
+
+  grid.innerHTML = variant.images.map((img, i) => {
+    const url = `${imgPath}/${img.file}`;
+    return `<div class="img-opt" id="r2-img-${i}" onclick="r2SelectImage(${i},'${url}')">
+      <img src="${url}" onerror="this.parentElement.style.opacity='0.3'" alt="${img.label}">
+      <div class="img-opt-check">✓</div>
+      <div class="img-opt-name">${img.label}</div>
+    </div>`;
+  }).join('');
+}
+
+function r2SelectImage(i, url) {
+  document.querySelectorAll('#post-image-grid .img-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById('r2-img-' + i)?.classList.add('selected');
+  selectedPostImageUrl = url;
+  const imgEl = document.getElementById('post-preview-img');
+  imgEl.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  updatePreview();
+}
+
+function r2UpdateBreadcrumb() {
+  const bcProduct = document.getElementById('bc-product');
+  const bcVariant = document.getElementById('bc-variant');
+  const bcFolder = document.getElementById('bc-folder');
+  const sep1 = document.getElementById('bc-sep1');
+  const sep2 = document.getElementById('bc-sep2');
+
+  if (r2State.product) {
+    bcProduct.textContent = R2_CATALOG[r2State.product].label;
+    sep1.style.display = 'block';
+    bcVariant.style.display = 'block';
+  } else {
+    bcProduct.textContent = '— select product —';
+    sep1.style.display = 'none';
+    bcVariant.style.display = 'none';
+  }
+
+  if (r2State.variant) {
+    bcVariant.textContent = R2_CATALOG[r2State.product].variants[r2State.variant].label;
+    sep2.style.display = 'block';
+    bcFolder.style.display = 'block';
+  } else {
+    bcVariant.textContent = '';
+    sep2.style.display = 'none';
+    bcFolder.style.display = 'none';
+  }
+}
 let token = '', igUserId = '', fbPageId = '1032503303260114';
 let connected = false;
 let selectedPostImage = null, selectedPostImageUrl = null;
@@ -699,7 +904,7 @@ async function aiCaption() {
 
   document.getElementById('ai-caption-btn').innerHTML = '<span class="spinner"></span> Generating...';
   try {
-    const res = await fetch('https://api.orrisoak.com', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -728,7 +933,7 @@ async function aiReelCaption() {
   if (!claudeKey) { toast('Add Claude API key to config-private.js','red'); return; }
 
   try {
-    const res = await fetch('https://api.orrisoak.com', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -943,8 +1148,8 @@ window.onload = () => {
     if (ig) { document.getElementById('ig-user-id').value = ig; igUserId = ig; }
   }
 
-  buildImageGrid('post-image-grid', 'selectPostImage');
-  buildImageGrid('reel-cover-grid', 'selectPostImage');
+  r2RenderProducts(); // Show R2 product browser on load
+  buildImageGrid('reel-cover-grid', 'selectPostImage'); // Reel cover still uses quick grid
   renderHistory();
 };
 </script>
