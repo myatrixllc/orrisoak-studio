@@ -983,7 +983,7 @@ async function publishPost(target) {
 }
 
 // ── RUNWAY AI VIDEO GENERATION ──
-const RUNWAY_API = 'https://api.orrisoak.com/runway';
+const RUNWAY_API = 'https://api.dev.runwayml.com/v1';
 let runwayImageUrl = null;
 let runwayVideoUrl = null;
 
@@ -1056,7 +1056,11 @@ async function generateRunwayReel() {
     // Create generation task
     const res = await fetch(`${RUNWAY_API}/image_to_video`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'X-Runway-Version': '2024-11-06',
+      },
       body: JSON.stringify({
         model: 'gen4_turbo',
         promptImage: runwayImageUrl,
@@ -1081,8 +1085,10 @@ async function generateRunwayReel() {
       updateProgress(pct, `Processing... (${attempts * 3}s)`);
 
       const pollRes = await fetch(`${RUNWAY_API}/tasks/${task.id}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'X-Runway-Version': '2024-11-06',
+        }
       });
       const pollData = await pollRes.json();
 
