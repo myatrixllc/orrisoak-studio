@@ -466,13 +466,8 @@ textarea.cap:focus{border-color:var(--gold);}
               <div id="voice-result" style="display:none;margin-top:10px;">
                 <div style="font-size:8px;letter-spacing:2px;color:var(--green);margin-bottom:6px;">✓ Voiceover ready</div>
                 <audio id="voice-audio" controls style="width:100%;margin-bottom:10px;"></audio>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
-                  <a id="dl-video-btn" class="btn btn-outline" style="font-size:7px;justify-content:center;text-align:center;" download="orrisoak-reel.mp4">↓ Download Video</a>
-                  <a id="dl-audio-btn" class="btn btn-outline" style="font-size:7px;justify-content:center;text-align:center;" download="orrisoak-voice.mp3">↓ Download Audio</a>
-                </div>
-                <div style="font-size:8px;letter-spacing:1px;color:var(--muted);margin-top:8px;text-align:center;">Merge in CapCut → import both files → export → upload below</div>
                 <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:8px;margin-top:8px;" id="merge-btn" onclick="mergeVideoAudio()">
-                  <span id="merge-inner">⚡ Try Auto-Merge (Beta)</span>
+                  <span id="merge-inner">⚡ Merge Video + Voiceover</span>
                 </button>
               </div>
               <div id="merge-progress" style="display:none;margin-top:10px;">
