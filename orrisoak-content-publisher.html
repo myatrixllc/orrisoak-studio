@@ -350,11 +350,40 @@ textarea.cap:focus{border-color:var(--gold);}
           <span class="field-label">✦ AI Generate UGC Reel with Runway</span>
           <p class="field-sub">Select a <strong style="color:var(--gold)">model/lifestyle image</strong> (⭐) for best UGC results → pick a motion style → generate</p>
 
-          <!-- IMAGE SELECTOR FOR RUNWAY -->
+          <!-- IMAGE SELECTOR FOR RUNWAY - Full R2 Browser + Upload -->
           <div style="margin-bottom:12px;">
-            <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">1. Select Source Image</div>
-            <div class="image-grid" id="runway-image-grid"></div>
-            <div style="font-size:8px;letter-spacing:2px;color:var(--green);margin-top:6px;" id="runway-selected-img"></div>
+            <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">1. Select Source Image(s)</div>
+
+            <!-- R2 BREADCRUMB -->
+            <div id="rw-breadcrumb" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;background:#0D0D0D;border:1px solid rgba(201,168,76,0.25);padding:8px 12px;">
+              <span style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,76,0.5);">images.orrisoak.com</span>
+              <span style="color:rgba(201,168,76,0.3);">/</span>
+              <span id="rw-bc-product" style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);cursor:pointer;" onclick="rwNav('product')">— select product —</span>
+              <span id="rw-bc-sep1" style="color:rgba(201,168,76,0.3);display:none;">/</span>
+              <span id="rw-bc-variant" style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);cursor:pointer;display:none;" onclick="rwNav('variant')"></span>
+              <span id="rw-bc-sep2" style="color:rgba(201,168,76,0.3);display:none;">/</span>
+              <span id="rw-bc-folder" style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;display:none;"></span>
+            </div>
+
+            <!-- PRODUCT/FOLDER TILES -->
+            <div id="rw-tiles" class="image-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:8px;"></div>
+
+            <!-- IMAGE GRID (multi-select) -->
+            <div class="image-grid" id="runway-image-grid" style="margin-bottom:8px;"></div>
+
+            <!-- SELECTED COUNT + UPLOAD -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
+              <div style="font-size:8px;letter-spacing:2px;color:var(--green);" id="runway-selected-img">No image selected</div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button class="upload-btn" onclick="document.getElementById('rw-upload').click()">+ Upload Image</button>
+                <input type="file" id="rw-upload" accept="image/*" multiple style="display:none" onchange="handleRunwayUpload(this)">
+              </div>
+            </div>
+
+            <!-- MULTI-SELECT NOTE -->
+            <div style="font-size:8px;letter-spacing:1px;color:var(--muted);margin-top:4px;">
+              Tip: Select multiple images to create a multi-scene Reel (generates one video per image)
+            </div>
           </div>
 
           <!-- MOTION PROMPT -->
@@ -1019,40 +1048,117 @@ const RUNWAY_API = 'https://api.dev.runwayml.com/v1';
 let runwayImageUrl = null;
 let runwayVideoUrl = null;
 
-function buildRunwayImageGrid() {
-  const grid = document.getElementById('runway-image-grid');
-  if (!grid) return;
-  // Use ivory hero images as quick picks
-  // Prioritize MODEL/LIFESTYLE images for UGC-style Reels
-  const quickImages = [
-    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-model-brush-sparkle-01.png', label: '⭐ Model Sparkle 1' },
-    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-model-brush-sparkle-02.png', label: '⭐ Model Sparkle 2' },
-    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-model-case-smile-01.png', label: '⭐ Model Smile' },
-    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-model-case-open-01.png', label: '⭐ Model Case Open' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-face-bokeh.png', label: '⭐ Model Face Bokeh' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-model-white-bg.png', label: '⭐ Model White BG' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-model-case-white-bg.png', label: '⭐ Model + Case' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-hand-case-bokeh.png', label: 'Hand + Case Bokeh' },
-    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-hand-case-open-01.png', label: 'Hand Case Open' },
-    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-hand-4brushes-01.png', label: 'Hand 4 Brushes' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-hero.png', label: 'Ivory Hero' },
-    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-hero-01.png', label: 'Noir Hero' },
-  ];
-  grid.innerHTML = quickImages.map((img, i) => `
-    <div class="img-opt" id="rw-img-${i}" onclick="selectRunwayImage(${i},'${img.url}','${img.label}')">
-      <img src="${img.url}" onerror="this.parentElement.style.opacity='0.3'" alt="${img.label}">
-      <div class="img-opt-check">✓</div>
-      <div class="img-opt-name">${img.label}</div>
-    </div>
-  `).join('');
+// ── RUNWAY R2 BROWSER ──
+let rwState = { level: 'product', product: null, variant: null };
+let selectedRunwayImages = [];
+
+function buildRunwayImageGrid() { rwRenderProducts(); }
+
+function rwNav(level) {
+  if (level === 'product') { rwState = { level:'product', product:null, variant:null }; rwRenderProducts(); }
+  else if (level === 'variant') { rwState.level = 'variant'; rwState.variant = null; rwRenderVariants(rwState.product); }
+  rwUpdateBreadcrumb();
 }
 
-function selectRunwayImage(i, url, label) {
-  document.querySelectorAll('#runway-image-grid .img-opt').forEach(el => el.classList.remove('selected'));
-  document.getElementById('rw-img-' + i)?.classList.add('selected');
-  runwayImageUrl = url;
-  document.getElementById('runway-selected-img').textContent = '✓ ' + label + ' selected';
+function rwRenderProducts() {
+  const tiles = document.getElementById('rw-tiles');
+  const grid = document.getElementById('runway-image-grid');
+  if (!tiles || !grid) return;
+  grid.innerHTML = '';
+  tiles.innerHTML = Object.entries(R2_CATALOG).map(([key, p]) => `
+    <div onclick="rwSelectProduct('${key}')" style="background:#1A1A1A;border:1px solid rgba(201,168,76,0.25);padding:12px;cursor:pointer;text-align:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.25)'">
+      <div style="font-size:20px;margin-bottom:6px;">${p.icon}</div>
+      <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;">${p.label}</div>
+    </div>`).join('');
 }
+
+function rwSelectProduct(key) {
+  rwState.product = key; rwState.level = 'variant';
+  rwUpdateBreadcrumb(); rwRenderVariants(key);
+}
+
+function rwRenderVariants(productKey) {
+  const product = R2_CATALOG[productKey];
+  const tiles = document.getElementById('rw-tiles');
+  document.getElementById('runway-image-grid').innerHTML = '';
+  const vars = Object.entries(product.variants).filter(([k]) => ['black','ivory','images'].includes(k));
+  tiles.innerHTML = vars.map(([key, v]) => `
+    <div onclick="rwSelectVariant('${productKey}','${key}')" style="background:#1A1A1A;border:1px solid rgba(201,168,76,0.25);padding:12px;cursor:pointer;text-align:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.25)'">
+      <div style="font-size:20px;margin-bottom:6px;">${v.icon}</div>
+      <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;">${v.label}</div>
+    </div>`).join('');
+}
+
+function rwSelectVariant(productKey, variantKey) {
+  rwState.variant = variantKey; rwState.level = 'images';
+  rwUpdateBreadcrumb();
+  document.getElementById('rw-tiles').innerHTML = '';
+  const variant = R2_CATALOG[productKey].variants[variantKey];
+  const images = variant?.images || [];
+  const grid = document.getElementById('runway-image-grid');
+  let imgPath = (productKey === 'magnetic-brush' && ['black','ivory'].includes(variantKey))
+    ? `${R2_BASE}/${productKey}/${variantKey}/images`
+    : `${R2_BASE}/${productKey}/images`;
+  if (!images.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;font-size:9px;letter-spacing:2px;color:var(--muted);">No images yet — upload one above</div>`;
+    return;
+  }
+  grid.innerHTML = images.map((img, i) => {
+    const url = `${imgPath}/${img.file}`;
+    const isModel = /model|lifestyle|hand|sparkle/i.test(img.label);
+    return `<div class="img-opt" id="rw-img-${i}" onclick="toggleRunwayImage(${i},'${url}','${img.label}')">
+      <img src="${url}" onerror="this.parentElement.style.opacity='0.3'" alt="${img.label}">
+      <div class="img-opt-check">✓</div>
+      <div class="img-opt-name">${isModel ? '⭐ ' : ''}${img.label}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRunwayImage(i, url, label) {
+  const el = document.getElementById('rw-img-' + i);
+  const idx = selectedRunwayImages.findIndex(x => x.url === url);
+  if (idx > -1) { selectedRunwayImages.splice(idx, 1); el?.classList.remove('selected'); }
+  else { selectedRunwayImages.push({ url, label }); el?.classList.add('selected'); }
+  runwayImageUrl = selectedRunwayImages[0]?.url || null;
+  const count = selectedRunwayImages.length;
+  document.getElementById('runway-selected-img').textContent = count === 0 ? 'No image selected'
+    : count === 1 ? `✓ ${selectedRunwayImages[0].label} selected`
+    : `✓ ${count} images selected — will generate ${count} Reels`;
+}
+
+function handleRunwayUpload(input) {
+  const files = Array.from(input.files);
+  const grid = document.getElementById('runway-image-grid');
+  files.forEach(file => {
+    const url = URL.createObjectURL(file);
+    selectedRunwayImages.push({ url, label: file.name, isUpload: true });
+    const div = document.createElement('div');
+    div.className = 'img-opt selected';
+    div.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;"><div class="img-opt-check">✓</div><div class="img-opt-name">${file.name}</div>`;
+    grid.appendChild(div);
+  });
+  runwayImageUrl = selectedRunwayImages[0]?.url || null;
+  const count = selectedRunwayImages.length;
+  document.getElementById('runway-selected-img').textContent = `✓ ${count} image${count>1?'s':''} selected`;
+}
+
+function rwUpdateBreadcrumb() {
+  const bcProduct = document.getElementById('rw-bc-product');
+  const bcVariant = document.getElementById('rw-bc-variant');
+  const bcFolder = document.getElementById('rw-bc-folder');
+  const sep1 = document.getElementById('rw-bc-sep1');
+  const sep2 = document.getElementById('rw-bc-sep2');
+  if (!bcProduct) return;
+  if (rwState.product) {
+    bcProduct.textContent = R2_CATALOG[rwState.product]?.label || rwState.product;
+    sep1.style.display = 'inline'; bcVariant.style.display = 'inline';
+  } else { bcProduct.textContent = '— select product —'; sep1.style.display = 'none'; bcVariant.style.display = 'none'; }
+  if (rwState.variant) {
+    bcVariant.textContent = R2_CATALOG[rwState.product]?.variants[rwState.variant]?.label || rwState.variant;
+    sep2.style.display = 'inline'; bcFolder.style.display = 'inline'; bcFolder.textContent = 'Images';
+  } else { sep2.style.display = 'none'; bcFolder.style.display = 'none'; }
+}
+
 
 function setRunwayPrompt(prompt) {
   document.getElementById('runway-prompt').value = prompt;
