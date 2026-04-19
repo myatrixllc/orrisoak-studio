@@ -1520,8 +1520,9 @@ async function mergeVideoAudio() {
     return;
   }
 
-  document.getElementById('merge-btn').disabled = true;
-  document.getElementById('merge-inner').innerHTML = '<span class="spinner"></span> Loading FFmpeg...';
+  const btn = document.getElementById('merge-btn');
+  btn.disabled = true;
+  document.getElementById('merge-inner').innerHTML = '<span class="spinner"></span> Merging...';
   document.getElementById('merge-progress').style.display = 'block';
 
   const updateMerge = (pct, status) => {
@@ -1530,45 +1531,68 @@ async function mergeVideoAudio() {
   };
 
   try {
-    updateMerge(20, 'Sending to merge service...');
+    updateMerge(15, 'Submitting to fal.ai merge service...');
 
-    // Send both R2 URLs to worker for server-side merge
-    const mergeRes = await fetch('https://api.orrisoak.com/merge', {
+    // Submit merge job
+    const res = await fetch('https://api.orrisoak.com/merge', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         videoUrl: runwayVideoUrl,
         audioUrl: voiceAudioUrl,
-        product: r2State.product || 'magnetic-brush',
-        variant: r2State.color || r2State.variant || 'ivory',
       })
     });
 
-    const mergeData = await mergeRes.json();
-    if (mergeData.error) throw new Error(mergeData.error);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
 
-    updateMerge(90, 'Saving to R2...');
-    const outputUrl = mergeData.permanentUrl || mergeData.outputUrl;
-    if (!outputUrl) throw new Error('No output URL returned');
+    log('reel-log', `✓ Merge job: ${data.requestId}`, 'ok');
+    updateMerge(20, 'Merging video + voiceover...');
 
-    // Use merged video
-    reelVideoUrl = outputUrl;
-    document.getElementById('runway-video').src = outputUrl;
-    document.getElementById('reel-preview-img').innerHTML =
-      `<video src="${outputUrl}" style="width:100%;height:100%;object-fit:cover;" controls></video>`;
-    document.getElementById('reel-upload-name').textContent = '✓ Reel with voiceover ready to publish';
+    // Poll status
+    let attempts = 0;
+    while (attempts < 30) {
+      await sleep(3000);
+      attempts++;
+      const pct = 20 + (attempts / 30) * 75;
+      updateMerge(pct, `Merging... (${attempts * 3}s)`);
 
-    updateMerge(100, '✓ Merged! Ready to publish.');
-    toast('Video + voiceover merged! ✓', 'green');
-    log('reel-log', '✓ Final Reel with voiceover ready', 'ok');
+      const pollRes = await fetch(`https://api.orrisoak.com/merge/status/${data.requestId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const pollData = await pollRes.json();
+
+      if (pollData.status === 'COMPLETED') {
+        updateMerge(100, '✓ Merged and saved to R2!');
+        const finalUrl = pollData.permanentUrl;
+        runwayVideoUrl = finalUrl;
+        reelVideoUrl = finalUrl;
+
+        // Update preview
+        document.getElementById('runway-video').src = finalUrl;
+        document.getElementById('runway-download').href = finalUrl;
+        document.getElementById('reel-preview-img').innerHTML =
+          `<video src="${finalUrl}" style="width:100%;height:100%;object-fit:cover;" controls></video>`;
+        document.getElementById('reel-upload-name').textContent = '✓ Reel with voiceover ready to publish';
+
+        log('reel-log', `✓ Final Reel saved: ${pollData.r2Key}`, 'ok');
+        toast('Merged and saved! Ready to publish ✓', 'green');
+        break;
+      }
+
+      if (pollData.error) throw new Error(pollData.error);
+    }
+
+    if (attempts >= 30) throw new Error('Timeout — try again');
 
   } catch(e) {
-    updateMerge(0, '✗ Error: ' + e.message);
+    updateMerge(0, '✗ ' + e.message);
     toast('Merge error: ' + e.message, 'red');
     log('reel-log', '✗ Merge failed: ' + e.message, 'err');
   }
 
-  document.getElementById('merge-btn').disabled = false;
+  btn.disabled = false;
   document.getElementById('merge-inner').innerHTML = '⚡ Merge Video + Voiceover';
 }
 
