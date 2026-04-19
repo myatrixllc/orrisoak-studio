@@ -1525,10 +1525,44 @@ async function mergeVideoAudio() {
     document.getElementById('merge-status').textContent = status;
   };
 
+  const applyMergeResult = (data) => {
+    const finalUrl = data.permanentUrl;
+    const audioUrl = data.audioUrl;
+    runwayVideoUrl = finalUrl;
+    reelVideoUrl = finalUrl;
+
+    updateMerge(100, '✓ Saved to R2!');
+
+    // Update video preview
+    const videoEl = document.getElementById('runway-video');
+    videoEl.src = finalUrl;
+    document.getElementById('runway-download').href = finalUrl;
+
+    // Sync audio
+    if (audioUrl) {
+      let audioEl = document.getElementById('runway-audio-sync');
+      if (!audioEl) {
+        audioEl = document.createElement('audio');
+        audioEl.id = 'runway-audio-sync';
+        audioEl.style.display = 'none';
+        document.body.appendChild(audioEl);
+      }
+      audioEl.src = audioUrl;
+      videoEl.onplay = () => { audioEl.currentTime = videoEl.currentTime; audioEl.play(); };
+      videoEl.onpause = () => audioEl.pause();
+      videoEl.onseeked = () => { audioEl.currentTime = videoEl.currentTime; };
+    }
+
+    document.getElementById('reel-preview-img').innerHTML =
+      `<video src="${finalUrl}" style="width:100%;height:100%;object-fit:cover;" controls></video>`;
+    document.getElementById('reel-upload-name').textContent = '✓ Reel with voiceover ready to publish';
+    log('reel-log', `✓ Final Reel saved: ${data.r2Key}`, 'ok');
+    toast('Reel ready to publish! ✓', 'green');
+  };
+
   try {
     updateMerge(20, 'Saving to R2...');
 
-    // Submit merge — returns immediately with COMPLETED
     const res = await fetch('https://api.orrisoak.com/merge', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1541,71 +1575,28 @@ async function mergeVideoAudio() {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
 
-    updateMerge(80, 'Processing...');
-
-    // If already completed (direct save), handle immediately
-    // Otherwise poll
-    let pollData = data;
-    if (data.status !== 'COMPLETED') {
-      log('reel-log', `✓ Merge job: ${data.requestId}`, 'ok');
+    // Worker returns COMPLETED immediately — handle right away
+    if (data.status === 'COMPLETED') {
+      applyMergeResult(data);
+    } else {
+      // Fallback polling for async cases
+      log('reel-log', `Merge job: ${data.requestId}`, 'info');
+      updateMerge(30, 'Processing...');
       let attempts = 0;
       while (attempts < 30) {
         await sleep(3000);
         attempts++;
-        const pct = 20 + (attempts / 30) * 75;
-        updateMerge(pct, `Merging... (${attempts * 3}s)`);
+        updateMerge(30 + (attempts / 30) * 65, `Processing... (${attempts * 3}s)`);
         const pollRes = await fetch(`https://api.orrisoak.com/merge/status/${data.requestId}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
+          method: 'GET', headers: { 'Content-Type': 'application/json' }
         });
-        pollData = await pollRes.json();
-
-      if (pollData.status === 'COMPLETED') {
-        updateMerge(100, '✓ Saved to R2!');
-        const finalUrl = pollData.permanentUrl;
-        const audioUrl = pollData.audioUrl;
-        runwayVideoUrl = finalUrl;
-        reelVideoUrl = finalUrl;
-
-        // Update preview with synchronized video+audio player
-        if (audioUrl) {
-          document.getElementById('runway-video').src = finalUrl;
-          // Add audio track to video element
-          const videoEl = document.getElementById('runway-video');
-          videoEl.src = finalUrl;
-          // Create synchronized audio element
-          let audioEl = document.getElementById('runway-audio-sync');
-          if (!audioEl) {
-            audioEl = document.createElement('audio');
-            audioEl.id = 'runway-audio-sync';
-            audioEl.src = audioUrl;
-            audioEl.style.display = 'none';
-            document.body.appendChild(audioEl);
-          } else {
-            audioEl.src = audioUrl;
-          }
-          // Sync play/pause
-          videoEl.onplay = () => audioEl.play();
-          videoEl.onpause = () => audioEl.pause();
-          videoEl.onseeked = () => { audioEl.currentTime = videoEl.currentTime; };
-        } else {
-          document.getElementById('runway-video').src = finalUrl;
-        }
-
-        document.getElementById('reel-preview-img').innerHTML =
-          `<video src="${finalUrl}" style="width:100%;height:100%;object-fit:cover;" controls></video>`;
-        document.getElementById('reel-upload-name').textContent = '✓ Reel with voiceover ready to publish';
-
-        log('reel-log', `✓ Reel saved: ${pollData.r2Key}`, 'ok');
-        toast('Reel ready to publish! ✓', 'green');
-        break;
+        const pollData = await pollRes.json();
+        if (pollData.status === 'COMPLETED') { applyMergeResult(pollData); break; }
+        if (pollData.error) throw new Error(pollData.error);
+        if (attempts >= 30) throw new Error('Timeout — try again');
       }
-
-      if (pollData.error) throw new Error(pollData.error);
     }
 
-      if (attempts >= 30) throw new Error('Timeout — try again');
-    }
   } catch(e) {
     updateMerge(0, '✗ ' + e.message);
     toast('Merge error: ' + e.message, 'red');
@@ -1615,6 +1606,10 @@ async function mergeVideoAudio() {
   btn.disabled = false;
   document.getElementById('merge-inner').innerHTML = '⚡ Merge Video + Voiceover';
 }
+
+function _oldMergeVideoAudio() {
+}
+
 
 // ── PUBLISH REEL ──
 async function publishReel(target) {
