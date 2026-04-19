@@ -347,8 +347,8 @@ textarea.cap:focus{border-color:var(--gold);}
 
         <!-- AI VIDEO GENERATOR -->
         <div class="image-picker" style="margin-bottom:16px;">
-          <span class="field-label">✦ AI Generate Reel with Runway</span>
-          <p class="field-sub">Select a product image → write a motion prompt → Runway generates your Reel automatically</p>
+          <span class="field-label">✦ AI Generate UGC Reel with Runway</span>
+          <p class="field-sub">Select a <strong style="color:var(--gold)">model/lifestyle image</strong> (⭐) for best UGC results → pick a motion style → generate</p>
 
           <!-- IMAGE SELECTOR FOR RUNWAY -->
           <div style="margin-bottom:12px;">
@@ -361,10 +361,12 @@ textarea.cap:focus{border-color:var(--gold);}
           <div style="margin-bottom:12px;">
             <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">2. Motion Prompt</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Slow cinematic zoom in, golden particles floating, luxury beauty atmosphere')">✦ Cinematic Zoom</button>
-              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Gentle rotation, soft bokeh background, warm golden light, elegant product reveal')">✦ Elegant Reveal</button>
-              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Camera slowly pulls back revealing full product, sparkle effect, black background with gold shimmer')">✦ Pull Back</button>
-              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Brushes snapping together magnetically, satisfying click motion, ivory and gold tones')">✦ Magnetic Snap</button>
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Woman smiling naturally, brushing her cheek gently with a makeup brush, warm sunlight, casual authentic feel, handheld camera movement, UGC style')">✦ UGC Natural</button>
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Woman applying blush with a luxury brush, soft natural lighting, slight head turn, authentic get ready with me style, bokeh background, subtle camera shake')">✦ GRWM Style</button>
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Close up of a woman holding a makeup brush near her face, natural lighting, she smiles and looks into camera, authentic testimonial style, handheld feel')">✦ Testimonial</button>
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Woman snapping magnetic brush heads together satisfyingly, looking at camera with delight, bright natural light, authentic reaction, slight slow motion')">✦ Magnetic Snap</button>
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Slow motion close up of brush bristles sweeping across skin, warm golden hour light, ultra smooth skin texture, luxury beauty editorial feel')">✦ Slow Mo Beauty</button>
+              <button class="btn btn-outline" style="font-size:7px;padding:6px 12px;" onclick="setRunwayPrompt('Woman at vanity mirror doing makeup routine, picks up luxury brush set, natural morning light, cozy authentic atmosphere, real person UGC feel')">✦ Morning Ritual</button>
             </div>
             <textarea id="runway-prompt" style="width:100%;background:#242424;border:1px solid var(--gold-border);color:#F0EDE8;font-family:Josefin Sans,sans-serif;font-size:11px;padding:10px;resize:vertical;outline:none;min-height:70px;" placeholder="Describe the motion and mood of your Reel..."></textarea>
           </div>
@@ -1021,15 +1023,20 @@ function buildRunwayImageGrid() {
   const grid = document.getElementById('runway-image-grid');
   if (!grid) return;
   // Use ivory hero images as quick picks
+  // Prioritize MODEL/LIFESTYLE images for UGC-style Reels
   const quickImages = [
+    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-model-brush-sparkle-01.png', label: '⭐ Model Sparkle 1' },
+    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-model-brush-sparkle-02.png', label: '⭐ Model Sparkle 2' },
+    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-model-case-smile-01.png', label: '⭐ Model Smile' },
+    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-model-case-open-01.png', label: '⭐ Model Case Open' },
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-face-bokeh.png', label: '⭐ Model Face Bokeh' },
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-model-white-bg.png', label: '⭐ Model White BG' },
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-model-case-white-bg.png', label: '⭐ Model + Case' },
+    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-hand-case-bokeh.png', label: 'Hand + Case Bokeh' },
+    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-hand-case-open-01.png', label: 'Hand Case Open' },
+    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-hand-4brushes-01.png', label: 'Hand 4 Brushes' },
     { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-hero.png', label: 'Ivory Hero' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-hero-gold-sparkle.png', label: 'Gold Sparkle' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-face-bokeh.png', label: 'Model Face' },
     { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-hero-01.png', label: 'Noir Hero' },
-    { url: R2_BASE + '/magnetic-brush/black/images/makeup-brush-set-orrisoak-noir-dramatic-gold-01.png', label: 'Noir Gold' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-case-ivory-gold-sparkle.png', label: 'Case Sparkle' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-set-with-case-white-bg.png', label: 'Full Set' },
-    { url: R2_BASE + '/magnetic-brush/ivory/images/orrisoak-4in1-brush-ivory-lifestyle-vanity-two-colors.png', label: 'Two Colors' },
   ];
   grid.innerHTML = quickImages.map((img, i) => `
     <div class="img-opt" id="rw-img-${i}" onclick="selectRunwayImage(${i},'${img.url}','${img.label}')">
