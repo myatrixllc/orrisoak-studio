@@ -427,7 +427,7 @@ textarea.cap:focus{border-color:var(--gold);}
               <span style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;">Runway</span>
               <span style="font-size:7px;color:var(--muted);">High quality</span>
             </label>
-            <label style="display:none;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-left:16px;">
               <input type="radio" name="generator" value="pika" id="gen-pika" style="accent-color:var(--gold);">
               <span style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;">Pika 2.2</span>
               <span style="font-size:7px;color:var(--muted);">Faster · UGC style</span>
@@ -436,7 +436,7 @@ textarea.cap:focus{border-color:var(--gold);}
 
           <!-- GENERATE BUTTON -->
           <button class="btn btn-gold" style="width:100%;justify-content:center;" id="runway-gen-btn" onclick="generateReel()">
-            <span id="runway-gen-inner">🎬 Generate Reel with Runway AI</span>
+            <span id="runway-gen-inner">🎬 Generate Reel</span>
           </button>
 
           <!-- PROGRESS -->
@@ -500,6 +500,12 @@ textarea.cap:focus{border-color:var(--gold);}
             <div style="font-size:9px;color:var(--green);margin-top:8px;" id="reel-upload-name"></div>
           </div>
           <input type="file" id="reel-upload" accept="video/mp4,video/mov,video/quicktime" style="display:none" onchange="handleReelUpload(this)">
+          
+          <!-- R2 URL INPUT -->
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <input id="reel-r2-url" style="flex:1;background:#242424;border:1px solid var(--gold-border);color:#F0EDE8;font-family:Josefin Sans,sans-serif;font-size:10px;padding:8px 12px;outline:none;" placeholder="Or paste R2 video URL directly...">
+            <button class="btn btn-outline" style="font-size:7px;padding:8px 14px;white-space:nowrap;" onclick="useR2ReelUrl()">Use URL</button>
+          </div>
 
           <div style="margin-top:16px;">
             <span class="field-label">Cover Image (Optional)</span>
@@ -1219,13 +1225,15 @@ async function generatePikaReel() {
     log('reel-log', `✓ Pika task: ${data.requestId}`, 'ok');
     updateProgress(20, 'Processing... Pika is faster (~30s)');
 
-    // Poll status
+    // Poll status — Pika takes up to 3-4 minutes
     let attempts = 0;
-    while (attempts < 40) {
+    const maxAttempts = 100; // 5 minutes max
+    while (attempts < maxAttempts) {
       await sleep(3000);
       attempts++;
-      const pct = 20 + (attempts / 40) * 75;
-      updateProgress(pct, `Generating... (${attempts * 3}s)`);
+      const pct = 20 + (attempts / maxAttempts) * 75;
+      const elapsed = Math.round(attempts * 3);
+      updateProgress(pct, `Generating with Pika... (${elapsed}s) — may take up to 3 min`);
 
       const pollRes = await fetch(`https://api.orrisoak.com/pika/status/${data.requestId}`, {
         method: 'GET',
@@ -1248,7 +1256,7 @@ async function generatePikaReel() {
       if (pollData.error) throw new Error(pollData.error);
     }
 
-    if (attempts >= 40) throw new Error('Timeout — try again');
+    if (attempts >= maxAttempts) throw new Error('Timeout after 5 minutes — try again');
 
   } catch(e) {
     document.getElementById('runway-status').textContent = '✗ ' + e.message;
@@ -1311,12 +1319,12 @@ async function generateRunwayReel() {
 
     // 2. Poll via worker status endpoint — auto-saves to R2 on success
     let attempts = 0;
-    const maxAttempts = 60;
+    const maxAttempts = 100; // 5 min max
     while (attempts < maxAttempts) {
       await sleep(3000);
       attempts++;
       const pct = 20 + (attempts / maxAttempts) * 75;
-      updateProgress(pct, `Generating... (${attempts * 3}s elapsed)`);
+      updateProgress(pct, `Generating with Runway... (${Math.round(attempts * 3)}s)`);
 
       const pollRes = await fetch(`https://api.orrisoak.com/runway/status/${task.id}`, {
         method: 'GET',
@@ -1612,6 +1620,17 @@ function _oldMergeVideoAudio() {
 
 
 // ── PUBLISH REEL ──
+function useR2ReelUrl() {
+  const url = document.getElementById('reel-r2-url').value.trim();
+  if (!url) { toast('Enter a video URL first', 'red'); return; }
+  reelVideoUrl = url;
+  document.getElementById('reel-upload-name').textContent = '✓ R2 video ready: ' + url.split('/').pop();
+  document.getElementById('pub-reel-ig-btn').disabled = false;
+  document.getElementById('pub-reel-fb-btn').disabled = false;
+  document.getElementById('pub-reel-both-btn').disabled = false;
+  toast('Video URL set ✓', 'green');
+}
+
 async function publishReel(target) {
   if (!connected) { toast('Connect Meta first', 'red'); return; }
   const caption = document.getElementById('reel-caption').value.trim();
@@ -1628,27 +1647,44 @@ async function publishReel(target) {
     else {
       try {
         log('reel-log','Creating Instagram Reel container...','info');
-        const container = await api(`/${igUserId}/media`, 'POST', {
-          media_type: 'REELS',
-          video_url: reelVideoUrl,
-          caption: caption,
-          share_to_feed: true,
+        
+        // Use page token for Reels (same as photo posts)
+        const igToken = window._pageToken || token;
+        
+        const containerRes = await fetch(`https://graph.facebook.com/v19.0/${igUserId}/media?access_token=${igToken}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            media_type: 'REELS',
+            video_url: reelVideoUrl,
+            caption: caption,
+            share_to_feed: true,
+          })
         });
-        log('reel-log', `Container: ${container.id} — waiting for video processing...`, 'ok');
+        const container = await containerRes.json();
+        if (container.error) throw new Error(container.error.message);
+        log('reel-log', `Container: ${container.id} — waiting for processing...`, 'ok');
 
-        // Poll until ready
+        // Poll until ready (max 3 minutes)
         let ready = false;
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 36; i++) {
           await sleep(5000);
-          const status = await api(`/${container.id}?fields=status_code`);
-          log('reel-log', `Status: ${status.status_code}`, 'info');
+          const statusRes = await fetch(`https://graph.facebook.com/v19.0/${container.id}?fields=status_code,status&access_token=${igToken}`);
+          const status = await statusRes.json();
+          log('reel-log', `Status: ${status.status_code || status.status}`, 'info');
           if (status.status_code === 'FINISHED') { ready = true; break; }
-          if (status.status_code === 'ERROR') { throw new Error('Video processing failed'); }
+          if (status.status_code === 'ERROR') throw new Error(`Processing failed: ${JSON.stringify(status)}`);
         }
 
-        if (!ready) throw new Error('Video processing timeout — try again');
+        if (!ready) throw new Error('Timeout — try again');
 
-        const pub = await api(`/${igUserId}/media_publish`, 'POST', { creation_id: container.id });
+        const pubRes = await fetch(`https://graph.facebook.com/v19.0/${igUserId}/media_publish?access_token=${igToken}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creation_id: container.id })
+        });
+        const pub = await pubRes.json();
+        if (pub.error) throw new Error(pub.error.message);
         log('reel-log', `✓ Reel published to Instagram! ID: ${pub.id}`, 'ok');
         igOk = true;
       } catch(e) {
