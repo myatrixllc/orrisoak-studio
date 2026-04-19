@@ -419,9 +419,24 @@ textarea.cap:focus{border-color:var(--gold);}
             </div>
           </div>
 
+          <!-- GENERATOR SELECTOR -->
+          <div style="display:flex;gap:8px;margin-bottom:10px;border:1px solid var(--gold-border);padding:10px;">
+            <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-right:8px;line-height:2;">Generate with:</div>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="radio" name="generator" value="runway" id="gen-runway" checked style="accent-color:var(--gold);">
+              <span style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;">Runway</span>
+              <span style="font-size:7px;color:var(--muted);">High quality</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-left:16px;">
+              <input type="radio" name="generator" value="pika" id="gen-pika" style="accent-color:var(--gold);">
+              <span style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#F0EDE8;">Pika 2.2</span>
+              <span style="font-size:7px;color:var(--muted);">Faster · UGC style</span>
+            </label>
+          </div>
+
           <!-- GENERATE BUTTON -->
-          <button class="btn btn-gold" style="width:100%;justify-content:center;" id="runway-gen-btn" onclick="generateRunwayReel()">
-            <span id="runway-gen-inner">🎬 Generate Reel with Runway AI</span>
+          <button class="btn btn-gold" style="width:100%;justify-content:center;" id="runway-gen-btn" onclick="generateReel()">
+            <span id="runway-gen-inner">🎬 Generate Reel</span>
           </button>
 
           <!-- PROGRESS -->
@@ -1162,6 +1177,91 @@ function rwUpdateBreadcrumb() {
 
 function setRunwayPrompt(prompt) {
   document.getElementById('runway-prompt').value = prompt;
+}
+
+async function generateReel() {
+  const generator = document.querySelector('input[name="generator"]:checked')?.value || 'runway';
+  if (generator === 'pika') {
+    await generatePikaReel();
+  } else {
+    await generateRunwayReel();
+  }
+}
+
+async function generatePikaReel() {
+  if (!runwayImageUrl) { toast('Select a source image first', 'red'); return; }
+  const motionPrompt = document.getElementById('runway-prompt').value.trim();
+  if (!motionPrompt) { toast('Enter a motion prompt first', 'red'); return; }
+
+  const btn = document.getElementById('runway-gen-btn');
+  btn.disabled = true;
+  document.getElementById('runway-gen-inner').innerHTML = '<span class="spinner"></span> Generating with Pika...';
+  document.getElementById('runway-progress').style.display = 'block';
+  document.getElementById('runway-result').style.display = 'none';
+
+  const updateProgress = (pct, status) => {
+    document.getElementById('runway-progress-bar').style.width = pct + '%';
+    document.getElementById('runway-status').textContent = status;
+  };
+
+  try {
+    updateProgress(15, 'Submitting to Pika 2.2...');
+
+    const res = await fetch('https://api.orrisoak.com/pika/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageUrl: runwayImageUrl,
+        prompt: motionPrompt + '. Luxury beauty brand Orris and Oak. Cinematic, elegant.',
+        resolution: '720p',
+        duration: 5,
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    log('reel-log', `✓ Pika task: ${data.requestId}`, 'ok');
+    updateProgress(20, 'Processing... Pika is faster (~30s)');
+
+    // Poll status
+    let attempts = 0;
+    while (attempts < 40) {
+      await sleep(3000);
+      attempts++;
+      const pct = 20 + (attempts / 40) * 75;
+      updateProgress(pct, `Generating... (${attempts * 3}s)`);
+
+      const pollRes = await fetch(`https://api.orrisoak.com/pika/status/${data.requestId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const pollData = await pollRes.json();
+
+      if (pollData.status === 'COMPLETED') {
+        updateProgress(100, '✓ Saved to R2!');
+        const videoUrl = pollData.permanentUrl;
+        runwayVideoUrl = videoUrl;
+        document.getElementById('runway-result').style.display = 'block';
+        document.getElementById('runway-video').src = videoUrl;
+        document.getElementById('runway-download').href = videoUrl;
+        log('reel-log', `✓ Pika Reel saved: ${pollData.r2Key}`, 'ok');
+        toast('Pika Reel generated and saved! ✓', 'green');
+        break;
+      }
+
+      if (pollData.error) throw new Error(pollData.error);
+    }
+
+    if (attempts >= 40) throw new Error('Timeout — try again');
+
+  } catch(e) {
+    document.getElementById('runway-status').textContent = '✗ ' + e.message;
+    toast('Pika error: ' + e.message, 'red');
+  }
+
+  btn.disabled = false;
+  document.getElementById('runway-gen-inner').innerHTML = '🎬 Generate Reel';
 }
 
 async function generateRunwayReel() {
