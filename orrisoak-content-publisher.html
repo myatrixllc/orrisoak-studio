@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Orrisoak · Content Publisher</title>
 <script src="config-private.js" onerror="console.log('config-private.js not found — using localStorage')"></script>
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
-<script src="https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js" crossorigin="anonymous"></script>
+<!-- FFmpeg removed - using Web Audio API instead -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1308,42 +1307,81 @@ async function mergeVideoAudio() {
   };
 
   try {
-    updateMerge(10, 'Loading FFmpeg...');
+    updateMerge(10, 'Setting up audio context...');
 
-    // Use globally loaded FFmpeg
-    if (typeof FFmpeg === 'undefined' || !FFmpeg.createFFmpeg) {
-      throw new Error('FFmpeg not loaded — please refresh the page and try again');
-    }
-    const { createFFmpeg, fetchFile } = FFmpeg;
-    const ffmpeg = createFFmpeg({
-      corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
-      log: false,
+    // Use Web Audio API + MediaRecorder — no FFmpeg needed
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    updateMerge(20, 'Loading video...');
+    const videoEl = document.createElement('video');
+    videoEl.src = runwayVideoUrl;
+    videoEl.crossOrigin = 'anonymous';
+    videoEl.muted = false;
+    videoEl.volume = 0;
+    await new Promise(r => { videoEl.onloadedmetadata = r; videoEl.load(); });
+    const videoDuration = videoEl.duration;
+
+    updateMerge(35, 'Loading voiceover...');
+    const audioRes = await fetch(voiceAudioUrl);
+    const audioBuffer = await audioCtx.decodeAudioData(await audioRes.arrayBuffer());
+
+    updateMerge(50, 'Recording merged output...');
+
+    // Create canvas to capture video frames
+    const canvas = document.createElement('canvas');
+    canvas.width = 720; canvas.height = 1280;
+    const ctx2d = canvas.getContext('2d');
+
+    // Create media stream from canvas + audio
+    const canvasStream = canvas.captureStream(30);
+    const dest = audioCtx.createMediaStreamDestination();
+
+    // Play voiceover through audio context
+    const voiceSource = audioCtx.createBufferSource();
+    voiceSource.buffer = audioBuffer;
+    voiceSource.connect(dest);
+
+    // Add all audio tracks to canvas stream
+    dest.stream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
+
+    // Record the combined stream
+    const recorder = new MediaRecorder(canvasStream, {
+      mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+        ? 'video/webm;codecs=vp9,opus' : 'video/webm',
+      videoBitsPerSecond: 2500000,
     });
 
-    await ffmpeg.load();
-    updateMerge(25, 'FFmpeg ready');
+    const chunks = [];
+    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
 
-    updateMerge(35, 'Downloading video...');
-    const videoData = await fetchFile(runwayVideoUrl);
-    ffmpeg.FS('writeFile', 'video.mp4', videoData);
+    recorder.start(100);
+    voiceSource.start(0);
+    videoEl.play();
 
-    updateMerge(55, 'Downloading voiceover...');
-    const audioData = await fetchFile(voiceAudioUrl);
-    ffmpeg.FS('writeFile', 'audio.mp3', audioData);
+    // Draw video frames to canvas
+    const drawFrame = () => {
+      if (videoEl.ended || videoEl.paused) return;
+      ctx2d.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+      requestAnimationFrame(drawFrame);
+    };
+    requestAnimationFrame(drawFrame);
 
-    updateMerge(70, 'Merging...');
-    await ffmpeg.run(
-      '-i', 'video.mp4',
-      '-i', 'audio.mp3',
-      '-c:v', 'copy',
-      '-c:a', 'aac',
-      '-shortest',
-      '-y', 'output.mp4'
-    );
+    // Wait for video to finish
+    await new Promise(resolve => {
+      const maxTime = Math.max(videoDuration, audioBuffer.duration) * 1000 + 500;
+      setTimeout(() => {
+        videoEl.pause();
+        recorder.stop();
+        resolve();
+      }, maxTime);
 
+      updateMerge(75, 'Recording...');
+    });
+
+    await new Promise(r => recorder.onstop = r);
     updateMerge(90, 'Finalizing...');
-    const outputData = ffmpeg.FS('readFile', 'output.mp4');
-    const outputBlob = new Blob([outputData.buffer], { type: 'video/mp4' });
+
+    const outputBlob = new Blob(chunks, { type: 'video/webm' });
     const outputUrl = URL.createObjectURL(outputBlob);
 
     // Use merged video
