@@ -420,8 +420,13 @@ textarea.cap:focus{border-color:var(--gold);}
               <div id="voice-result" style="display:none;margin-top:10px;">
                 <div style="font-size:8px;letter-spacing:2px;color:var(--green);margin-bottom:6px;">✓ Voiceover ready</div>
                 <audio id="voice-audio" controls style="width:100%;margin-bottom:10px;"></audio>
-                <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:8px;" id="merge-btn" onclick="mergeVideoAudio()">
-                  <span id="merge-inner">⚡ Merge Video + Voiceover</span>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+                  <a id="dl-video-btn" class="btn btn-outline" style="font-size:7px;justify-content:center;text-align:center;" download="orrisoak-reel.mp4">↓ Download Video</a>
+                  <a id="dl-audio-btn" class="btn btn-outline" style="font-size:7px;justify-content:center;text-align:center;" download="orrisoak-voice.mp3">↓ Download Audio</a>
+                </div>
+                <div style="font-size:8px;letter-spacing:1px;color:var(--muted);margin-top:8px;text-align:center;">Merge in CapCut → import both files → export → upload below</div>
+                <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:8px;margin-top:8px;" id="merge-btn" onclick="mergeVideoAudio()">
+                  <span id="merge-inner">⚡ Try Auto-Merge (Beta)</span>
                 </button>
               </div>
               <div id="merge-progress" style="display:none;margin-top:10px;">
@@ -1280,6 +1285,11 @@ async function generateVoiceover() {
     voiceAudioUrl = data.audioUrl;
     document.getElementById('voice-result').style.display = 'block';
     document.getElementById('voice-audio').src = data.audioUrl;
+    // Set download links
+    const dlAudio = document.getElementById('dl-audio-btn');
+    if (dlAudio) { dlAudio.href = data.audioUrl; dlAudio.style.display = 'flex'; }
+    const dlVideo = document.getElementById('dl-video-btn');
+    if (dlVideo && runwayVideoUrl) { dlVideo.href = runwayVideoUrl; dlVideo.style.display = 'flex'; }
     toast('Voiceover generated ✓', 'green');
     log('reel-log', `✓ Voiceover saved: ${data.r2Key}`, 'ok');
   } catch(e) {
@@ -1307,82 +1317,26 @@ async function mergeVideoAudio() {
   };
 
   try {
-    updateMerge(10, 'Setting up audio context...');
+    updateMerge(20, 'Sending to merge service...');
 
-    // Use Web Audio API + MediaRecorder — no FFmpeg needed
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    updateMerge(20, 'Loading video...');
-    const videoEl = document.createElement('video');
-    videoEl.src = runwayVideoUrl;
-    videoEl.crossOrigin = 'anonymous';
-    videoEl.muted = false;
-    videoEl.volume = 0;
-    await new Promise(r => { videoEl.onloadedmetadata = r; videoEl.load(); });
-    const videoDuration = videoEl.duration;
-
-    updateMerge(35, 'Loading voiceover...');
-    const audioRes = await fetch(voiceAudioUrl);
-    const audioBuffer = await audioCtx.decodeAudioData(await audioRes.arrayBuffer());
-
-    updateMerge(50, 'Recording merged output...');
-
-    // Create canvas to capture video frames
-    const canvas = document.createElement('canvas');
-    canvas.width = 720; canvas.height = 1280;
-    const ctx2d = canvas.getContext('2d');
-
-    // Create media stream from canvas + audio
-    const canvasStream = canvas.captureStream(30);
-    const dest = audioCtx.createMediaStreamDestination();
-
-    // Play voiceover through audio context
-    const voiceSource = audioCtx.createBufferSource();
-    voiceSource.buffer = audioBuffer;
-    voiceSource.connect(dest);
-
-    // Add all audio tracks to canvas stream
-    dest.stream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
-
-    // Record the combined stream
-    const recorder = new MediaRecorder(canvasStream, {
-      mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
-        ? 'video/webm;codecs=vp9,opus' : 'video/webm',
-      videoBitsPerSecond: 2500000,
+    // Send both R2 URLs to worker for server-side merge
+    const mergeRes = await fetch('https://api.orrisoak.com/merge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        videoUrl: runwayVideoUrl,
+        audioUrl: voiceAudioUrl,
+        product: r2State.product || 'magnetic-brush',
+        variant: r2State.color || r2State.variant || 'ivory',
+      })
     });
 
-    const chunks = [];
-    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    const mergeData = await mergeRes.json();
+    if (mergeData.error) throw new Error(mergeData.error);
 
-    recorder.start(100);
-    voiceSource.start(0);
-    videoEl.play();
-
-    // Draw video frames to canvas
-    const drawFrame = () => {
-      if (videoEl.ended || videoEl.paused) return;
-      ctx2d.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
-      requestAnimationFrame(drawFrame);
-    };
-    requestAnimationFrame(drawFrame);
-
-    // Wait for video to finish
-    await new Promise(resolve => {
-      const maxTime = Math.max(videoDuration, audioBuffer.duration) * 1000 + 500;
-      setTimeout(() => {
-        videoEl.pause();
-        recorder.stop();
-        resolve();
-      }, maxTime);
-
-      updateMerge(75, 'Recording...');
-    });
-
-    await new Promise(r => recorder.onstop = r);
-    updateMerge(90, 'Finalizing...');
-
-    const outputBlob = new Blob(chunks, { type: 'video/webm' });
-    const outputUrl = URL.createObjectURL(outputBlob);
+    updateMerge(90, 'Saving to R2...');
+    const outputUrl = mergeData.permanentUrl || mergeData.outputUrl;
+    if (!outputUrl) throw new Error('No output URL returned');
 
     // Use merged video
     reelVideoUrl = outputUrl;
