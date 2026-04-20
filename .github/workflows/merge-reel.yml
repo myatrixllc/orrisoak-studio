@@ -1,0 +1,135 @@
+name: Merge Reel + Publish to Instagram
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'R2 video URL'
+        required: true
+      audio_url:
+        description: 'R2 voiceover URL'
+        required: true
+      caption:
+        description: 'Instagram caption'
+        required: true
+      music_volume:
+        description: 'Background music volume (0.0-1.0)'
+        required: false
+        default: '0.2'
+
+jobs:
+  merge-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Install dependencies
+        run: pip install moviepy requests
+
+      - name: Download background music
+        run: |
+          curl -L -o /tmp/bgmusic.mp4 "${{ secrets.BG_MUSIC_URL }}"
+
+      - name: Merge video + voiceover + music
+        env:
+          VIDEO_URL: ${{ inputs.video_url }}
+          AUDIO_URL: ${{ inputs.audio_url }}
+          MUSIC_VOL: ${{ inputs.music_volume }}
+        run: |
+          python3 << 'PYEOF'
+          import os, time, subprocess
+          from moviepy import VideoFileClip, AudioFileClip, CompositeAudioClip
+          from moviepy.video.fx import FadeOut
+
+          subprocess.run(['curl', '-L', '-o', '/tmp/reel.mp4', os.environ['VIDEO_URL']])
+          subprocess.run(['curl', '-L', '-o', '/tmp/voice.mp3', os.environ['AUDIO_URL']])
+
+          video = VideoFileClip('/tmp/reel.mp4')
+          voice = AudioFileClip('/tmp/voice.mp3')
+          music = AudioFileClip('/tmp/bgmusic.mp4')
+
+          music = music.subclipped(0, video.duration).with_volume_scaled(float(os.environ['MUSIC_VOL']))
+          voice = voice.subclipped(0, min(voice.duration, video.duration))
+          mixed = CompositeAudioClip([music, voice])
+
+          final = FadeOut(1.5).apply(video.with_audio(mixed))
+          final.write_videofile('/tmp/merged.mp4', codec='libx264', audio_codec='aac', logger=None)
+          print('Merge complete')
+          PYEOF
+
+      - name: Upload merged video to R2
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          TIMESTAMP=$(date +%s)
+          R2_KEY="content/magnetic-brush/reels/orrisoak-final-${TIMESTAMP}.mp4"
+          
+          pip install boto3
+          python3 << PYEOF
+          import boto3, os, time
+          timestamp = int(time.time())
+          key = f"content/magnetic-brush/reels/orrisoak-final-{timestamp}.mp4"
+          
+          s3 = boto3.client('s3',
+            endpoint_url=f"https://{os.environ['R2_ACCOUNT_ID']}.r2.cloudflarestorage.com",
+            aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],
+            aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
+            region_name='auto'
+          )
+          s3.upload_file('/tmp/merged.mp4', os.environ['R2_BUCKET'], key,
+            ExtraArgs={'ContentType': 'video/mp4'})
+          
+          url = f"https://images.orrisoak.com/{key}"
+          print(f"FINAL_URL={url}")
+          
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+            f.write(f"FINAL_URL={url}\n")
+          PYEOF
+
+      - name: Publish to Instagram
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          CAPTION: ${{ inputs.caption }}
+        run: |
+          python3 << 'PYEOF'
+          import requests, os, time
+
+          token = os.environ['META_TOKEN']
+          ig_id = os.environ['IG_USER_ID']
+          video_url = os.environ['FINAL_URL']
+          caption = os.environ['CAPTION']
+
+          # Create container
+          r = requests.post(
+            f"https://graph.facebook.com/v19.0/{ig_id}/media",
+            params={'access_token': token},
+            json={'media_type': 'REELS', 'video_url': video_url, 'caption': caption, 'share_to_feed': True}
+          )
+          container_id = r.json()['id']
+          print(f"Container: {container_id}")
+
+          # Poll until ready
+          for i in range(36):
+            time.sleep(5)
+            s = requests.get(
+              f"https://graph.facebook.com/v19.0/{container_id}",
+              params={'fields': 'status_code', 'access_token': token}
+            ).json()
+            print(f"Status: {s.get('status_code')}")
+            if s.get('status_code') == 'FINISHED':
+              break
+            if s.get('status_code') == 'ERROR':
+              raise Exception('Video processing failed')
+
+          # Publish
+          r = requests.post(
+            f"https://graph.facebook.com/v19.0/{ig_id}/media_publish",
+            params={'access_token': token},
+            json={'creation_id': container_id}
+          )
+          print(f"Published: {r.json()}")
+          PYEOF
