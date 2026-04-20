@@ -1365,6 +1365,45 @@ async function generateRunwayReel() {
   document.getElementById('runway-gen-inner').innerHTML = '🎬 Generate Reel with Runway AI';
 }
 
+async function autoMergeAndPublish() {
+  if (!runwayVideoUrl) { toast('Generate a Reel video first', 'red'); return; }
+  if (!voiceAudioUrl) { toast('Generate a voiceover first', 'red'); return; }
+
+  const caption = document.getElementById('reel-caption').value.trim();
+  if (!caption) { toast('Add a caption first', 'red'); return; }
+
+  const btn = document.getElementById('auto-publish-btn');
+  btn.disabled = true;
+  document.getElementById('auto-publish-inner').innerHTML = '<span class="spinner"></span> Starting...';
+
+  try {
+    const res = await fetch('https://api.orrisoak.com/publish-reel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        videoUrl: runwayVideoUrl,
+        audioUrl: voiceAudioUrl,
+        caption: caption,
+        musicVolume: 0.2,
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    document.getElementById('auto-publish-inner').innerHTML = '✓ Publishing in background...';
+    toast('🚀 Reel is being processed — check Instagram in ~3 minutes!', 'green');
+    log('reel-log', '✓ Auto merge + publish triggered via GitHub Actions', 'ok');
+    log('reel-log', 'Check Instagram @orrisoakbeauty in 3 minutes', 'info');
+
+  } catch(e) {
+    toast('Error: ' + e.message, 'red');
+    log('reel-log', '✗ Auto publish failed: ' + e.message, 'err');
+    btn.disabled = false;
+    document.getElementById('auto-publish-inner').innerHTML = '🚀 Auto Merge + Publish to Instagram';
+  }
+}
+
 function useRunwayVideo() {
   if (!runwayVideoUrl) return;
   reelVideoUrl = runwayVideoUrl;
@@ -1725,7 +1764,7 @@ async function aiCaption() {
 
   document.getElementById('ai-caption-btn').innerHTML = '<span class="spinner"></span> Generating...';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://api.orrisoak.com', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -1748,29 +1787,32 @@ Include a line break between hook and body. Return only the caption text.`}]
 }
 
 async function aiReelCaption() {
-  const claudeKey = (typeof ORRISOAK_CONFIG !== 'undefined')
-    ? ORRISOAK_CONFIG.claude?.apiKey
-    : localStorage.getItem('oo_claude_key');
-  if (!claudeKey) { toast('Add Claude API key to config-private.js','red'); return; }
+  const tmpl = detectProductFromImage();
+  const prompt = `Write a luxury Instagram Reel caption for ${tmpl.product} by Orris and Oak luxury beauty brand. 
+Hook: "${tmpl.hook}"
+Max 150 words. Include GLOW15 discount code. Elegant, aspirational tone.
+End with relevant hashtags including #OrrisAndOak #GLOW15`;
 
+  document.getElementById('reel-caption').placeholder = 'Generating...';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+    const res = await fetch('https://api.orrisoak.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:300,
-        messages:[{role:'user',content:`Write an Instagram Reel caption for Orris & Oak luxury beauty brand.
-Short, punchy, scroll-stopping. Under 80 words. Start with a hook like "POV:" or a question.
-Product: 4-in-1 Magnetic Brush. Include GLOW15 code and orrisoak.com link.
-Return only the caption text.`}]
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }],
       })
     });
     const data = await res.json();
-    document.getElementById('reel-caption').value = data.content[0].text;
-    document.getElementById('reel-preview-cap').textContent = data.content[0].text;
-    toast('Reel caption generated ✓','green');
-  } catch(e) { toast('AI error: ' + e.message,'red'); }
+    const text = data.content?.[0]?.text?.trim() || '';
+    document.getElementById('reel-caption').value = text;
+    updateCharCount('reel-caption', 'reel-char');
+    toast('Caption generated ✓', 'green');
+  } catch(e) {
+    toast('Caption error: ' + e.message, 'red');
+  }
+  document.getElementById('reel-caption').placeholder = 'Write your Reel caption...';
 }
 
 // ── IMAGE SELECTION ──
