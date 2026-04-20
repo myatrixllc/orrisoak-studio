@@ -466,13 +466,17 @@ textarea.cap:focus{border-color:var(--gold);}
               <div id="voice-result" style="display:none;margin-top:10px;">
                 <div style="font-size:8px;letter-spacing:2px;color:var(--green);margin-bottom:6px;">✓ Voiceover ready</div>
                 <audio id="voice-audio" controls style="width:100%;margin-bottom:10px;"></audio>
-                <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:8px;margin-bottom:8px;" id="auto-publish-btn" onclick="autoMergeAndPublish()">
-                  <span id="auto-publish-inner">🚀 Auto Merge + Publish to Instagram</span>
+                <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:8px;margin-top:8px;" id="merge-btn" onclick="mergeVideoAudio()">
+                  <span id="merge-inner">⚡ Step 1 — Merge Video + Voiceover + Music</span>
                 </button>
-                <div style="font-size:7px;color:var(--muted);text-align:center;margin-bottom:8px;">Merges video + voiceover + music and posts to Instagram automatically</div>
-                <button class="btn btn-outline" style="width:100%;justify-content:center;font-size:8px;" id="merge-btn" onclick="mergeVideoAudio()">
-                  <span id="merge-inner">⚡ Manual Merge Only</span>
-                </button>
+
+                <!-- Step 2 shown after merge -->
+                <div id="auto-publish-section" style="display:none;margin-top:10px;border:1px solid var(--gold-border);padding:12px;background:var(--s2);">
+                  <div style="font-size:8px;letter-spacing:2px;color:var(--green);margin-bottom:8px;">✓ Merged video ready — preview in Reel Preview</div>
+                  <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:8px;" id="auto-publish-btn" onclick="autoPublishReel()">
+                    <span id="auto-publish-inner">🚀 Step 2 — Publish to Instagram</span>
+                  </button>
+                </div>
               </div>
               <div id="merge-progress" style="display:none;margin-top:10px;">
                 <div style="font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px;" id="merge-status">Merging...</div>
@@ -1369,6 +1373,65 @@ async function generateRunwayReel() {
   document.getElementById('runway-gen-inner').innerHTML = '🎬 Generate Reel with Runway AI';
 }
 
+async function autoPublishReel() {
+  if (!reelVideoUrl) { toast('Merge video first (Step 1)', 'red'); return; }
+  const caption = document.getElementById('reel-caption').value.trim();
+  if (!caption) { toast('Add a caption first', 'red'); return; }
+
+  const btn = document.getElementById('auto-publish-btn');
+  btn.disabled = true;
+  document.getElementById('auto-publish-inner').innerHTML = '<span class="spinner"></span> Publishing...';
+
+  try {
+    // Publish directly via Meta API using page token
+    const igToken = window._pageToken || token;
+    log('reel-log', 'Creating Instagram Reel container...', 'info');
+
+    const containerRes = await fetch(`https://graph.facebook.com/v19.0/${igUserId}/media?access_token=${igToken}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        media_type: 'REELS',
+        video_url: reelVideoUrl,
+        caption: caption,
+        share_to_feed: true,
+      })
+    });
+    const container = await containerRes.json();
+    if (container.error) throw new Error(container.error.message);
+    log('reel-log', `Container: ${container.id} — processing...`, 'ok');
+
+    // Poll until ready
+    for (let i = 0; i < 36; i++) {
+      await sleep(5000);
+      const statusRes = await fetch(`https://graph.facebook.com/v19.0/${container.id}?fields=status_code&access_token=${igToken}`);
+      const status = await statusRes.json();
+      log('reel-log', `Status: ${status.status_code}`, 'info');
+      if (status.status_code === 'FINISHED') break;
+      if (status.status_code === 'ERROR') throw new Error('Video processing failed');
+    }
+
+    // Publish
+    const pubRes = await fetch(`https://graph.facebook.com/v19.0/${igUserId}/media_publish?access_token=${igToken}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ creation_id: container.id })
+    });
+    const pub = await pubRes.json();
+    if (pub.error) throw new Error(pub.error.message);
+
+    log('reel-log', `✓ Reel published to Instagram! ID: ${pub.id}`, 'ok');
+    toast('Reel live on Instagram! ✓', 'green');
+    document.getElementById('auto-publish-inner').innerHTML = '✓ Published to Instagram';
+
+  } catch(e) {
+    toast('Publish error: ' + e.message, 'red');
+    log('reel-log', '✗ Publish failed: ' + e.message, 'err');
+    btn.disabled = false;
+    document.getElementById('auto-publish-inner').innerHTML = '🚀 Step 2 — Publish to Instagram';
+  }
+}
+
 async function autoMergeAndPublish() {
   if (!runwayVideoUrl) { toast('Generate a Reel video first', 'red'); return; }
   if (!voiceAudioUrl) { toast('Generate a voiceover first', 'red'); return; }
@@ -1608,7 +1671,9 @@ async function mergeVideoAudio() {
       `<video src="${finalUrl}" style="width:100%;height:100%;object-fit:cover;" controls></video>`;
     document.getElementById('reel-upload-name').textContent = '✓ Reel with voiceover ready to publish';
     log('reel-log', `✓ Final Reel saved: ${data.r2Key}`, 'ok');
-    toast('Reel ready to publish! ✓', 'green');
+    toast('Merged! Now click Step 2 to publish ✓', 'green');
+    // Show publish button
+    document.getElementById('auto-publish-section').style.display = 'block';
   };
 
   try {
