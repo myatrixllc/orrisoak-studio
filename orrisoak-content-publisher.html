@@ -466,8 +466,12 @@ textarea.cap:focus{border-color:var(--gold);}
               <div id="voice-result" style="display:none;margin-top:10px;">
                 <div style="font-size:8px;letter-spacing:2px;color:var(--green);margin-bottom:6px;">✓ Voiceover ready</div>
                 <audio id="voice-audio" controls style="width:100%;margin-bottom:10px;"></audio>
-                <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:8px;margin-top:8px;" id="merge-btn" onclick="mergeVideoAudio()">
-                  <span id="merge-inner">⚡ Merge Video + Voiceover</span>
+                <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:8px;margin-bottom:8px;" id="auto-publish-btn" onclick="autoMergeAndPublish()">
+                  <span id="auto-publish-inner">🚀 Auto Merge + Publish to Instagram</span>
+                </button>
+                <div style="font-size:7px;color:var(--muted);text-align:center;margin-bottom:8px;">Merges video + voiceover + music and posts to Instagram automatically</div>
+                <button class="btn btn-outline" style="width:100%;justify-content:center;font-size:8px;" id="merge-btn" onclick="mergeVideoAudio()">
+                  <span id="merge-inner">⚡ Manual Merge Only</span>
                 </button>
               </div>
               <div id="merge-progress" style="display:none;margin-top:10px;">
