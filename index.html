@@ -7,10 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dim:rgba(201,168,76,0.1);
-  --gold-border:rgba(201,168,76,0.35);--black:#080808;--s1:#141414;
-  --s2:#1C1C1C;--s3:#242424;--s4:#252525;--cream:#F5F0E8;--muted:#C8B89A;
-  --green:#4CAF7D;--blue:#7B9FE8;--orange:#D4894A;--red:#D45A5A;
+  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dim:rgba(201,168,76,0.12);
+  --gold-border:rgba(201,168,76,0.35);--black:#080808;--s1:#111111;
+  --s2:#1A1A1A;--s3:#242424;--s4:#2E2E2E;--cream:#F0EDE8;--muted:#C8B89A;
+  --green:#4CAF7A;--blue:#7BAAF0;--orange:#E08840;--red:#E05040;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;}
@@ -62,7 +62,7 @@ body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font
 
 /* SECTION */
 .section-head{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
-.section-eye{font-size:8px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);font-weight:400;}
+.section-eye{font-size:8px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);}
 .section-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent);}
 
 /* TOOLS GRID */
@@ -73,7 +73,7 @@ body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font
 .tool-card:hover::before{transform:scaleX(1);}
 .tool-icon{font-size:28px;margin-bottom:14px;display:block;}
 .tool-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cream);margin-bottom:6px;}
-.tool-desc{font-size:9px;letter-spacing:1px;color:#B8A898;line-height:2;}
+.tool-desc{font-size:9px;letter-spacing:1px;color:#C8B89A;line-height:2;}
 .tool-tag{position:absolute;top:16px;right:16px;font-size:6px;letter-spacing:3px;text-transform:uppercase;padding:3px 8px;border:1px solid var(--gold-border);color:var(--gold);}
 .tool-tag.new{background:rgba(76,175,125,0.1);border-color:rgba(76,175,125,0.3);color:#4CAF7D;}
 .tool-tag.live{background:rgba(201,168,76,0.1);color:var(--gold);}
@@ -89,7 +89,7 @@ body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font
 .step-num{background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);border-right:1px solid var(--gold-border);}
 .step-body{padding:14px 18px;}
 .step-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
-.step-text{font-size:10px;color:#B8A898;line-height:2;}
+.step-text{font-size:10px;color:#C8B89A;line-height:2;}
 .code-block{background:#0D0D0D;border:1px solid rgba(201,168,76,0.25);padding:12px 14px;margin-top:10px;font-family:monospace;font-size:11px;color:#A8E090;line-height:1.8;overflow-x:auto;white-space:pre;}
 .copy-code{background:none;border:1px solid rgba(201,168,76,0.2);color:var(--gold);font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;cursor:pointer;margin-top:8px;transition:all 0.2s;}
 .copy-code:hover{background:var(--gold-dim);}
@@ -104,25 +104,25 @@ body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font
 .subdomain-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:40px;}
 .sub-card{background:var(--s1);border:1px solid var(--gold-border);padding:20px;}
 .sub-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
-.sub-desc{font-size:10px;color:#B8A898;line-height:2;}
+.sub-desc{font-size:10px;color:#C8B89A;line-height:2;}
 
 /* FILE MANAGER */
 .file-manager{background:#151515;border:1px solid rgba(201,168,76,0.35);margin-bottom:40px;}
 .fm-head{background:#1A1A1A;border-bottom:1px solid rgba(201,168,76,0.35);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
-.fm-title{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);font-weight:400;}
+.fm-title{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
 .fm-body{display:grid;grid-template-columns:200px 1fr;min-height:300px;}
 .fm-sidebar{border-right:1px solid rgba(201,168,76,0.35);padding:16px 0;}
 .fm-folder{padding:10px 16px;cursor:pointer;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#C8B89A;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
 .fm-folder:hover,.fm-folder.active{background:var(--gold-dim);color:var(--gold);}
 .fm-folder-icon{font-size:12px;}
 .fm-main{padding:20px;}
-.fm-breadcrumb{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#E8D5A3;margin-bottom:16px;}
+.fm-breadcrumb{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
 .fm-breadcrumb span{color:var(--gold);}
 .fm-files{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .fm-file{background:#1A1A1A;border:1px solid rgba(201,168,76,0.35);padding:12px;text-align:center;cursor:pointer;transition:all 0.2s;}
 .fm-file:hover{border-color:var(--gold);}
 .fm-file-icon{font-size:22px;margin-bottom:6px;}
-.fm-file-name{font-size:8px;letter-spacing:1px;color:#F0EDE8;word-break:break-all;line-height:1.5;}
+.fm-file-name{font-size:8px;letter-spacing:1px;color:var(--cream);word-break:break-all;line-height:1.5;}
 .fm-empty{color:#C8B89A;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:40px;text-align:center;grid-column:1/-1;}
 
 /* COUNTDOWN */
@@ -204,7 +204,7 @@ body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font
   <p class="hero-sub">Your complete marketing infrastructure — all tools, all content, all in one place.</p>
   <div class="hero-stats">
     <div>
-      <div class="hero-stat-num" id="h-tools">12</div>
+      <div class="hero-stat-num" id="h-tools">9</div>
       <div class="hero-stat-label">Tools<br>Available</div>
     </div>
     <div>
@@ -293,26 +293,6 @@ body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font
       <div class="tool-name">Content File Manager</div>
       <div class="tool-desc">Organised content library — content/&lt;product&gt;/images structure</div>
     </a>
-
-    <a class="tool-card" onclick="openTool('publisher')">
-      <div class="tool-tag new">New</div>
-      <span class="tool-icon">📲</span>
-      <div class="tool-name">Content Publisher</div>
-      <div class="tool-desc">One-click post photos and Reels to Instagram &amp; Facebook simultaneously</div>
-    </a>
-
-    <a class="tool-card" onclick="openTool('launchcontrol')">
-      <div class="tool-tag new">New</div>
-      <span class="tool-icon">🚀</span>
-      <div class="tool-name">Launch Control</div>
-      <div class="tool-desc">Publish all 3 Meta campaigns and toggle them live on May 1 with one click</div>
-    </a>
-    <a class="tool-card" onclick="openTool('adcreatives')">
-      <div class="tool-tag new">New</div>
-      <span class="tool-icon">🎨</span>
-      <div class="tool-name">Meta Ad Creatives</div>
-      <div class="tool-desc">Select R2 hero images, copy ad copy &amp; audiences for all 3 campaigns. 15-day launch checklist included</div>
-    </a>
   </div>
 
   <!-- FILE MANAGER -->
@@ -331,7 +311,7 @@ body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font
     <div class="fm-body">
       <div class="fm-sidebar">
         <div class="fm-folder active" onclick="fmOpen('magnetic-brush','images')" id="fm-brush-img">
-          <span class="fm-folder-icon">🖌️</span> Brush / Images / Black
+          <span class="fm-folder-icon">🖌️</span> Brush / Images
         </div>
         <div class="fm-folder" onclick="fmOpen('magnetic-brush','videos')">
           <span class="fm-folder-icon">🎬</span> Brush / Videos
@@ -658,10 +638,7 @@ const toolMap = {
   brand: 'orrisoak-brand-page.html',
   shopify: 'orrisoak-shopify-theme-preview.html',
   setup: 'orrisoak-setup-guide.html',
-  adcreatives: 'orrisoak-meta-ad-creatives.html',
   traffic: 'orrisoak-traffic-strategy.html',
-  publisher:    'orrisoak-content-publisher.html',
-  launchcontrol:'orrisoak-launch-control.html',
 };
 function openTool(name){
   if(toolMap[name]) window.open(toolMap[name], '_blank');
