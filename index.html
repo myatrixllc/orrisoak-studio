@@ -7,717 +7,691 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dim:rgba(201,168,76,0.12);
-  --gold-border:rgba(201,168,76,0.35);--black:#080808;--s1:#111111;
-  --s2:#1A1A1A;--s3:#242424;--s4:#2E2E2E;--cream:#F0EDE8;--muted:#C8B89A;
-  --green:#4CAF7A;--blue:#7BAAF0;--orange:#E08840;--red:#E05040;
+  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dim:rgba(201,168,76,0.08);
+  --gold-border:rgba(201,168,76,0.2);--black:#070707;--s1:#0F0F0F;
+  --s2:#141414;--s3:#1A1A1A;--cream:#F0E9DC;--muted:#6B6259;--green:#4CAF7D;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#080808;color:#F0EDE8;font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;}
+body{background:var(--black);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-weight:300;min-height:100vh;}
 
-/* ── PASSWORD GATE ── */
-#gate{
-  position:fixed;inset:0;background:var(--black);z-index:9999;
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:0;
-}
-.gate-logo{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--gold);letter-spacing:6px;margin-bottom:8px;}
-.gate-logo span{font-style:italic;}
-.gate-sub{font-size:8px;letter-spacing:8px;text-transform:uppercase;color:#C8B89A;margin-bottom:40px;}
-.gate-box{background:var(--s1);border:1px solid var(--gold-border);padding:40px;width:340px;text-align:center;}
-.gate-label{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:block;}
-.gate-input{width:100%;background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:14px;letter-spacing:4px;padding:14px;text-align:center;margin-bottom:14px;}
-.gate-input:focus{outline:none;border-color:var(--gold);}
-.gate-btn{width:100%;background:var(--gold);color:var(--black);border:none;font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:5px;text-transform:uppercase;padding:14px;cursor:pointer;transition:all 0.3s;}
-.gate-btn:hover{background:var(--gold-light);}
-.gate-err{font-size:9px;letter-spacing:2px;color:var(--red);margin-top:10px;display:none;}
-.gate-line{width:60px;height:1px;background:var(--gold);margin:0 auto 20px;}
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--black);}
+.login-box{width:360px;text-align:center;padding:48px 40px;border:1px solid var(--gold-border);background:var(--s1);}
+.login-logo{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--gold);letter-spacing:6px;margin-bottom:6px;}
+.login-logo span{font-style:italic;}
+.login-rule{width:40px;height:1px;background:rgba(201,168,76,0.4);margin:16px auto;}
+.login-sub{font-size:8px;letter-spacing:6px;text-transform:uppercase;color:var(--muted);margin-bottom:32px;}
+.login-input{width:100%;background:var(--s2);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;padding:12px 16px;letter-spacing:2px;margin-bottom:10px;}
+.login-input:focus{outline:none;border-color:var(--gold);}
+.login-btn{width:100%;background:var(--gold);color:var(--black);border:none;font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:5px;text-transform:uppercase;padding:13px;cursor:pointer;transition:background 0.3s;margin-top:4px;}
+.login-btn:hover{background:var(--gold-light);}
+.login-err{font-size:8px;letter-spacing:2px;color:#e57373;margin-top:8px;display:none;}
 
-/* ── STUDIO LAYOUT ── */
-#studio{display:none;}
+/* STUDIO */
+.studio{display:none;}
 
 /* HEADER */
-.header{background:var(--s1);border-bottom:1px solid var(--gold-border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;}
-.logo{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);letter-spacing:4px;}
+.header{background:var(--s1);border-bottom:1px solid var(--gold-border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);letter-spacing:4px;}
 .logo span{font-style:italic;}
 .header-right{display:flex;align-items:center;gap:16px;}
-.header-date{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:#C8B89A;}
-.header-badge{font-size:7px;letter-spacing:4px;text-transform:uppercase;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:4px 12px;}
-.logout-btn{background:none;border:1px solid rgba(201,168,76,0.35);color:#C8B89A;font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:5px 12px;cursor:pointer;transition:all 0.2s;}
-.logout-btn:hover{border-color:var(--gold);color:var(--gold);}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.live-text{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--green);}
+.logout-btn{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;background:none;padding:4px 8px;}
+.logout-btn:hover{color:var(--gold);}
 
-/* HERO */
-.hero{padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--gold-border);position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(201,168,76,0.05),transparent);}
-.hero-eye{font-size:8px;letter-spacing:8px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;position:relative;}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,60px);font-weight:300;line-height:1.05;position:relative;}
-.hero-title em{font-style:italic;color:var(--gold);}
-.hero-sub{font-size:10px;letter-spacing:3px;color:#C8B89A;margin-top:14px;line-height:2;position:relative;}
-.hero-stats{display:flex;justify-content:center;gap:48px;margin-top:32px;position:relative;}
-.hero-stat-num{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--gold);line-height:1;}
-.hero-stat-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:#C8B89A;margin-top:4px;}
+/* NAV TABS */
+.nav{background:var(--s1);border-bottom:1px solid var(--gold-border);padding:0 32px;display:flex;gap:0;overflow-x:auto;}
+.nav-tab{font-size:7px;letter-spacing:4px;text-transform:uppercase;padding:14px 20px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);white-space:nowrap;transition:all 0.2s;}
+.nav-tab:hover{color:var(--cream);}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.nav-tab .tab-icon{margin-right:6px;}
 
-/* CONTENT */
-.content{max-width:1200px;margin:0 auto;padding:40px;}
+/* MAIN */
+.main{padding:32px;max-width:1400px;margin:0 auto;}
 
 /* SECTION */
-.section-head{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
-.section-eye{font-size:8px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);}
-.section-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent);}
+.section{display:none;}
+.section.active{display:block;}
+.section-header{margin-bottom:24px;}
+.section-eye{font-size:7px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--cream);font-weight:300;}
+.section-title em{font-style:italic;color:var(--gold);}
+.section-sub{font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:4px;}
 
-/* TOOLS GRID */
-.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:40px;}
-.tool-card{background:#151515;border:1px solid rgba(201,168,76,0.35);padding:24px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;text-decoration:none;display:block;}
-.tool-card:hover{border-color:var(--gold);transform:translateY(-3px);}
-.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transition:transform 0.3s;}
-.tool-card:hover::before{transform:scaleX(1);}
-.tool-icon{font-size:28px;margin-bottom:14px;display:block;}
-.tool-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cream);margin-bottom:6px;}
-.tool-desc{font-size:9px;letter-spacing:1px;color:#C8B89A;line-height:2;}
-.tool-tag{position:absolute;top:16px;right:16px;font-size:6px;letter-spacing:3px;text-transform:uppercase;padding:3px 8px;border:1px solid var(--gold-border);color:var(--gold);}
-.tool-tag.new{background:rgba(76,175,125,0.1);border-color:rgba(76,175,125,0.3);color:#4CAF7D;}
-.tool-tag.live{background:rgba(201,168,76,0.1);color:var(--gold);}
+/* CARDS GRID */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:32px;}
+.card{background:var(--s1);border:1px solid var(--gold-border);padding:20px;transition:all 0.2s;cursor:pointer;text-decoration:none;display:block;}
+.card:hover{border-color:var(--gold);background:var(--gold-dim);}
+.card-icon{font-size:24px;margin-bottom:10px;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cream);margin-bottom:4px;}
+.card-desc{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);line-height:1.6;}
+.card-badge{display:inline-block;font-size:7px;letter-spacing:3px;text-transform:uppercase;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:2px 8px;margin-top:8px;}
+.card-badge.green{background:rgba(76,175,125,0.1);border-color:rgba(76,175,125,0.3);color:var(--green);}
+.card-badge.new{background:rgba(201,168,76,0.15);border-color:var(--gold);color:var(--gold);}
 
-/* GITHUB GUIDE */
-.github-section{background:#151515;border:1px solid rgba(201,168,76,0.35);margin-bottom:40px;overflow:hidden;}
-.github-head{background:var(--s2);border-bottom:1px solid var(--gold-border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
-.github-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cream);}
-.github-body{padding:24px;}
+/* IMAGE GRID */
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px;}
+.img-item{position:relative;aspect-ratio:1;overflow:hidden;background:var(--s2);border:1px solid var(--gold-border);}
+.img-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s;}
+.img-item:hover img{transform:scale(1.05);}
+.img-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.8);padding:6px 8px;font-size:7px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;}
 
-.step-list{display:flex;flex-direction:column;gap:2px;}
-.step-item{display:grid;grid-template-columns:48px 1fr;background:var(--s2);overflow:hidden;border:1px solid rgba(201,168,76,0.08);}
-.step-num{background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);border-right:1px solid var(--gold-border);}
-.step-body{padding:14px 18px;}
-.step-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
-.step-text{font-size:10px;color:#C8B89A;line-height:2;}
-.code-block{background:#0D0D0D;border:1px solid rgba(201,168,76,0.25);padding:12px 14px;margin-top:10px;font-family:monospace;font-size:11px;color:#A8E090;line-height:1.8;overflow-x:auto;white-space:pre;}
-.copy-code{background:none;border:1px solid rgba(201,168,76,0.2);color:var(--gold);font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;cursor:pointer;margin-top:8px;transition:all 0.2s;}
-.copy-code:hover{background:var(--gold-dim);}
+/* VIDEO GRID */
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;}
+.video-item{background:var(--s2);border:1px solid var(--gold-border);padding:16px;}
+.video-thumb{width:100%;aspect-ratio:16/9;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:10px;border:1px solid var(--gold-border);}
+.video-name{font-size:9px;letter-spacing:2px;color:var(--cream);margin-bottom:4px;}
+.video-url{font-size:7px;letter-spacing:1px;color:var(--muted);word-break:break-all;}
+.video-copy{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);cursor:pointer;margin-top:6px;border:none;background:none;padding:0;}
+.video-copy:hover{text-decoration:underline;}
 
-/* FILE STRUCTURE */
-.file-tree{background:var(--black);border:1px solid rgba(201,168,76,0.15);padding:16px 20px;font-family:monospace;font-size:11px;color:#C8B89A;line-height:2;}
-.file-tree .folder{color:var(--gold);}
-.file-tree .file{color:#98C98A;}
-.file-tree .comment{color:rgba(201,168,76,0.4);}
+/* META PANEL */
+.meta-panel{background:var(--s1);border:1px solid var(--gold-border);padding:24px;margin-bottom:16px;}
+.meta-panel-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cream);margin-bottom:4px;}
+.meta-panel-sub{font-size:8px;letter-spacing:2px;color:var(--muted);margin-bottom:16px;}
+.meta-tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
+.meta-tool{background:var(--s2);border:1px solid var(--gold-border);padding:12px;display:flex;align-items:flex-start;gap:10px;}
+.meta-tool-icon{font-size:18px;flex-shrink:0;}
+.meta-tool-name{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;}
+.meta-tool-desc{font-size:8px;color:var(--muted);line-height:1.4;}
+.meta-status{display:flex;align-items:center;gap:6px;margin-bottom:16px;}
+.meta-status-dot{width:8px;height:8px;background:var(--green);border-radius:50%;}
+.meta-status-text{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--green);}
 
-/* SUBDOMAIN GUIDE */
-.subdomain-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:40px;}
-.sub-card{background:var(--s1);border:1px solid var(--gold-border);padding:20px;}
-.sub-title{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
-.sub-desc{font-size:10px;color:#C8B89A;line-height:2;}
+/* STATS ROW */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.stat{background:var(--s1);border:1px solid var(--gold-border);padding:16px;}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);}
+.stat-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
 
-/* FILE MANAGER */
-.file-manager{background:#151515;border:1px solid rgba(201,168,76,0.35);margin-bottom:40px;}
-.fm-head{background:#1A1A1A;border-bottom:1px solid rgba(201,168,76,0.35);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
-.fm-title{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
-.fm-body{display:grid;grid-template-columns:200px 1fr;min-height:300px;}
-.fm-sidebar{border-right:1px solid rgba(201,168,76,0.35);padding:16px 0;}
-.fm-folder{padding:10px 16px;cursor:pointer;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#C8B89A;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
-.fm-folder:hover,.fm-folder.active{background:var(--gold-dim);color:var(--gold);}
-.fm-folder-icon{font-size:12px;}
-.fm-main{padding:20px;}
-.fm-breadcrumb{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
-.fm-breadcrumb span{color:var(--gold);}
-.fm-files{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.fm-file{background:#1A1A1A;border:1px solid rgba(201,168,76,0.35);padding:12px;text-align:center;cursor:pointer;transition:all 0.2s;}
-.fm-file:hover{border-color:var(--gold);}
-.fm-file-icon{font-size:22px;margin-bottom:6px;}
-.fm-file-name{font-size:8px;letter-spacing:1px;color:var(--cream);word-break:break-all;line-height:1.5;}
-.fm-empty{color:#C8B89A;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:40px;text-align:center;grid-column:1/-1;}
+/* URL DISPLAY */
+.url-row{background:var(--s2);border:1px solid var(--gold-border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.url-text{font-size:9px;letter-spacing:1px;color:var(--cream);word-break:break-all;}
+.url-copy{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);cursor:pointer;border:none;background:none;flex-shrink:0;margin-left:12px;}
 
-/* COUNTDOWN */
-.countdown-bar{background:#151515;border:1px solid rgba(201,168,76,0.35);padding:20px 24px;margin-bottom:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
-.countdown-label{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
-.countdown-nums{display:flex;gap:20px;}
-.countdown-unit{text-align:center;}
-.countdown-num{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--gold);line-height:1;}
-.countdown-unit-label{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
-.launch-btn{background:var(--gold);color:var(--black);border:none;font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:12px 24px;cursor:pointer;transition:all 0.3s;}
-.launch-btn:hover{background:var(--gold-light);}
+/* TABLE */
+.table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+.table th{font-size:7px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);padding:10px 12px;border-bottom:1px solid var(--gold-border);text-align:left;}
+.table td{font-size:9px;padding:10px 12px;border-bottom:1px solid rgba(201,168,76,0.08);color:var(--cream);}
+.table tr:hover td{background:var(--gold-dim);}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;}
+.status-dot.green{background:var(--green);}
+.status-dot.gold{background:var(--gold);}
+.status-dot.grey{background:var(--muted);}
 
-/* FOOTER */
-.footer{border-top:1px solid var(--gold-border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-.footer-logo{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold);letter-spacing:4px;}
-.footer-logo span{font-style:italic;}
-.footer-text{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--gold-border);margin:24px 0;}
 
-/* BTN */
-.btn{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:4px;text-transform:uppercase;padding:10px 22px;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px;}
-.btn-gold{background:var(--gold);color:var(--black);}
-.btn-gold:hover{background:var(--gold-light);}
-.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);}
-.btn-outline:hover{background:var(--gold-dim);}
-
-.toast{position:fixed;bottom:20px;right:20px;z-index:9999;background:var(--s3);border:1px solid var(--gold);border-left:3px solid var(--gold);padding:10px 14px;font-size:9px;letter-spacing:1px;color:var(--cream);transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:260px;}
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;z-index:999;background:var(--s3);border:1px solid var(--gold);border-left:3px solid var(--gold);padding:10px 16px;font-size:9px;letter-spacing:1px;color:var(--cream);transform:translateY(80px);opacity:0;transition:all 0.3s;}
 .toast.show{transform:translateY(0);opacity:1;}
-.toast.green{border-color:var(--green);border-left-color:var(--green);}
-
-@media(max-width:900px){
-  .tools-grid{grid-template-columns:1fr 1fr;}
-  .subdomain-grid{grid-template-columns:1fr;}
-  .fm-body{grid-template-columns:1fr;}
-  .fm-sidebar{border-right:none;border-bottom:1px solid var(--gold-border);display:flex;flex-wrap:wrap;padding:8px;}
-  .fm-folder{padding:8px 12px;}
-  .content{padding:20px;}
-  .header{padding:0 20px;}
-  .hero{padding:40px 20px 30px;}
-  .hero-stats{gap:24px;}
-  .footer{padding:20px;}
-}
 </style>
 </head>
 <body>
 
-<!-- ── PASSWORD GATE ── -->
-<div id="gate">
-  <div class="gate-logo">Orris<span>oak</span></div>
-  <div class="gate-sub">Studio · Private Access</div>
-  <div class="gate-box">
-    <span class="gate-label">Enter Studio Password</span>
-    <div class="gate-line"></div>
-    <input class="gate-input" type="password" id="gatePass" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPass()">
-    <button class="gate-btn" onclick="checkPass()">Enter Studio →</button>
-    <div class="gate-err" id="gateErr">Incorrect password. Try again.</div>
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">Orris<span>oak</span></div>
+    <div class="login-rule"></div>
+    <div class="login-sub">Marketing Studio · Private Access</div>
+    <input class="login-input" type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()">
+    <button class="login-btn" onclick="login()">Enter Studio</button>
+    <div class="login-err" id="loginErr">Incorrect password</div>
   </div>
 </div>
 
-<!-- ── STUDIO ── -->
-<div id="studio">
+<!-- STUDIO -->
+<div class="studio" id="studioWrap">
 
-<!-- HEADER -->
-<div class="header">
-  <div style="display:flex;align-items:center;gap:14px;">
-    <div class="logo">Orris<span>oak</span></div>
-    <div class="header-badge">✦ Studio</div>
-  </div>
-  <div class="header-right">
-    <div class="header-date" id="headerDate"></div>
-    <div class="header-badge" id="launchCountdown">21 days to launch</div>
-    <button class="logout-btn" onclick="logout()">Lock Studio</button>
-  </div>
-</div>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-eye">studio.orrisoak.com · Marketing Command Centre</div>
-  <h1 class="hero-title">Welcome Back,<br><em>Julary.</em></h1>
-  <p class="hero-sub">Your complete marketing infrastructure — all tools, all content, all in one place.</p>
-  <div class="hero-stats">
-    <div>
-      <div class="hero-stat-num" id="h-tools">9</div>
-      <div class="hero-stat-label">Tools<br>Available</div>
-    </div>
-    <div>
-      <div class="hero-stat-num" id="h-posts">0</div>
-      <div class="hero-stat-label">Posts<br>Scheduled</div>
-    </div>
-    <div>
-      <div class="hero-stat-num">May 1</div>
-      <div class="hero-stat-label">Launch<br>Date</div>
-    </div>
-    <div>
-      <div class="hero-stat-num">$65</div>
-      <div class="hero-stat-label">Brush<br>Price</div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">Orris<span>oak</span> <span style="font-family:'Josefin Sans';font-size:9px;letter-spacing:4px;color:var(--muted);margin-left:8px;">STUDIO</span></div>
+    <div class="header-right">
+      <div class="live-dot"></div>
+      <div class="live-text">Live · orrisoak.com</div>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
     </div>
   </div>
-</div>
 
-<div class="content">
-
-  <!-- LAUNCH COUNTDOWN -->
-  <div class="countdown-bar">
-    <div>
-      <div class="countdown-label">🚀 Launch Countdown · May 1, 2026</div>
-    </div>
-    <div class="countdown-nums">
-      <div class="countdown-unit"><div class="countdown-num" id="cd-days">21</div><div class="countdown-unit-label">Days</div></div>
-      <div class="countdown-unit"><div class="countdown-num" id="cd-hours">00</div><div class="countdown-unit-label">Hours</div></div>
-      <div class="countdown-unit"><div class="countdown-num" id="cd-mins">00</div><div class="countdown-unit-label">Mins</div></div>
-      <div class="countdown-unit"><div class="countdown-num" id="cd-secs">00</div><div class="countdown-unit-label">Secs</div></div>
-    </div>
-    <button class="launch-btn" onclick="openTool('automation')">Open Automation System →</button>
+  <!-- NAV -->
+  <div class="nav">
+    <div class="nav-tab active" onclick="showTab('dashboard')"><span class="tab-icon">✦</span>Dashboard</div>
+    <div class="nav-tab" onclick="showTab('images')"><span class="tab-icon">🖼</span>Images</div>
+    <div class="nav-tab" onclick="showTab('videos')"><span class="tab-icon">🎬</span>Videos</div>
+    <div class="nav-tab" onclick="showTab('meta')"><span class="tab-icon">📣</span>Meta Ads</div>
+    <div class="nav-tab" onclick="showTab('tools')"><span class="tab-icon">🛠</span>Tools</div>
+    <div class="nav-tab" onclick="showTab('urls')"><span class="tab-icon">🔗</span>CDN URLs</div>
   </div>
 
-  <!-- TOOLS -->
-  <div class="section-head">
-    <div class="section-eye">✦ Your Tools</div>
-    <div class="section-line"></div>
-  </div>
-  <div class="tools-grid">
-    <a class="tool-card" onclick="openTool('automation')">
-      <div class="tool-tag new">New</div>
-      <span class="tool-icon">🤖</span>
-      <div class="tool-name">Automation System</div>
-      <div class="tool-desc">Post scheduler, DM inbox, auto-responder, reel scheduler, full funnel dashboard</div>
-    </a>
-    <a class="tool-card" onclick="openTool('content')">
-      <div class="tool-tag live">AI Powered</div>
-      <span class="tool-icon">✨</span>
-      <div class="tool-name">Content Agent</div>
-      <div class="tool-desc">Generate captions, ad copy, reel scripts, image prompts, emails — AI suggests ideas first</div>
-    </a>
-    <a class="tool-card" onclick="openTool('meta')">
-      <div class="tool-tag live">Connected</div>
-      <span class="tool-icon">📢</span>
-      <div class="tool-name">Meta Command Center</div>
-      <div class="tool-desc">Build and publish Meta campaigns. 3 campaigns ready to activate on May 1</div>
-    </a>
-    <a class="tool-card" onclick="openTool('outreach')">
-      <span class="tool-icon">⭐</span>
-      <div class="tool-name">Influencer Outreach</div>
-      <div class="tool-desc">DM generator, pipeline tracker, follow-up automation. 5 contacts in progress</div>
-    </a>
-    <a class="tool-card" onclick="openTool('brand')">
-      <span class="tool-icon">🖤</span>
-      <div class="tool-name">Brand Page</div>
-      <div class="tool-desc">Full brand story, products, strategy, ad copy — shareable with partners and press</div>
-    </a>
-    <a class="tool-card" onclick="openTool('shopify')">
-      <span class="tool-icon">🛍️</span>
-      <div class="tool-name">Shopify Theme Preview</div>
-      <div class="tool-desc">Custom dark luxury theme preview for orrisoak.com — ready to implement</div>
-    </a>
-    <a class="tool-card" onclick="openTool('setup')">
-      <span class="tool-icon">📋</span>
-      <div class="tool-name">Setup Guide</div>
-      <div class="tool-desc">Step-by-step setup for Meta, Klaviyo, Shopify and all marketing channels</div>
-    </a>
-    <a class="tool-card" onclick="openTool('traffic')">
-      <span class="tool-icon">📈</span>
-      <div class="tool-name">Traffic Strategy</div>
-      <div class="tool-desc">Complete organic and paid traffic plan — month by month breakdown</div>
-    </a>
-    <a class="tool-card" onclick="nav('files')">
-      <div class="tool-tag new">New</div>
-      <span class="tool-icon">📁</span>
-      <div class="tool-name">Content File Manager</div>
-      <div class="tool-desc">Organised content library — content/&lt;product&gt;/images structure</div>
-    </a>
-  </div>
+  <div class="main">
 
-  <!-- FILE MANAGER -->
-  <div class="section-head">
-    <div class="section-eye">✦ Content File Manager</div>
-    <div class="section-line"></div>
-  </div>
-  <div class="file-manager" id="fileManager">
-    <div class="fm-head">
-      <span class="fm-title">📁 orrisoak-content / <span id="fm-path" style="color:var(--cream);">Select a folder</span></span>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-outline" style="font-size:7px;padding:6px 14px;" onclick="document.getElementById('fm-upload').click()">+ Upload File</button>
-        <input type="file" id="fm-upload" multiple style="display:none" onchange="fmUpload(this)">
+    <!-- ══ DASHBOARD ══ -->
+    <div class="section active" id="sec-dashboard">
+      <div class="section-header">
+        <span class="section-eye">Overview</span>
+        <div class="section-title">Marketing <em>Command Center</em></div>
+        <div class="section-sub">Orris & Oak · Westmont, IL · Launching May 1, 2026</div>
       </div>
-    </div>
-    <div class="fm-body">
-      <div class="fm-sidebar">
-        <div class="fm-folder active" onclick="fmOpen('magnetic-brush','images')" id="fm-brush-img">
-          <span class="fm-folder-icon">🖌️</span> Brush / Images
+
+      <div class="stats">
+        <div class="stat"><div class="stat-val">3</div><div class="stat-label">Active SKUs</div></div>
+        <div class="stat"><div class="stat-val">22+</div><div class="stat-label">Black Brush Images</div></div>
+        <div class="stat"><div class="stat-val">11</div><div class="stat-label">Cleanser Images</div></div>
+        <div class="stat"><div class="stat-val">5</div><div class="stat-label">Meta MCP Tools</div></div>
+        <div class="stat"><div class="stat-val">$149</div><div class="stat-label">Total Ad Budget/mo</div></div>
+        <div class="stat"><div class="stat-val">3</div><div class="stat-label">Campaigns Ready</div></div>
+      </div>
+
+      <div class="cards">
+        <div class="card" onclick="showTab('images')">
+          <div class="card-icon">🖼️</div>
+          <div class="card-title">Product Images</div>
+          <div class="card-desc">Browse all product images hosted on images.orrisoak.com CDN</div>
+          <div class="card-badge green">33+ Images Live</div>
         </div>
-        <div class="fm-folder" onclick="fmOpen('magnetic-brush','videos')">
-          <span class="fm-folder-icon">🎬</span> Brush / Videos
+        <div class="card" onclick="showTab('videos')">
+          <div class="card-icon">🎬</div>
+          <div class="card-title">Product Videos</div>
+          <div class="card-desc">Gold Serum demo videos hosted on R2 CDN</div>
+          <div class="card-badge new">✦ New — Gold Serum</div>
         </div>
-        <div class="fm-folder" onclick="fmOpen('magnetic-brush','captions')">
-          <span class="fm-folder-icon">📝</span> Brush / Captions
+        <div class="card" onclick="showTab('meta')">
+          <div class="card-icon">📣</div>
+          <div class="card-title">Meta Ads via Claude</div>
+          <div class="card-desc">Create campaigns, check performance and activate ads via Meta MCP connector</div>
+          <div class="card-badge new">✦ AI-Powered via Claude</div>
         </div>
-        <div class="fm-folder" onclick="fmOpen('magnetic-brush','ads')">
-          <span class="fm-folder-icon">📢</span> Brush / Ads
+        <div class="card" onclick="window.open('orrisoak-reel-builder.html','_blank')">
+          <div class="card-icon">🎬</div>
+          <div class="card-title">Reel Builder</div>
+          <div class="card-desc">Upload any image and animate it as a 9-panel Instagram Reel</div>
+          <div class="card-badge">Screen Record Ready</div>
         </div>
-        <div class="fm-folder" onclick="fmOpen('gold-serum','images')">
-          <span class="fm-folder-icon">✨</span> Serum / Images
+        <div class="card" onclick="window.open('orrisoak-content-agent.html','_blank')">
+          <div class="card-icon">✍️</div>
+          <div class="card-title">Content Agent</div>
+          <div class="card-desc">AI-generated captions, Reels scripts, ad copy and email campaigns</div>
+          <div class="card-badge">AI Powered</div>
         </div>
-        <div class="fm-folder" onclick="fmOpen('gold-serum','captions')">
-          <span class="fm-folder-icon">📝</span> Serum / Captions
+        <div class="card" onclick="window.open('orrisoak-outreach-agent.html','_blank')">
+          <div class="card-icon">💌</div>
+          <div class="card-title">Influencer Outreach</div>
+          <div class="card-desc">DM generator and pipeline tracker for micro-influencer campaigns</div>
+          <div class="card-badge">5 DMs Sent</div>
         </div>
-        <div class="fm-folder" onclick="fmOpen('glow-cleanser','images')">
-          <span class="fm-folder-icon">💧</span> Cleanser / Images
+        <div class="card" onclick="window.open('orrisoak-meta-command-center.html','_blank')">
+          <div class="card-icon">⚡</div>
+          <div class="card-title">Meta Command Center</div>
+          <div class="card-desc">Full campaign builder, ad sets, targeting and performance dashboard</div>
+          <div class="card-badge">3 Campaigns Ready</div>
         </div>
-        <div class="fm-folder" onclick="fmOpen('glow-cleanser','captions')">
-          <span class="fm-folder-icon">📝</span> Cleanser / Captions
-        </div>
-        <div class="fm-folder" onclick="fmOpen('brand','logos')">
-          <span class="fm-folder-icon">🖤</span> Brand / Logos
-        </div>
-        <div class="fm-folder" onclick="fmOpen('campaigns','launch-may1')">
-          <span class="fm-folder-icon">🚀</span> Campaigns / May1
-        </div>
-        <div class="fm-folder" onclick="fmOpen('campaigns','mothers-day')">
-          <span class="fm-folder-icon">🎁</span> Campaigns / MothersDay
-        </div>
-        <div class="fm-folder" onclick="fmOpen('email','welcome-series')">
-          <span class="fm-folder-icon">📧</span> Email / Welcome
+        <div class="card" onclick="window.open('orrisoak-automation-system.html','_blank')">
+          <div class="card-icon">🤖</div>
+          <div class="card-title">Automation System</div>
+          <div class="card-desc">Post scheduler, DM inbox, auto-responder and funnel dashboard</div>
+          <div class="card-badge">Live</div>
         </div>
       </div>
-      <div class="fm-main">
-        <div class="fm-breadcrumb">orrisoak-content / <span id="fm-breadcrumb">magnetic-brush / images</span></div>
-        <div class="fm-files" id="fmFiles">
-          <div class="fm-empty">Click a folder to view files<br>Upload files using the button above</div>
+
+      <!-- SKU STATUS TABLE -->
+      <div class="section-eye" style="margin-bottom:12px;">SKU Status</div>
+      <table class="table">
+        <tr><th>SKU</th><th>Product</th><th>Price</th><th>Images</th><th>Videos</th><th>Status</th></tr>
+        <tr>
+          <td>OO-BRUSH-BLK-001</td>
+          <td>4-in-1 Magnetic Brush — Black</td>
+          <td>$65</td>
+          <td><span class="status-dot green"></span>22 images</td>
+          <td><span class="status-dot grey"></span>—</td>
+          <td><span class="status-dot green"></span>Active</td>
+        </tr>
+        <tr>
+          <td>OO-BRUSH-IVY-001</td>
+          <td>4-in-1 Magnetic Brush — Ivory</td>
+          <td>$65</td>
+          <td><span class="status-dot gold"></span>Pending</td>
+          <td><span class="status-dot grey"></span>—</td>
+          <td><span class="status-dot gold"></span>Pending</td>
+        </tr>
+        <tr>
+          <td>OO-SERUM-GLD-001</td>
+          <td>24K Gold Anti-Aging Serum</td>
+          <td>$89</td>
+          <td><span class="status-dot gold"></span>Pending</td>
+          <td><span class="status-dot green"></span>Live ✓</td>
+          <td><span class="status-dot gold"></span>Pending Images</td>
+        </tr>
+        <tr>
+          <td>OO-CLEAN-GLD-001</td>
+          <td>24K Gold Hydrating Glow Cleanser</td>
+          <td>$49</td>
+          <td><span class="status-dot green"></span>11 images</td>
+          <td><span class="status-dot grey"></span>—</td>
+          <td><span class="status-dot green"></span>Active</td>
+        </tr>
+        <tr>
+          <td><s>OO-BRUSH-PUR-001</s></td>
+          <td><s>4-in-1 Magnetic Brush — Purple</s></td>
+          <td>$65</td>
+          <td>—</td><td>—</td>
+          <td><span class="status-dot grey"></span>On Hold</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ══ IMAGES ══ -->
+    <div class="section" id="sec-images">
+      <div class="section-header">
+        <span class="section-eye">Content · images.orrisoak.com</span>
+        <div class="section-title">Product <em>Image Library</em></div>
+        <div class="section-sub">All images hosted on Cloudflare R2 · Global CDN</div>
+      </div>
+
+      <div class="section-eye" style="margin-bottom:12px;">🖤 Magnetic Brush — Black (22 images)</div>
+      <div class="img-grid" id="blackBrushGrid"></div>
+
+      <hr class="divider">
+
+      <div class="section-eye" style="margin-bottom:12px;">💧 24K Gold Glow Cleanser (11 images)</div>
+      <div class="img-grid" id="cleanserGrid"></div>
+
+      <hr class="divider">
+
+      <div class="section-eye" style="margin-bottom:12px;">🤍 Magnetic Brush — Ivory (Pending Upload)</div>
+      <div style="background:var(--s2);border:1px dashed var(--gold-border);padding:24px;text-align:center;color:var(--muted);font-size:9px;letter-spacing:3px;text-transform:uppercase;">
+        Images pending — run rename-upload-ivory.sh to upload
+      </div>
+
+      <hr class="divider">
+
+      <div class="section-eye" style="margin-bottom:12px;">✨ 24K Gold Anti-Aging Serum (Pending Upload)</div>
+      <div style="background:var(--s2);border:1px dashed var(--gold-border);padding:24px;text-align:center;color:var(--muted);font-size:9px;letter-spacing:3px;text-transform:uppercase;">
+        Images pending — run rename-upload-serum.sh to upload
+      </div>
+    </div>
+
+    <!-- ══ VIDEOS ══ -->
+    <div class="section" id="sec-videos">
+      <div class="section-header">
+        <span class="section-eye">Content · images.orrisoak.com/content/gold-serum/default/videos/</span>
+        <div class="section-title">Product <em>Videos</em></div>
+        <div class="section-sub">Video assets hosted on Cloudflare R2 · Ready for Meta ads and product pages</div>
+      </div>
+
+      <div class="meta-status">
+        <div class="meta-status-dot"></div>
+        <div class="meta-status-text">Gold Serum Videos — Live on R2</div>
+      </div>
+
+      <div class="video-grid" id="videoGrid"></div>
+
+      <hr class="divider">
+
+      <div class="section-eye" style="margin-bottom:12px;">Video CDN Base URL</div>
+      <div class="url-row">
+        <div class="url-text">https://images.orrisoak.com/content/gold-serum/default/videos/</div>
+        <button class="url-copy" onclick="copyText('https://images.orrisoak.com/content/gold-serum/default/videos/')">Copy</button>
+      </div>
+
+      <div class="section-eye" style="margin-top:24px;margin-bottom:12px;">Use Videos In</div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">📣</div>
+          <div class="card-title">Meta Video Ad</div>
+          <div class="card-desc">Use video URL directly in Meta Ads Manager as creative asset for video campaigns</div>
+          <div class="card-badge new">Gold Serum Campaign</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">📱</div>
+          <div class="card-title">Instagram Reel</div>
+          <div class="card-desc">Download video from R2 and post directly as an Instagram Reel</div>
+          <div class="card-badge">@orrisoakbeauty</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛍️</div>
+          <div class="card-title">Product Page</div>
+          <div class="card-desc">Embed video on orrisoak.com product page using the CDN URL</div>
+          <div class="card-badge">orrisoak.com</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- GITHUB SETUP -->
-  <div class="section-head">
-    <div class="section-eye">✦ GitHub Setup Guide</div>
-    <div class="section-line"></div>
-  </div>
-  <div class="github-section">
-    <div class="github-head">
-      <div class="github-title">Set Up Your Content Repository</div>
-      <button class="btn btn-outline" style="font-size:7px;padding:7px 14px;" onclick="window.open('https://github.com/new','_blank')">Create GitHub Repo →</button>
-    </div>
-    <div class="github-body">
+    <!-- ══ META ADS ══ -->
+    <div class="section" id="sec-meta">
+      <div class="section-header">
+        <span class="section-eye">Meta Ads · AI-Powered via Claude MCP</span>
+        <div class="section-title">Meta <em>Ad Manager</em></div>
+        <div class="section-sub">Connected to https://mcp.facebook.com/ads · Manage campaigns directly through Claude</div>
+      </div>
 
-      <div class="step-list">
-        <div class="step-item">
-          <div class="step-num">1</div>
-          <div class="step-body">
-            <div class="step-title">Create Private GitHub Repository</div>
-            <div class="step-text">Go to github.com → Click "New repository" → Name it <strong>orrisoak-content</strong> → Set to <strong>Private</strong> → Click "Create repository"</div>
+      <div class="meta-status">
+        <div class="meta-status-dot"></div>
+        <div class="meta-status-text">Meta MCP Connected · 5 Tools Active</div>
+      </div>
+
+      <div class="meta-panel">
+        <div class="meta-panel-title">Available Meta MCP Tools via Claude</div>
+        <div class="meta-panel-sub">These tools are active in Claude — just ask Claude directly to perform any of these actions</div>
+        <div class="meta-tools">
+          <div class="meta-tool">
+            <div class="meta-tool-icon">🚀</div>
+            <div>
+              <div class="meta-tool-name">Create Campaign</div>
+              <div class="meta-tool-desc">Launch new awareness, traffic, or conversion campaigns</div>
+            </div>
           </div>
-        </div>
-
-        <div class="step-item">
-          <div class="step-num">2</div>
-          <div class="step-body">
-            <div class="step-title">Install Git on Your Computer</div>
-            <div class="step-text">Download Git from git-scm.com and install. Then open Terminal (Mac) or Command Prompt (Windows).</div>
+          <div class="meta-tool">
+            <div class="meta-tool-icon">📊</div>
+            <div>
+              <div class="meta-tool-name">Get Ad Entities</div>
+              <div class="meta-tool-desc">View all campaigns, ad sets and ads with performance data</div>
+            </div>
           </div>
-        </div>
-
-        <div class="step-item">
-          <div class="step-num">3</div>
-          <div class="step-body">
-            <div class="step-title">Create the Folder Structure</div>
-            <div class="step-text">Run these commands in your terminal:</div>
-            <div class="code-block" id="code-structure">mkdir orrisoak-content
-cd orrisoak-content
-mkdir -p content/magnetic-brush/images
-mkdir -p content/magnetic-brush/videos
-mkdir -p content/magnetic-brush/captions
-mkdir -p content/magnetic-brush/ads
-mkdir -p content/gold-serum/images
-mkdir -p content/gold-serum/captions
-mkdir -p content/gold-serum/ads
-mkdir -p content/glow-cleanser/images
-mkdir -p content/glow-cleanser/captions
-mkdir -p content/glow-cleanser/ads
-mkdir -p content/brand/images
-mkdir -p content/brand/logos
-mkdir -p campaigns/pre-launch-april
-mkdir -p campaigns/launch-may1
-mkdir -p campaigns/mothers-day
-mkdir -p email/welcome-series
-mkdir -p email/mothers-day
-mkdir -p email/abandoned-cart
-mkdir -p social/instagram
-mkdir -p social/facebook
-mkdir -p tools</div>
-            <button class="copy-code" onclick="copyCode('code-structure')">Copy Commands</button>
+          <div class="meta-tool">
+            <div class="meta-tool-icon">✅</div>
+            <div>
+              <div class="meta-tool-name">Activate Entity</div>
+              <div class="meta-tool-desc">Publish and activate paused campaigns, ad sets or ads</div>
+            </div>
           </div>
-        </div>
-
-        <div class="step-item">
-          <div class="step-num">4</div>
-          <div class="step-body">
-            <div class="step-title">Add Your Tools to the Repo</div>
-            <div class="step-text">Copy all your Orrisoak HTML tools into the <strong>tools/</strong> folder. These will be version-controlled alongside your content.</div>
-            <div class="code-block">tools/
-├── automation-system.html
-├── content-agent.html
-├── meta-command-center.html
-├── outreach-agent.html
-└── studio-index.html  ← this file</div>
+          <div class="meta-tool">
+            <div class="meta-tool-icon">✏️</div>
+            <div>
+              <div class="meta-tool-name">Update Entity</div>
+              <div class="meta-tool-desc">Edit budgets, names, targeting and schedules</div>
+            </div>
           </div>
-        </div>
-
-        <div class="step-item">
-          <div class="step-num">5</div>
-          <div class="step-body">
-            <div class="step-title">Initialize Git and Push to GitHub</div>
-            <div class="step-text">Connect your local folder to GitHub:</div>
-            <div class="code-block" id="code-git">git init
-git add .
-git commit -m "Initial Orrisoak content structure"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/orrisoak-content.git
-git push -u origin main</div>
-            <button class="copy-code" onclick="copyCode('code-git')">Copy Commands</button>
-          </div>
-        </div>
-
-        <div class="step-item">
-          <div class="step-num">6</div>
-          <div class="step-body">
-            <div class="step-title">Daily Workflow — Save Your Content</div>
-            <div class="step-text">Every time you create new content or update a file, run these 3 commands to save it to GitHub:</div>
-            <div class="code-block" id="code-daily">git add .
-git commit -m "Add April 10 magnetic brush caption"
-git push</div>
-            <button class="copy-code" onclick="copyCode('code-daily')">Copy Commands</button>
+          <div class="meta-tool">
+            <div class="meta-tool-icon">📈</div>
+            <div>
+              <div class="meta-tool-name">Performance Trends</div>
+              <div class="meta-tool-desc">Analyze ROAS, CPC, CTR, CPM trends over time</div>
+            </div>
           </div>
         </div>
       </div>
 
-    </div>
-  </div>
+      <hr class="divider">
 
-  <!-- SUBDOMAIN SETUP -->
-  <div class="section-head">
-    <div class="section-eye">✦ Subdomain Setup · studio.orrisoak.com</div>
-    <div class="section-line"></div>
-  </div>
-  <div class="subdomain-grid">
-    <div class="sub-card">
-      <div class="sub-title">Step 1 · Cloudflare DNS</div>
-      <div class="sub-desc">Log in to Cloudflare → Select orrisoak.com → DNS → Add Record:</div>
-      <div class="code-block" id="code-dns" style="margin-top:10px;">Type:  CNAME
-Name:  studio
-Target: orrisoak.com
-Proxy: DNS Only (grey cloud ☁️)
-TTL:   Auto</div>
-      <button class="copy-code" onclick="copyCode('code-dns')">Copy</button>
-    </div>
-    <div class="sub-card">
-      <div class="sub-title">Step 2 · Hostinger File Upload</div>
-      <div class="sub-desc">Log in to Hostinger → File Manager → public_html → Create folder "studio" → Upload all your HTML tool files into it.</div>
-      <div class="code-block" style="margin-top:10px;">public_html/
-└── studio/
-    ├── index.html ← this file
-    ├── automation.html
-    ├── content-agent.html
-    ├── meta-command-center.html
-    └── outreach-agent.html</div>
-    </div>
-    <div class="sub-card">
-      <div class="sub-title">Step 3 · Cloudflare Access (Free Password)</div>
-      <div class="sub-desc">Cloudflare → Zero Trust → Access → Applications → Add Application → Self-hosted → Domain: studio.orrisoak.com → Add your email as allowed user → Save. Now only you can access it.</div>
-    </div>
-    <div class="sub-card">
-      <div class="sub-title">Step 4 · Test Your Studio</div>
-      <div class="sub-desc">Wait 5-10 minutes for DNS to propagate → Visit studio.orrisoak.com → You should see this password screen → Enter your password → Your studio loads.</div>
-      <div style="margin-top:14px;">
-        <button class="btn btn-gold" onclick="window.open('https://studio.orrisoak.com','_blank')">Test studio.orrisoak.com →</button>
+      <div class="section-eye" style="margin-bottom:12px;">Campaign Strategy</div>
+      <table class="table">
+        <tr><th>Campaign</th><th>Objective</th><th>Budget</th><th>Audience</th><th>Status</th></tr>
+        <tr>
+          <td>Magnetic Brush — Conversions</td>
+          <td>OUTCOME_SALES</td>
+          <td>$5/day</td>
+          <td>Women 22-45 · US</td>
+          <td><span class="status-dot gold"></span>Ready to Activate</td>
+        </tr>
+        <tr>
+          <td>Gold Serum — Awareness</td>
+          <td>OUTCOME_AWARENESS</td>
+          <td>$3/day</td>
+          <td>Women 35-60 · US</td>
+          <td><span class="status-dot gold"></span>Ready to Activate</td>
+        </tr>
+        <tr>
+          <td>Glow Cleanser — Traffic</td>
+          <td>OUTCOME_TRAFFIC</td>
+          <td>$2/day</td>
+          <td>Women 28-50 · US</td>
+          <td><span class="status-dot gold"></span>Ready to Activate</td>
+        </tr>
+      </table>
+
+      <div class="section-eye" style="margin-bottom:12px;">Ad Account Details</div>
+      <div class="url-row"><div class="url-text">Ad Account ID: act_1252129529887815</div><button class="url-copy" onclick="copyText('1252129529887815')">Copy ID</button></div>
+      <div class="url-row"><div class="url-text">Meta Page ID: 61587688695074</div><button class="url-copy" onclick="copyText('61587688695074')">Copy</button></div>
+      <div class="url-row"><div class="url-text">Instagram: @orrisoakbeauty</div><button class="url-copy" onclick="copyText('@orrisoakbeauty')">Copy</button></div>
+
+      <hr class="divider">
+
+      <div class="section-eye" style="margin-bottom:12px;">How to Use Claude for Meta Ads</div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">1️⃣</div>
+          <div class="card-title">Check Campaigns</div>
+          <div class="card-desc">Ask Claude: "Show me all my Meta campaigns and their status"</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">2️⃣</div>
+          <div class="card-title">Create Campaign</div>
+          <div class="card-desc">Ask Claude: "Create a new awareness campaign for the Gold Serum with $3/day budget"</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">3️⃣</div>
+          <div class="card-title">Check Performance</div>
+          <div class="card-desc">Ask Claude: "Show me my ROAS and CTR trends for last 7 days"</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">4️⃣</div>
+          <div class="card-title">Activate Campaign</div>
+          <div class="card-desc">Ask Claude: "Activate my Magnetic Brush conversion campaign"</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- PASSWORD CHANGE -->
-  <div class="section-head">
-    <div class="section-eye">✦ Studio Password</div>
-    <div class="section-line"></div>
-  </div>
-  <div style="background:#151515;border:1px solid rgba(201,168,76,0.35);padding:24px;margin-bottom:40px;">
-    <div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Change Studio Password</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
-      <div>
-        <label style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;">New Password</label>
-        <input type="password" id="newPass1" placeholder="Enter new password" style="width:100%;background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;padding:9px 12px;">
+    <!-- ══ TOOLS ══ -->
+    <div class="section" id="sec-tools">
+      <div class="section-header">
+        <span class="section-eye">Marketing Tools</span>
+        <div class="section-title">Studio <em>Toolkit</em></div>
+        <div class="section-sub">All tools built for Orris & Oak — open in a new tab</div>
       </div>
-      <div>
-        <label style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;">Confirm Password</label>
-        <input type="password" id="newPass2" placeholder="Confirm password" style="width:100%;background:var(--s3);border:1px solid var(--gold-border);color:var(--cream);font-family:'Josefin Sans',sans-serif;font-size:11px;padding:9px 12px;">
+      <div class="cards">
+        <a class="card" href="orrisoak-reel-builder.html" target="_blank">
+          <div class="card-icon">🎬</div>
+          <div class="card-title">Reel Builder</div>
+          <div class="card-desc">Upload image → animate → screen record as Instagram Reel. Fixed sequence, correct 3×3 grid.</div>
+          <div class="card-badge new">✦ Updated</div>
+        </a>
+        <a class="card" href="orrisoak-content-agent.html" target="_blank">
+          <div class="card-icon">✍️</div>
+          <div class="card-title">Content Agent</div>
+          <div class="card-desc">AI captions, Reels scripts, ad copy, email campaigns — all generated on demand</div>
+          <div class="card-badge">AI Powered</div>
+        </a>
+        <a class="card" href="orrisoak-outreach-agent.html" target="_blank">
+          <div class="card-icon">💌</div>
+          <div class="card-title">Influencer Outreach</div>
+          <div class="card-desc">DM generator, follow-up alerts and influencer pipeline tracker</div>
+          <div class="card-badge">5 DMs Sent</div>
+        </a>
+        <a class="card" href="orrisoak-meta-command-center.html" target="_blank">
+          <div class="card-icon">⚡</div>
+          <div class="card-title">Meta Command Center</div>
+          <div class="card-desc">Campaign builder, ad sets, targeting and creative management</div>
+          <div class="card-badge">3 Campaigns</div>
+        </a>
+        <a class="card" href="orrisoak-automation-system.html" target="_blank">
+          <div class="card-icon">🤖</div>
+          <div class="card-title">Automation System</div>
+          <div class="card-desc">Post scheduler, DM inbox, auto-responder and analytics dashboard</div>
+          <div class="card-badge">Live</div>
+        </a>
+        <a class="card" href="orrisoak-brush-reel-animation.html" target="_blank">
+          <div class="card-icon">🧲</div>
+          <div class="card-title">Brush Demo Animation</div>
+          <div class="card-desc">9-panel magnetic brush demo — base64 embedded, works offline</div>
+          <div class="card-badge">Screen Record</div>
+        </a>
       </div>
-      <button class="btn btn-gold" onclick="changePassword()">Update Password</button>
     </div>
-    <div style="font-size:9px;color:var(--muted);margin-top:10px;line-height:2;">Current password is saved in your browser. Share access by giving someone the URL + password. Never share your API keys.</div>
-  </div>
 
-</div><!-- /content -->
+    <!-- ══ CDN URLs ══ -->
+    <div class="section" id="sec-urls">
+      <div class="section-header">
+        <span class="section-eye">Cloudflare R2 · images.orrisoak.com</span>
+        <div class="section-title">CDN <em>URL Reference</em></div>
+        <div class="section-sub">Copy any URL to use in your website, ads or emails</div>
+      </div>
 
-<!-- FOOTER -->
-<div class="footer">
-  <div class="footer-logo">Orris<span>oak</span> Studio</div>
-  <div class="footer-text">studio.orrisoak.com · Private</div>
-  <div class="footer-text" id="footerTime"></div>
-</div>
+      <div class="section-eye" style="margin-bottom:12px;">Base URLs</div>
+      <div class="url-row"><div class="url-text">https://images.orrisoak.com/content/magnetic-brush/black/images/</div><button class="url-copy" onclick="copyText('https://images.orrisoak.com/content/magnetic-brush/black/images/')">Copy</button></div>
+      <div class="url-row"><div class="url-text">https://images.orrisoak.com/content/magnetic-brush/ivory/images/</div><button class="url-copy" onclick="copyText('https://images.orrisoak.com/content/magnetic-brush/ivory/images/')">Copy</button></div>
+      <div class="url-row"><div class="url-text">https://images.orrisoak.com/content/gold-serum/default/images/</div><button class="url-copy" onclick="copyText('https://images.orrisoak.com/content/gold-serum/default/images/')">Copy</button></div>
+      <div class="url-row"><div class="url-text">https://images.orrisoak.com/content/gold-serum/default/videos/</div><button class="url-copy" onclick="copyText('https://images.orrisoak.com/content/gold-serum/default/videos/')">Copy</button></div>
+      <div class="url-row"><div class="url-text">https://images.orrisoak.com/content/glow-cleanser/default/images/</div><button class="url-copy" onclick="copyText('https://images.orrisoak.com/content/glow-cleanser/default/images/')">Copy</button></div>
 
+      <hr class="divider">
+
+      <div class="section-eye" style="margin-bottom:12px;">Key Image URLs — Black Brush</div>
+      <div id="urlBlackBrush"></div>
+
+      <hr class="divider">
+
+      <div class="section-eye" style="margin-bottom:12px;">Key Image URLs — Glow Cleanser</div>
+      <div id="urlCleanser"></div>
+    </div>
+
+  </div><!-- /main -->
 </div><!-- /studio -->
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ── DEFAULT PASSWORD ──
-const DEFAULT_PASS = 'orrisoak2025';
-
 // ── AUTH ──
-function checkPass(){
-  const p = document.getElementById('gatePass').value;
-  const saved = localStorage.getItem('oo_studio_pass') || DEFAULT_PASS;
-  if(p === saved){
-    localStorage.setItem('oo_studio_auth', Date.now());
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('studio').style.display = 'block';
-    initStudio();
+const PW = 'orrisoak2025';
+function login() {
+  if (document.getElementById('pwInput').value === PW) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('studioWrap').style.display = 'block';
+    buildImageGrids();
+    buildVideoGrid();
+    buildUrlLists();
   } else {
-    document.getElementById('gateErr').style.display = 'block';
-    document.getElementById('gatePass').value = '';
+    document.getElementById('loginErr').style.display = 'block';
   }
 }
-function logout(){
-  localStorage.removeItem('oo_studio_auth');
-  document.getElementById('gate').style.display = 'flex';
-  document.getElementById('studio').style.display = 'none';
-  document.getElementById('gatePass').value = '';
-  document.getElementById('gateErr').style.display = 'none';
-}
-function changePassword(){
-  const p1 = document.getElementById('newPass1').value;
-  const p2 = document.getElementById('newPass2').value;
-  if(!p1){ toast('Enter a password'); return; }
-  if(p1 !== p2){ toast('Passwords do not match', 'red'); return; }
-  if(p1.length < 6){ toast('Password must be at least 6 characters', 'red'); return; }
-  localStorage.setItem('oo_studio_pass', p1);
-  document.getElementById('newPass1').value = '';
-  document.getElementById('newPass2').value = '';
-  toast('Password updated ✓', 'green');
-}
-// Auto-login if session fresh (24 hours)
-window.onload = () => {
-  const auth = localStorage.getItem('oo_studio_auth');
-  if(auth && Date.now() - parseInt(auth) < 86400000){
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('studio').style.display = 'block';
-    initStudio();
-  }
-};
-document.getElementById('gatePass').addEventListener('keydown', e => {
-  if(e.key === 'Enter') checkPass();
-});
-
-// ── INIT ──
-function initStudio(){
-  updateClock();
-  updateCountdown();
-  setInterval(updateClock, 1000);
-  setInterval(updateCountdown, 1000);
-  loadScheduledCount();
-  fmOpen('magnetic-brush', 'images');
+function logout() {
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('studioWrap').style.display = 'none';
+  document.getElementById('pwInput').value = '';
 }
 
-// ── CLOCK ──
-function updateClock(){
-  const now = new Date();
-  document.getElementById('headerDate').textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-  document.getElementById('footerTime').textContent = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-}
-
-// ── COUNTDOWN ──
-function updateCountdown(){
-  const launch = new Date('2026-05-01T09:00:00');
-  const now = new Date();
-  const diff = launch - now;
-  if(diff <= 0){
-    document.getElementById('cd-days').textContent = '🎉';
-    document.getElementById('launchCountdown').textContent = 'LAUNCH DAY!';
-    return;
-  }
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-  const mins = Math.floor((diff % 3600000) / 60000);
-  const secs = Math.floor((diff % 60000) / 1000);
-  document.getElementById('cd-days').textContent = days;
-  document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
-  document.getElementById('cd-mins').textContent = String(mins).padStart(2,'0');
-  document.getElementById('cd-secs').textContent = String(secs).padStart(2,'0');
-  document.getElementById('launchCountdown').textContent = days + ' days to launch';
-}
-
-// ── SCHEDULED COUNT ──
-function loadScheduledCount(){
-  const posts = JSON.parse(localStorage.getItem('oo_scheduled_posts') || '[]');
-  document.getElementById('h-posts').textContent = posts.length;
-}
-
-// ── TOOL NAVIGATION ──
-const toolMap = {
-  automation: 'orrisoak-automation-system.html',
-  content: 'orrisoak-content-agent.html',
-  meta: 'orrisoak-meta-command-center.html',
-  outreach: 'orrisoak-outreach-agent.html',
-  brand: 'orrisoak-brand-page.html',
-  shopify: 'orrisoak-shopify-theme-preview.html',
-  setup: 'orrisoak-setup-guide.html',
-  traffic: 'orrisoak-traffic-strategy.html',
-};
-function openTool(name){
-  if(toolMap[name]) window.open(toolMap[name], '_blank');
-}
-function nav(section){
-  if(section === 'files'){
-    document.getElementById('fileManager').scrollIntoView({behavior:'smooth'});
-  }
-}
-
-// ── FILE MANAGER ──
-let fmStorage = JSON.parse(localStorage.getItem('oo_fm_files') || '{}');
-
-function fmOpen(product, folder){
-  document.querySelectorAll('.fm-folder').forEach(f => f.classList.remove('active'));
-  event && event.target.closest('.fm-folder') && event.target.closest('.fm-folder').classList.add('active');
-  document.getElementById('fm-path').textContent = `${product} / ${folder}`;
-  document.getElementById('fm-breadcrumb').textContent = `${product} / ${folder}`;
-  const key = `${product}/${folder}`;
-  const files = fmStorage[key] || [];
-  const grid = document.getElementById('fmFiles');
-  if(!files.length){
-    grid.innerHTML = '<div class="fm-empty">No files yet — upload files using the button above</div>';
-    return;
-  }
-  grid.innerHTML = files.map((f,i) => `
-    <div class="fm-file">
-      <div class="fm-file-icon">${fmIcon(f.type)}</div>
-      <div class="fm-file-name">${f.name}</div>
-      <div style="font-size:7px;color:var(--muted);margin-top:4px;">${f.size}</div>
-      <button onclick="fmDelete('${key}',${i})" style="background:none;border:none;color:var(--red);font-size:9px;cursor:pointer;margin-top:4px;">Remove</button>
-    </div>`).join('');
-  window._currentFmKey = key;
-}
-function fmIcon(type){
-  if(type.startsWith('image')) return '🖼️';
-  if(type.startsWith('video')) return '🎬';
-  if(type.includes('text') || type.includes('html')) return '📝';
-  return '📄';
-}
-function fmUpload(input){
-  const key = window._currentFmKey || 'magnetic-brush/images';
-  if(!fmStorage[key]) fmStorage[key] = [];
-  Array.from(input.files).forEach(f => {
-    fmStorage[key].push({
-      name: f.name,
-      type: f.type,
-      size: (f.size/1024).toFixed(0) + ' KB',
-      date: new Date().toLocaleDateString()
-    });
+// ── TABS ──
+function showTab(id) {
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    const ids = ['dashboard','images','videos','meta','tools','urls'];
+    t.classList.toggle('active', ids[i] === id);
   });
-  localStorage.setItem('oo_fm_files', JSON.stringify(fmStorage));
-  // Re-open current folder
-  const [product, folder] = key.split('/');
-  fmOpen(product, folder);
-  toast(`${input.files.length} file(s) added ✓`, 'green');
-  input.value = '';
-}
-function fmDelete(key, idx){
-  fmStorage[key].splice(idx, 1);
-  localStorage.setItem('oo_fm_files', JSON.stringify(fmStorage));
-  const [product, folder] = key.split('/');
-  fmOpen(product, folder);
-  toast('File removed', 'red');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
 }
 
-// ── COPY CODE ──
-function copyCode(id){
-  navigator.clipboard.writeText(document.getElementById(id).innerText)
-    .then(() => toast('Copied ✓', 'green'))
-    .catch(() => toast('Copy failed'));
+// ── IMAGE DATA ──
+const BASE_BLACK = 'https://images.orrisoak.com/content/magnetic-brush/black/images/';
+const BASE_CLEAN = 'https://images.orrisoak.com/content/glow-cleanser/default/images/';
+const BASE_VID   = 'https://images.orrisoak.com/content/gold-serum/default/videos/';
+
+const BLACK_IMGS = [
+  'makeup-brush-set-orrisoak-noir-hero-01.png',
+  'makeup-brush-set-orrisoak-noir-hand-black-bg-01.png',
+  'makeup-brush-set-orrisoak-noir-case-dramatic-01.png',
+  'makeup-brush-set-orrisoak-noir-dramatic-gold-01.png',
+  'makeup-brush-set-orrisoak-noir-exploded-marble-01.png',
+  'makeup-brush-set-orrisoak-noir-hand-case-bg-01.png',
+  'makeup-brush-set-orrisoak-noir-case-dark-bg-01.png',
+  'makeup-brush-set-orrisoak-noir-case-white-bg-01.png',
+  'makeup-brush-set-orrisoak-noir-case-white-bg-02.png',
+  'makeup-brush-set-orrisoak-noir-fullset-white-bg-01.png',
+  'makeup-brush-set-orrisoak-noir-model-case-open-01.png',
+  'makeup-brush-set-orrisoak-noir-model-brush-sparkle-01.png',
+  'makeup-brush-set-orrisoak-noir-model-brush-sparkle-02.png',
+  'makeup-brush-set-orrisoak-noir-hand-4brushes-01.png',
+  'makeup-brush-set-orrisoak-noir-hand-case-open-01.png',
+  'makeup-brush-set-orrisoak-noir-model-case-smile-01.png',
+  'makeup-brush-set-orrisoak-noir-brush-case-hero-01.png',
+  'makeup-brush-set-orrisoak-noir-collage-models-01.png',
+  'makeup-brush-set-orrisoak-noir-collage-luxury-01.png',
+  'makeup-brush-set-orrisoak-noir-model-lifestyle-hero-01.png',
+  'makeup-brush-set-orrisoak-noir-model-vanity-applying-01.png',
+  'makeup-brush-set-orrisoak-noir-product-vanity-gold-01.png',
+];
+
+const CLEAN_IMGS = [
+  'gold-black-truffle-hydrating-glow-cleanser-hero-01.png',
+  'gold-black-truffle-hydrating-glow-cleanser-front-01.png',
+  'gold-black-truffle-hydrating-glow-cleanser-angle-01.jpg',
+  'gold-black-truffle-hydrating-glow-cleanser-model-foam-01.jpg',
+  'gold-black-truffle-hydrating-glow-cleanser-hands-foam-01.jpg',
+  'gold-black-truffle-hydrating-glow-cleanser-model-applying-01.jpg',
+  'gold-black-truffle-hydrating-glow-cleanser-dramatic-gold-01.jpg',
+  'gold-black-truffle-hydrating-glow-cleanser-model-green-bg-01.jpg',
+  'gold-black-truffle-hydrating-glow-cleanser-water-ripple-01.jpg',
+  'gold-black-truffle-hydrating-glow-cleanser-product-box-baroque-01.jpg',
+  'gold-black-truffle-hydrating-glow-cleanser-ingredient-truffle-01.jpg',
+];
+
+// Gold Serum videos — user has placed these in R2
+const SERUM_VIDEOS = [
+  'gold-serum-demo-01.mp4',
+  'gold-serum-lifestyle-01.mp4',
+  'gold-serum-texture-01.mp4',
+];
+
+function buildImageGrids() {
+  const bg = document.getElementById('blackBrushGrid');
+  BLACK_IMGS.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'img-item';
+    d.innerHTML = `<img src="${BASE_BLACK}${f}" loading="lazy" onerror="this.style.display='none'">
+      <div class="img-label">${f.replace('makeup-brush-set-orrisoak-noir-','').replace('.png','').replace(/-01$/,'')}</div>`;
+    d.onclick = () => copyText(BASE_BLACK + f);
+    bg.appendChild(d);
+  });
+
+  const cg = document.getElementById('cleanserGrid');
+  CLEAN_IMGS.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'img-item';
+    d.innerHTML = `<img src="${BASE_CLEAN}${f}" loading="lazy" onerror="this.style.display='none'">
+      <div class="img-label">${f.replace('gold-black-truffle-hydrating-glow-cleanser-','').replace(/\.(jpg|png)$/,'').replace(/-01$/,'')}</div>`;
+    d.onclick = () => copyText(BASE_CLEAN + f);
+    cg.appendChild(d);
+  });
 }
 
-// ── TOAST ──
-function toast(msg, type='gold'){
+function buildVideoGrid() {
+  const vg = document.getElementById('videoGrid');
+  SERUM_VIDEOS.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'video-item';
+    const url = BASE_VID + f;
+    d.innerHTML = `
+      <div class="video-thumb">🎬</div>
+      <div class="video-name">${f}</div>
+      <div class="video-url">${url}</div>
+      <button class="video-copy" onclick="copyText('${url}')">Copy URL</button>`;
+    vg.appendChild(d);
+  });
+}
+
+function buildUrlLists() {
+  const bb = document.getElementById('urlBlackBrush');
+  BLACK_IMGS.slice(0,8).forEach(f => {
+    const url = BASE_BLACK + f;
+    bb.innerHTML += `<div class="url-row"><div class="url-text">${url}</div><button class="url-copy" onclick="copyText('${url}')">Copy</button></div>`;
+  });
+  const cl = document.getElementById('urlCleanser');
+  CLEAN_IMGS.slice(0,6).forEach(f => {
+    const url = BASE_CLEAN + f;
+    cl.innerHTML += `<div class="url-row"><div class="url-text">${url}</div><button class="url-copy" onclick="copyText('${url}')">Copy</button></div>`;
+  });
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => toast('Copied ✓'));
+}
+
+function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast show' + (type==='green'?' green':'');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 </script>
 </body>
